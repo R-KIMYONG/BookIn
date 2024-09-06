@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 
 const fetchAladinDetailPage = async (isbn13: string) => {
-  const apiUrl = 'https://book-in-8th.vercel.app/';
+  // const apiUrl = 'http://localhost:3000/'
+  const apiUrl = 'https://book-in-two.vercel.app/';
   const response = await fetch(`${apiUrl}/api/AladinApi/${isbn13}`);
 
   if (!response.ok) {
@@ -17,12 +18,12 @@ const fetchAladinDetailPage = async (isbn13: string) => {
 const MainDetail = ({ params }: { params: { id: string } }) => {
   const { id: paramsId } = params;
 
-  const { data, error, isLoading } = useQuery({
+  const { data, error, isPending } = useQuery({
     queryKey: ['aladinDetailPage', paramsId],
     queryFn: () => fetchAladinDetailPage(paramsId),
     staleTime: 300000
   });
-  if (isLoading)
+  if (isPending)
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
@@ -33,7 +34,6 @@ const MainDetail = ({ params }: { params: { id: string } }) => {
     return <div className="flex justify-center items-center h-screen text-red-500">Error: {error.message}</div>;
 
   const items = data.item[0] || {};
-  console.log(items);
   return (
     <>
       <div className="w-[1280] container mx-auto">
