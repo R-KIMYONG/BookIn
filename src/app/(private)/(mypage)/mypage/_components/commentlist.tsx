@@ -28,7 +28,7 @@ const CommentList = ({ userInfo }: UserInfoPropsType): React.JSX.Element => {
         if (error) {
           throw error;
         }
-
+//
         const { count: total } = await supabase
           .from('comments')
           .select('*', { count: 'exact' })
