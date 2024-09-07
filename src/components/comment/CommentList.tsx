@@ -26,9 +26,9 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
-
+  console.log(comments);
   const offset: number = (page - 1) * pageSize;
-  const commentsToDisplay = comments!.slice(offset, offset + pageSize);
+  const commentsToDisplay = comments?.slice(offset, offset + pageSize);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const handleEdit = (comment: Tables<'comments'>) => {
@@ -95,7 +95,13 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
     setPage(page);
   };
 
-  if (isPending || !comments)
+  if (!comments)
+    return (
+      <div className="w-[100%] flex justify-center">
+        <Spinner />
+      </div>
+    );
+  if (isPending)
     return (
       <div className="w-[100%] flex justify-center">
         <Spinner />
