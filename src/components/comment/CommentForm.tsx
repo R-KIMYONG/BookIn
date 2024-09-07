@@ -28,7 +28,6 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
   const router = useRouter();
   const queryClient = useQueryClient();
   const { id: postId } = useParams<{ id: string }>();
-
   const handleChange = (value: string) => {
     if (!user) {
       if (confirm('로그인 후 이용 가능합니다. 로그인 하시겠습니까?')) {

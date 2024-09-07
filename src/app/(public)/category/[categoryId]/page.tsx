@@ -72,7 +72,6 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     window.history.pushState(null, '', `/category/${id}`);
     setSelectedTab(id.toString());
   };
-  console.log(data)
   return (
     <section className="max-w-7xl m-auto mt-6 flex">
       <nav

@@ -17,10 +17,10 @@ const useCommentQuery = ({ postId }: CommentQueryParams) => {
     error
   } = useQuery<Tables<'comments'>[], Error, Tables<'comments'>[]>({
     queryKey: ['comments', postId],
-    queryFn: () => fetchComments(postId)
+    queryFn: () => fetchComments(postId),
+    staleTime: 3000
   });
-  console.log(comments);
-  return { comments:[], isPending, error };
+  return { comments, isPending, error };
 };
 
 export default useCommentQuery;

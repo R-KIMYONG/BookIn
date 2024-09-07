@@ -29,8 +29,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
 
   const offset: number = (page - 1) * pageSize;
   const commentsToDisplay = comments?.slice(offset, offset + pageSize);
-
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const handleEdit = (comment: Tables<'comments'>) => {
     setEditingId(comment.id);
@@ -104,7 +103,6 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
     );
 
   const totalPages = Math.ceil(comments.length / 6);
-
   return (
     <div>
       <div className="flex gap-2 items-center my-4">
@@ -134,7 +132,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
                     <button className={`${buttonClass} bg-gray-500`} onClick={() => handleEdit(comment)}>
                       {isEdit && id === editingId ? '취소' : '수정'}
                     </button>
-                    <button className={`${buttonClass} bg-[#ad5f5f]`} onClick={() => handleDelete(id)}>
+                    <button className={`${buttonClass} bg-[#ad5f5f]`} onClick={() => handleDelete(id as string)}>
                       삭제
                     </button>
                   </div>

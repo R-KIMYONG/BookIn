@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const id = url.pathname.split('/').pop() || '';
-  console.log(url)
   const ttbKey = 'ttbright15321141655001';
   const apiUrl = `http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?ttbkey=${ttbKey}&itemIdType=ISBN&ItemId=${id}&output=js&Cover=Big&Version=20131101&OptResult=ebookList,usedList,reviewList`;
 
