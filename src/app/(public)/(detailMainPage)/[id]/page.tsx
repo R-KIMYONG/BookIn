@@ -6,7 +6,7 @@ import Image from 'next/image';
 const fetchAladinDetailPage = async (isbn13: string) => {
   // const apiUrl = 'http://localhost:3000/'
   const apiUrl = 'https://book-in-two.vercel.app/';
-  const response = await fetch(`${apiUrl}/api/AladinApi/${isbn13}`);
+  const response = await fetch(`/api/AladinApi/${isbn13}`);
 
   if (!response.ok) {
     throw new Error('Network response was not ok');

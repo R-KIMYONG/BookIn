@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "genTypes": "supabase gen types typescript --project-id blthjtndgzdzyqcvkdmm --schema public > src/types/supabase.ts"
+    "genTypes": "supabase gen types typescript --project-id bgzarwiwlgotrmaxmega --schema public > src/types/supabase.ts"
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.2",
@@ -27,11 +27,10 @@
     "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^5.2.1",
     "react-hot-toast": "^2.4.1",
+    "react-icons": "^5.2.1",
     "react-quill": "^2.0.0",
     "react-toastify": "^10.0.5",
-    "supabase": "^1.183.5",
     "uuidv4": "^6.2.13",
     "zustand": "^4.5.4"
   },
@@ -42,6 +41,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",
+    "supabase": "^1.191.3",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

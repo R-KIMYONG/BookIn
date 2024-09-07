@@ -72,12 +72,12 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     window.history.pushState(null, '', `/category/${id}`);
     setSelectedTab(id.toString());
   };
-
+  console.log(data)
   return (
     <section className="max-w-7xl m-auto mt-6 flex">
       <nav
         role="tablist"
-        className="border border-2 rounded-lg w-[200px] min-h-[400px] h-fit px-3 py-5 mr-7 flex flex-col items-center gap-4"
+        className="border-2 rounded-lg w-[200px] min-h-[400px] h-fit px-3 py-5 mr-7 flex flex-col items-center gap-4"
       >
         {genreData && (
           <p className="font-bold border-b pb-3 mb-1 w-[150px] text-center">
@@ -106,7 +106,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           {isPending
             ? Array.from({ length: 40 }).map((_, index) => <SkeletonItem key={index} />)
             : data?.item.map((item) => (
-                <Link key={item.isbn13} href={`https://book-in-two.vercel.app/${item.isbn13}`}>
+                <Link key={item.isbn13} href={`/${item.isbn13}`}>
                   <CategoryItem key={item.itemId} item={item} isForeign={genreData === foreignGenres} />
                 </Link>
               ))}

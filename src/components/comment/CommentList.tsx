@@ -30,7 +30,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
   const offset: number = (page - 1) * pageSize;
   const commentsToDisplay = comments?.slice(offset, offset + pageSize);
 
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const handleEdit = (comment: Tables<'comments'>) => {
     setEditingId(comment.id);

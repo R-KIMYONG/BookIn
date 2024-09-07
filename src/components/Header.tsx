@@ -147,12 +147,16 @@ export default function Header() {
                 <>
                   <NavbarItem>
                     <Link href="/login">
-                      <Button className="bg-white text-black font-semibold">로그인</Button>
+                      <Button className="bg-white text-black font-semibold">
+                        <p className='mt-1'>로그인</p>
+                      </Button>
                     </Link>
                   </NavbarItem>
                   <NavbarItem>
                     <Link href="/terms">
-                      <Button className="bg-black text-white font-semibold">회원가입</Button>
+                      <Button className="bg-black text-white font-semibold">
+                        <p className='mt-1'>회원가입</p>
+                      </Button>
                     </Link>
                   </NavbarItem>
                 </>

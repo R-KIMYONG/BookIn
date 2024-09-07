@@ -33,11 +33,11 @@ const Mypage = (): React.JSX.Element => {
           throw new Error('User data retrieval error');
         }
         const userData: UserInfoType = {
-          email: user.email,
-          nickname: user.nickname,
+          email: user.email || '',
+          nickname: user.nickname || '',
           id: user.id,
           created_at: user.created_at,
-          avatar: user.avatar
+          avatar: user.avatar || ''
         };
 
         return userData;
@@ -49,14 +49,14 @@ const Mypage = (): React.JSX.Element => {
       }
     }
   });
-  const updateAvatarImg = useMutation<unknown, Error, string, unknown>({
+  const updateAvatarImg = useMutation<string, Error, string, UserInfoType>({
     mutationFn: async (imgURL) => {
-      const { data: userData } = await supabase
-        .from('users')
-        .update({ avatar: imgURL })
-        .eq('id', userInfo?.id || '');
+      const { error } = await supabase.from('users').update({ avatar: imgURL }).eq('id', userInfo!.id);
 
-      return userData;
+      if (error) {
+        throw new Error(error.message);
+      }
+      return imgURL;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userInfo'] });
@@ -91,9 +91,11 @@ const Mypage = (): React.JSX.Element => {
           throw error;
         }
 
-        const imgURL = `https://blthjtndgzdzyqcvkdmm.supabase.co/storage/v1/object/public/avatars/${data.path}`;
+        const imgURL = `https://bgzarwiwlgotrmaxmega.supabase.co/storage/v1/object/public/avatars/${
+          data.path
+        }?ㅅ=${Date.now()}`;
 
-        updateAvatarImg.mutate(imgURL);
+        await updateAvatarImg.mutate(imgURL);
         toast.success('아바타 업로드 완료!', {
           position: 'top-right'
         });
@@ -135,8 +137,8 @@ const Mypage = (): React.JSX.Element => {
           <div className="w-20 h-20 rounded-full overflow-hidden mb-[10px] border-3 border-white">
             <Image
               src={userInfo.avatar || '/images/noImg.png'}
-              width={80}
-              height={80}
+              width={150}
+              height={150}
               alt="avatarImg"
               className="block w-[80px] h-[80px] object-cover"
               fetchPriority="high"

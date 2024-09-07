@@ -19,8 +19,8 @@ const useCommentQuery = ({ postId }: CommentQueryParams) => {
     queryKey: ['comments', postId],
     queryFn: () => fetchComments(postId)
   });
-
-  return { comments, isPending, error };
+  console.log(comments);
+  return { comments:[], isPending, error };
 };
 
 export default useCommentQuery;

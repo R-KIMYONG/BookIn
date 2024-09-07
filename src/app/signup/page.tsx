@@ -59,12 +59,24 @@ export default function SignupPage() {
         }
       }
     });
+    const userId = data.user?.id
+    if (userId) {
+      const { error: insertError } = await supabase.from('users').insert({
+        id: userId,
+        email: email,
+        nickname: nickname
+      });
 
+      if (insertError) {
+        return toast.error(`유저 정보 저장 중 오류: ${insertError.message}`);
+      }
+    }
+ 
     if (error) {
       setError(error.message);
     } else {
       toast.success('회원가입 성공!');
-      router.push('/');
+      router.push('/login');
     }
   };
 
