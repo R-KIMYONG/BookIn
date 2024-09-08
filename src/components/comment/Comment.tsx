@@ -57,7 +57,7 @@ const Comment = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="w-[1280px] container mx-auto p-4">
       <CommentList isEdit={isEdit} setIsEdit={setIsEdit} setTargetValue={setTargetValue} user={user} />
       <CommentForm
         isEdit={isEdit}
