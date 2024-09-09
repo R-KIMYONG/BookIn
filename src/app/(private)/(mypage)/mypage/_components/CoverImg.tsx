@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Card, Skeleton } from '@nextui-org/react';
-import Image from 'next/image';
+import { Card, Image, Skeleton } from '@nextui-org/react';
+// import Image from 'next/image';
 interface PostIdProps {
   postId: string;
 }
@@ -49,7 +49,7 @@ const CoverImg = ({ postId }: PostIdProps): JSX.Element => {
             src={coverImg || '/noImg.png'}
             width={30}
             height={30}
-            priority
+            // priority
           />
           <div className="bg-black/50 w-full h-full absolute top-0 left-0"></div>
         </div>
