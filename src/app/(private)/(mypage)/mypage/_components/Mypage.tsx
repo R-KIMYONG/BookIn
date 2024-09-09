@@ -8,8 +8,8 @@ import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/Supaba
 import { useRouter } from 'next/navigation';
 import { UserInfoType } from '@/types/userInfo.type';
 import { Spinner } from '@nextui-org/react';
-import CommentList from './commentlist';
-import UserInfo from './userInfo';
+import CommentList from './Commentlist';
+import UserInfo from './UserInfo';
 
 const Mypage = (): React.JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
