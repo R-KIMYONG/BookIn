@@ -8,3 +8,9 @@ body {
   font-family: 'Noto Sans KR', sans-serif !important;
   font-display: swap !important;
 }
+
+header > nav > header {
+  padding: 0px !important;
+  width: 100% !important;
+  max-width: 1280px !important;
+}

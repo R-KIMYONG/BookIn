@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToastContainer autoClose={1500} stacked draggable />
+        <ToastContainer autoClose={1000} stacked draggable />
         <QueryProvider>
           <NextUIProvider>
             <Header />

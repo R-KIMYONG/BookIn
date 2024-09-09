@@ -52,9 +52,9 @@ export default function Header() {
   };
 
   return (
-    <header>
-      <Navbar maxWidth="full" className="bg-main">
-        <NavbarContent className="hidden sm:flex gap-6 font-bold ml-[100px]" justify="start">
+    <header className="bg-main w-full">
+      <Navbar className="w-[1280px] mx-auto bg-main">
+        <NavbarContent className="hidden sm:flex  font-bold  justify-between">
           <NavbarItem>
             <Dropdown>
               <DropdownTrigger>
@@ -127,7 +127,7 @@ export default function Header() {
             </Link>
           </NavbarBrand>
         </NavbarContent>
-        <NavbarContent justify="end" className="mr-[100px]">
+        <NavbarContent justify="end" className="">
           {isLoggedIn !== null && (
             <>
               {isLoggedIn ? (
@@ -148,14 +148,14 @@ export default function Header() {
                   <NavbarItem>
                     <Link href="/login">
                       <Button className="bg-white text-black font-semibold">
-                        <p className='mt-1'>로그인</p>
+                        <p className="mt-1">로그인</p>
                       </Button>
                     </Link>
                   </NavbarItem>
                   <NavbarItem>
                     <Link href="/terms">
                       <Button className="bg-black text-white font-semibold">
-                        <p className='mt-1'>회원가입</p>
+                        <p className="mt-1">회원가입</p>
                       </Button>
                     </Link>
                   </NavbarItem>
