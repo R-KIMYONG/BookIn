@@ -102,7 +102,7 @@ const CommentList = ({ userInfo }: UserInfoPropsType): React.JSX.Element => {
           <div className="text-center">
             <p>댓글 남긴 기록이 없습니다.</p>
             <Link href="/">
-              <button className="mt-4 bg-[#af5858] text-white w-[60px] h-[30px] rounded-full text-xs font-bold hover:bg-opacity-80 transition rounded-full">
+              <button className="mt-4 bg-[#af5858] text-white w-[60px] h-[30px] rounded-full text-xs font-bold hover:bg-opacity-80 transition">
                 홈으로
               </button>
             </Link>
