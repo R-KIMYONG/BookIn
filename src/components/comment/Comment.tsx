@@ -45,7 +45,7 @@ const Comment = () => {
     post_id: postId,
     writer: 'fake_nickname',
     created_at: '',
-    user_id: user?.id
+    user_id: user.id
   });
 
   if (isLoading) {

@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['image.aladin.co.kr', 'bgzarwiwlgotrmaxmega.supabase.co'],
+    domains: ['image.aladin.co.kr', 'vshtzcektgnzzfgtstdy.supabase.co'],
     remotePatterns: [
       {
         protocol: 'https',

@@ -108,7 +108,6 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
     );
 
   const totalPages: number = comments && Array.isArray(comments) ? Math.ceil(comments.length / pageSize) : 1;
-  console.log(totalPages);
   return (
     <div>
       <div className="flex gap-2 items-center my-4">
@@ -117,6 +116,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
           <p className="text-[#AF5858]">{comments.length}</p>
         </div>
       </div>
+      
       {commentsToDisplay?.length === 0 ? (
         <div>No comments yet</div>
       ) : (
