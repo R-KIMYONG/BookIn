@@ -27,7 +27,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const offset: number = (page - 1) * pageSize;
-  const commentsToDisplay = comments?.slice(offset, offset + pageSize);
+  const commentsToDisplay = Array.isArray(comments) ? comments.slice(offset, offset + pageSize) : [];
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const handleEdit = (comment: Tables<'comments'>) => {
@@ -107,7 +107,8 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
       </div>
     );
 
-  const totalPages = Math.ceil(comments.length / 6);
+  const totalPages: number = comments && Array.isArray(comments) ? Math.ceil(comments.length / pageSize) : 1;
+  console.log(totalPages);
   return (
     <div>
       <div className="flex gap-2 items-center my-4">
@@ -149,6 +150,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
           })}
         </ul>
       )}
+
       <CommentPagination page={page} totalComments={totalPages} onPageChange={handlePageChange} />
     </div>
   );

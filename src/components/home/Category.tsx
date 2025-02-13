@@ -4,32 +4,43 @@ import { Navbar, NavbarContent, NavbarItem, Pagination } from '@nextui-org/react
 import CategoryItem from './CategoryItem';
 import { Book, Item } from '@/types/book.type';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SkeletonItem from './SkeletonItem';
 import Link from 'next/link';
 
 export default function Category() {
   const [queryType, setQueryType] = useState<string>('Bestseller');
   const [page, setPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  const {
-    data: bookItem,
-    isPending,
-    error
-  } = useQuery<Item[], Error>({
-    queryKey: ['books', queryType, page],
+  const { data: bookItem, isPending } = useQuery<Item[], Error>({
+    queryKey: ['books', queryType, page, itemsPerPage],
     queryFn: async ({ queryKey }) => {
       const queryType = queryKey[1];
       const page = queryKey[2];
-
-      const response: Response = await fetch(`/api/AladinApi?QueryType=${queryType}&page=${page}`);
+      const limit = queryKey[3];
+      console.log(limit);
+      const response: Response = await fetch(`/api/AladinApi?QueryType=${queryType}&page=${page}&limit=${limit}`);
       const data: Book = await response.json();
-      const item: Item[] = data.item;
 
-      return item;
+      return data.item;
     },
     staleTime: 30000
   });
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      const containerWidth = window.innerWidth;
+      const cardWidth = 200; // 카드의 최소 너비
+      const columns = Math.floor(containerWidth / cardWidth);
+      const rows = Math.floor(window.innerHeight / 300); // 카드의 높이로 줄 수 계산
+      setItemsPerPage(columns * rows);
+    };
+
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+  }, []);
 
   return (
     <section className="max-w-7xl m-auto">
@@ -77,9 +88,9 @@ export default function Category() {
           </NavbarItem>
         </NavbarContent>
       </Navbar>
-      <div className="gap-3 grid grid-cols-2 sm:grid-cols-5">
+      <div className="grid grid-flow-row auto-rows-auto grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
         {isPending
-          ? Array.from({ length: 10 }).map((_, index) => <SkeletonItem key={index} />)
+          ? Array.from({ length: itemsPerPage }).map((_, index) => <SkeletonItem key={index} />)
           : bookItem?.map((item) => (
               <Link key={item.isbn13} href={`/${item.isbn13}`}>
                 <CategoryItem key={item.itemId} item={item} />

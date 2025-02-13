@@ -13,7 +13,7 @@ const CommentPagination = ({ page, totalComments, onPageChange }: CommentPaginat
   };
 
   return (
-    <div className="mt-6 flex justify-center">
+    <div className={`mt-6 flex justify-center ${totalComments > 1 ? 'block' : 'invisible'}`}>
       <Pagination isCompact showControls total={totalComments} page={page} onChange={handleChange} />
     </div>
   );

@@ -24,7 +24,7 @@ export default function CategoryItem({ item, isForeign }: CategoryItemProps) {
 
   return (
     <Card shadow="sm" isPressable className="h-[500px]">
-      <CardBody className="overflow-visible p-0 m-auto w-[250px] h-[300px]">
+      <CardBody className="overflow-visible p-0 m-auto">
         <div className="w-full h-[300px]">
           <Image src={item.cover} alt="책 표지" width={200} height={200} className="w-full h-full" />
         </div>

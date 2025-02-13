@@ -73,7 +73,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     setSelectedTab(id.toString());
   };
   return (
-    <section className="max-w-7xl m-auto mt-6 flex">
+    <section className="max-w-7xl m-auto mt-6 flex px-10">
       <nav
         role="tablist"
         className="border-2 rounded-lg w-[200px] min-h-[400px] h-fit px-3 py-5 mr-7 flex flex-col items-center gap-4"
@@ -100,8 +100,8 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           </button>
         ))}
       </nav>
-      <div className="w-[1080px]">
-        <div className="gap-5 grid grid-cols-2 sm:grid-cols-4" style={{ rowGap: '30px' }}>
+      <div className="w-full">
+        <div className="grid grid-flow-row auto-rows-auto grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4" >
           {isPending
             ? Array.from({ length: 40 }).map((_, index) => <SkeletonItem key={index} />)
             : data?.item.map((item) => (

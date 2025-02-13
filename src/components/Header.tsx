@@ -53,7 +53,7 @@ export default function Header() {
 
   return (
     <header className="bg-main w-full">
-      <Navbar className="w-[1280px] mx-auto bg-main">
+      <Navbar className="w-full mx-auto bg-main px-10">
         <NavbarContent className="hidden sm:flex  font-bold  justify-between">
           <NavbarItem>
             <Dropdown>
