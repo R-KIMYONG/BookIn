@@ -14,6 +14,7 @@ import CommentList from './CommentList';
 const Mypage = (): React.JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const avatarImgRef = useRef<HTMLInputElement>(null);
+  const [localUserInfo, setLocalUserInfo] = useState<UserInfoType | null>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -58,7 +59,8 @@ const Mypage = (): React.JSX.Element => {
       }
       return imgURL;
     },
-    onSuccess: () => {
+    onSuccess: (updatedImgURL) => {
+      setLocalUserInfo((prevState) => (prevState ? { ...prevState, avatar: updatedImgURL } : null));
       queryClient.invalidateQueries({ queryKey: ['userInfo'] });
     }
   });
@@ -67,6 +69,7 @@ const Mypage = (): React.JSX.Element => {
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files!;
       const fileExtension = ['.jpg', '.jpeg', '.png', '.gif'];
+      const maxFileSize = 5 * 1024 * 1024;
       if (!files['0']) {
         toast.error('아바타 업로드 취소하셨습니다.', {
           position: 'top-right'
@@ -81,8 +84,16 @@ const Mypage = (): React.JSX.Element => {
         });
         return;
       }
+      if (files[0].size > maxFileSize) {
+        console.error('파일 용량이 초과되었습니다. 5MB 이하의 파일만 업로드 가능합니다.');
+        toast.error('파일 용량이 초과되었습니다. 5MB 이하의 파일만 업로드 가능합니다.', {
+          position: 'top-right'
+        });
+        return;
+      }
       try {
-        const { data, error } = await supabase.storage.from('avatars').upload(`avatar_${files[0].name}`, files[0], {
+        const sanitizedFileName = files[0].name.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+        const { data, error } = await supabase.storage.from('avatars').upload(`avatar_${sanitizedFileName}`, files[0], {
           cacheControl: '3600',
           upsert: true
         });
@@ -91,11 +102,11 @@ const Mypage = (): React.JSX.Element => {
           throw error;
         }
 
-        const imgURL = `https://bgzarwiwlgotrmaxmega.supabase.co/storage/v1/object/public/avatars/${
+        const imgURL = `https://vshtzcektgnzzfgtstdy.supabase.co/storage/v1/object/public/avatars/${
           data.path
-        }?ㅅ=${Date.now()}`;
+        }?t=${Date.now()}`;
 
-        await updateAvatarImg.mutate(imgURL);
+        updateAvatarImg.mutate(imgURL);
         toast.success('아바타 업로드 완료!', {
           position: 'top-right'
         });
@@ -136,7 +147,7 @@ const Mypage = (): React.JSX.Element => {
         <div className="bg-[#af5858] w-[250px] h-[670px] flex flex-col items-center justify-center rounded-tr-[50px]">
           <div className="w-20 h-20 rounded-full overflow-hidden mb-[10px] border-3 border-white">
             <Image
-              src={userInfo.avatar || '/images/noImg.png'}
+              src={localUserInfo?.avatar || userInfo?.avatar || '/images/noImg.png'}
               width={150}
               height={150}
               alt="avatarImg"

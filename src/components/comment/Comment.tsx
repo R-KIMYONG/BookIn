@@ -25,6 +25,15 @@ const Comment = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [targetValue, setTargetValue] = useState<TargetValue>({
+    id: '',
+    title: '',
+    content: '',
+    post_id: postId,
+    writer: 'fake_nickname',
+    created_at: '',
+    user_id: user?.id || ''
+  });
   useEffect(() => {
     async function getUser() {
       const supabase = createClient();
@@ -38,15 +47,14 @@ const Comment = () => {
     }
     getUser();
   }, []);
-  const [targetValue, setTargetValue] = useState<TargetValue>({
-    id: '',
-    title: '',
-    content: '',
-    post_id: postId,
-    writer: 'fake_nickname',
-    created_at: '',
-    user_id: user.id
-  });
+  useEffect(() => {
+    if (user) {
+      setTargetValue((prev) => ({
+        ...prev,
+        user_id: user.id
+      }));
+    }
+  }, [user]);
 
   if (isLoading) {
     return (
