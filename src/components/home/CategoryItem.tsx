@@ -4,39 +4,30 @@ import Image from 'next/image';
 
 interface CategoryItemProps {
   item: Item;
-  isForeign?: boolean | undefined;
 }
 
-const truncateText = (isForeign: boolean | undefined, text: string, maxLength: number): string => {
-  if (text.length <= maxLength) return text;
-  const newText: string = text.substring(0, maxLength);
-  if (isForeign) {
-    const englishCharCount: number = (newText.match(/[a-zA-Z]/g) || []).length;
-    if (englishCharCount > 10) return newText + text.substring(maxLength, maxLength + 8) + '...';
-    else return newText + '...';
-  } else return newText + '...';
-};
-
-export default function CategoryItem({ item, isForeign }: CategoryItemProps) {
-  const truncatedTitle: string = truncateText(isForeign, item.title, 18);
-  const truncatedDescription: string = truncateText(isForeign, item.description, 100);
-  const truncatedAuthor: string = truncateText(isForeign, item.author, 16);
-
+export default function CategoryItem({ item }: CategoryItemProps) {
   return (
-    <Card shadow="sm" isPressable className="h-[500px]">
-      <CardBody className="overflow-visible p-0 m-auto">
-        <div className="w-full h-[300px]">
-          <Image src={item.cover} alt="책 표지" width={200} height={200} className="w-full h-full" />
+    <Card shadow="md" isPressable className="w-full">
+      <CardBody className="p-0 group">
+        <div className="relative h-48 overflow-hidden rounded-t-lg bg-white ">
+          <Image
+            src={item.cover}
+            alt={`${item.title} 포스터`}
+            fill
+            className="object-contain transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 200px"
+            priority={false}
+          />
+        </div>
+        <div className="absolute inset-0 bg-black bg-opacity-70 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4 text-sm z-99 text-justify">
+          <p className="line-clamp-6">{item.description || '설명 없음'}</p>
         </div>
       </CardBody>
-      <CardFooter className="text-sm flex flex-col justify-start">
-        <b className="absolute h-[22px]">{truncatedTitle}</b>
-        <p className="mt-7 h-[130px]">{truncatedDescription || '설명 없음'}</p>
-        <div className="mt-2 flex justify-between w-full">
-          <div>
-            <p className="text-xs">저자: {truncatedAuthor}</p>
-          </div>
-        </div>
+      <CardFooter className="text-sm flex flex-col justify-start items-start gap-2 mt-2">
+        <h5 className="text-[12px] font-semibold leading-5 line-clamp-2 min-h-[2rem] text-justify">{item.title}</h5>
+
+        <p className="text-[10px] leading-5 line-clamp-2 min-h-[2rem]">저자: {item.author}</p>
       </CardFooter>
     </Card>
   );

@@ -6,10 +6,12 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'image.aladin.co.kr',
-        pathname: '/product/**'
-      }
-    ]
-  }
+        pathname: '/product/**',
+      },
+    ],
+  },
+  transpilePackages: ['@nextui-org/react', 'framer-motion'],
+  reactStrictMode: false,
 };
 
 export default nextConfig;

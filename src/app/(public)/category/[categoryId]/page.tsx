@@ -22,7 +22,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [genreData, setGenreData] = useState<Genre[] | null>(null);
+  const [genreData, setGenreData] = useState<Genre[]>([]);
   const [selectedTab, setSelectedTab] = useState<string>(categoryId.toString());
 
   const { koreanGenres, foreignGenres, ebookGenres } = useGenres();
@@ -41,7 +41,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       const item: Item[] = data.item;
 
       return { item, totalData };
-    }
+    },
   });
 
   useEffect(() => {
@@ -73,40 +73,47 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     setSelectedTab(id.toString());
   };
   return (
-    <section className="max-w-7xl m-auto mt-6 flex px-10">
+    <section className="max-w-7xl m-auto mt-6 flex flex-col px-10 gap-4">
+      {genreData && (
+        <p className="font-bold border-b text-center pb-3">
+          {genreData === koreanGenres
+            ? '국내도서'
+            : genreData === foreignGenres
+            ? '외국도서'
+            : genreData === ebookGenres
+            ? 'eBook'
+            : ''}
+        </p>
+      )}
       <nav
         role="tablist"
-        className="border-2 rounded-lg w-[200px] min-h-[400px] h-fit px-3 py-5 mr-7 flex flex-col items-center gap-4"
+        className="border rounded-lg px-3 w-fit h-fit py-3 flex gap-2 box-border flex-row items-start"
       >
-        {genreData && (
-          <p className="font-bold border-b pb-3 mb-1 w-[150px] text-center">
-            {genreData === koreanGenres
-              ? '국내도서'
-              : genreData === foreignGenres
-              ? '외국도서'
-              : genreData === ebookGenres
-              ? 'eBook'
-              : ''}
-          </p>
-        )}
-        {genreData?.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            onClick={() => handleTabClick(tab.id)}
-            className={clsx('block hover:font-bold', tab.id == Number(selectedTab) && 'font-bold')}
-          >
-            {tab.label}
-          </button>
-        ))}
+        <ul className="flex gap-2 w-fit flex-wrap">
+          {genreData?.map((tab) => (
+            <li
+              key={tab.id}
+              role="tab"
+              onClick={() => handleTabClick(tab.id)}
+              className={clsx(
+                'hover:font-bold transition-all duration-200 text-xs inline-flex cursor-pointer',
+                tab.id == Number(selectedTab) && 'font-bold'
+              )}
+            >
+              <p>{tab.label}</p>
+              {/* <p className="ml-2">|</p> */}
+              {tab.id !== genreData[genreData.length - 1]?.id && <p className="ml-2">|</p>}
+            </li>
+          ))}
+        </ul>
       </nav>
-      <div className="w-full">
-        <div className="grid grid-flow-row auto-rows-auto grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4" >
+      <div className="w-full flex-1">
+        <div className="grid grid-flow-row auto-rows-auto grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
           {isPending
             ? Array.from({ length: 40 }).map((_, index) => <SkeletonItem key={index} />)
             : data?.item.map((item) => (
                 <Link key={item.isbn13} href={`/${item.isbn13}`}>
-                  <CategoryItem key={item.itemId} item={item} isForeign={genreData === foreignGenres} />
+                  <CategoryItem key={item.itemId} item={item} />
                 </Link>
               ))}
         </div>

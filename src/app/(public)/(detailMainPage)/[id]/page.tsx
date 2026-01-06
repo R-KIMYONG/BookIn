@@ -18,7 +18,7 @@ const fetchAladinDetailPage = async (isbn13: string) => {
 
 const MainDetail = ({ params }: { params: { id: string } }) => {
   const { id: paramsId } = params;
-
+  console.log(paramsId)
   const { data, error, isPending } = useQuery({
     queryKey: ['aladinDetailPage', paramsId],
     queryFn: () => fetchAladinDetailPage(paramsId),
