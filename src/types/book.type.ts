@@ -39,3 +39,5 @@ export type Item = {
   bestRank?: number;
   subInfo: object;
 };
+
+export type SearchResult = Pick<Book, 'item' | 'totalResults'| 'itemsPerPage'>;

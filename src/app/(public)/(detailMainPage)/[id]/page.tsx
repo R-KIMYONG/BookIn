@@ -5,8 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const fetchAladinDetailPage = async (isbn13: string) => {
-  // const apiUrl = 'http://localhost:3000/'
-  const apiUrl = 'https://book-in-two.vercel.app/';
   const response = await fetch(`/api/AladinApi/${isbn13}`);
 
   if (!response.ok) {
@@ -18,11 +16,11 @@ const fetchAladinDetailPage = async (isbn13: string) => {
 
 const MainDetail = ({ params }: { params: { id: string } }) => {
   const { id: paramsId } = params;
-  console.log(paramsId)
+  console.log(paramsId);
   const { data, error, isPending } = useQuery({
     queryKey: ['aladinDetailPage', paramsId],
     queryFn: () => fetchAladinDetailPage(paramsId),
-    staleTime: 300000
+    staleTime: 300000,
   });
   if (isPending)
     return (

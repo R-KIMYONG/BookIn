@@ -10,7 +10,7 @@ export default function CategoryItem({ item }: CategoryItemProps) {
   return (
     <Card shadow="md" isPressable className="w-full">
       <CardBody className="p-0 group">
-        <div className="relative h-48 overflow-hidden rounded-t-lg bg-white ">
+        <div className="relative h-40 overflow-hidden rounded-t-lg bg-white ">
           <Image
             src={item.cover}
             alt={`${item.title} 포스터`}
@@ -20,14 +20,14 @@ export default function CategoryItem({ item }: CategoryItemProps) {
             priority={false}
           />
         </div>
-        <div className="absolute inset-0 bg-black bg-opacity-70 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4 text-sm z-99 text-justify">
+        <div className="absolute inset-0 bg-black bg-opacity-70 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4 text-sm z-99 text-start">
           <p className="line-clamp-6">{item.description || '설명 없음'}</p>
         </div>
       </CardBody>
       <CardFooter className="text-sm flex flex-col justify-start items-start gap-2 mt-2">
-        <h5 className="text-[12px] font-semibold leading-5 line-clamp-2 min-h-[2rem] text-justify">{item.title}</h5>
+        <h5 className="text-[12px] font-semibold leading-5 line-clamp-2 h-[40px] text-start">{item.title}</h5>
 
-        <p className="text-[10px] leading-5 line-clamp-2 min-h-[2rem]">저자: {item.author}</p>
+        <p className="text-[10px] leading-5 line-clamp-2 h-[40px] text-start">저자: {item.author}</p>
       </CardFooter>
     </Card>
   );

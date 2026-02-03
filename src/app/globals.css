@@ -14,3 +14,7 @@ header > nav > header {
   width: 100% !important;
   max-width: 80rem !important;
 }
+
+.searchInput > header {
+  padding: 0px !important;
+}

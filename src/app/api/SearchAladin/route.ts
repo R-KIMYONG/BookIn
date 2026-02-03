@@ -3,7 +3,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const keyword = searchParams.get('SearchKeyWord') ?? '';
     const page = Math.max(1, Number(searchParams.get('page') ?? '1')); // 1-based
-    const limitRaw = Number(searchParams.get('limit') ?? '10');
+    const limitRaw = Number(searchParams.get('limit') ?? '20');
     const limit = Math.min(Math.max(1, limitRaw), 50);    
 
   if (!keyword) {
@@ -12,12 +12,12 @@ export async function GET(request: NextRequest) {
 
    const apiUrl =
       `http://www.aladin.co.kr/ttb/api/ItemSearch.aspx` +
-      `?ttbkey=${process.env.NEXT_PUBLIC_ALADIN_TTB_KEY}` + // ← 가능하면 ALADIN_TTB_KEY로 바꾸세요
+      `?ttbkey=${process.env.NEXT_PUBLIC_ALADIN_TTB_KEY}` +
       `&Query=${encodeURIComponent(keyword)}` +
-      `&QueryType=Keyword` +            // 정확도 개선을 원하면 Keyword + 아래 Sort 권장
+      `&QueryType=Keyword` +            
       `&MaxResults=${limit}` +
       `&start=${page}` +
-      `&Sort=Accuracy` +                // 정확도 우선
+      `&Sort=Accuracy` +               
       `&SearchTarget=Book` +
       `&output=js` +
       `&Version=20131101`;

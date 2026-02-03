@@ -14,7 +14,7 @@ import {
   Navbar,
   NavbarBrand,
   NavbarContent,
-  NavbarItem
+  NavbarItem,
 } from '@nextui-org/react';
 import ButtonComponent from './ButtonComponent';
 import { useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ export default function Header() {
   useEffect(() => {
     const checkSession = async () => {
       const {
-        data: { session }
+        data: { session },
       } = await supabase.auth.getSession();
       setIsLoggedIn(session !== null);
     };
@@ -55,13 +55,13 @@ export default function Header() {
   const menus: { key: string; label: string; items?: Genre[] }[] = [
     { key: 'kr', label: '국내도서', items: koreanGenres },
     { key: 'fr', label: '외국도서', items: foreignGenres },
-    { key: 'eb', label: 'eBook', items: ebookGenres }
+    { key: 'eb', label: 'eBook', items: ebookGenres },
   ];
 
   return (
-    <header className="bg-main w-full">
-      <Navbar className="w-full mx-auto bg-main px-10">
-        <NavbarContent justify="start" className="hidden sm:flex  font-bold justify-between">
+    <header className="w-full">
+      <Navbar className="w-full mx-auto bg-main px-10 h-12">
+        <NavbarContent justify="start" className="font-bold justify-between">
           {menus.map(({ key, label, items }) => (
             <NavbarItem key={key}>
               <Dropdown>
@@ -84,7 +84,7 @@ export default function Header() {
             </NavbarItem>
           ))}
         </NavbarContent>
-        <NavbarContent justify="center">
+        <NavbarContent justify="center" className="hidden sm:flex">
           <NavbarBrand>
             <Link href="/">
               <svg width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
