@@ -1,12 +1,15 @@
 import { ButtonType } from '@/types/button.type';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-const ButtonComponent = ({ style, label, onClick }: ButtonType) => {
+type Props = ButtonType & React.ComponentPropsWithoutRef<'button'>;
+
+const ButtonComponent = forwardRef<HTMLButtonElement, Props>(({ style, label, onClick, ...props }, ref) => {
   return (
-    <button className={`${style} rounded-full`} onClick={onClick}>
+    <button ref={ref} type="button" className={style} onClick={onClick} {...props}>
       {label}
     </button>
   );
-};
+});
 
+ButtonComponent.displayName = 'ButtonComponent';
 export default ButtonComponent;
