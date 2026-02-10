@@ -3,9 +3,14 @@ import React, { forwardRef } from 'react';
 
 type Props = ButtonType & React.ComponentPropsWithoutRef<'button'>;
 
-const ButtonComponent = forwardRef<HTMLButtonElement, Props>(({ style, label, onClick, ...props }, ref) => {
+const ButtonComponent = forwardRef<HTMLButtonElement, Props>(({ style, label, type = 'button', ...props }, ref) => {
   return (
-    <button ref={ref} type="button" className={style} onClick={onClick} {...props}>
+    <button
+      ref={ref}
+      type={type}
+      className={`font-semibold text-xs px-2 py-1 rounded-md box-border hover:bg-gray-800 transition-colors ${style}`}
+      {...props}
+    >
       {label}
     </button>
   );

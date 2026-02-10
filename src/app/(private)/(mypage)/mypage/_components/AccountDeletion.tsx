@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from '@nextui-org/react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import ButtonComponent from '@/components/ButtonComponent';
 
 const AccountDeletion = ({ userInfo }: { userInfo: string }): React.JSX.Element => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -54,13 +55,7 @@ const AccountDeletion = ({ userInfo }: { userInfo: string }): React.JSX.Element 
           )}
         </ModalContent>
       </Modal>
-      <Button
-        onPress={onOpen}
-        className="bg-[#af5858] text-white w-[60px] h-[30px] rounded-full text-xs font-bold hover:bg-opacity-80 transition"
-        size="sm"
-      >
-        탈퇴
-      </Button>
+      <ButtonComponent type="button" label="탈퇴" style="bg-[#af5858] text-white" onClick={onOpen} />
     </>
   );
 };

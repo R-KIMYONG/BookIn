@@ -6,17 +6,17 @@ import Link from 'next/link';
 
 const fetchAladinDetailPage = async (isbn13: string) => {
   const response = await fetch(`/api/AladinApi/${isbn13}`);
+  const json = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    const msg = json?.message ?? json?.error ?? 'Network response was not ok';
+    throw new Error(msg);
   }
 
-  return response.json();
+  return json;
 };
-
 const MainDetail = ({ params }: { params: { id: string } }) => {
   const { id: paramsId } = params;
-  console.log(paramsId);
   const { data, error, isPending } = useQuery({
     queryKey: ['aladinDetailPage', paramsId],
     queryFn: () => fetchAladinDetailPage(paramsId),
@@ -31,8 +31,12 @@ const MainDetail = ({ params }: { params: { id: string } }) => {
     );
   if (error)
     return <div className="flex justify-center items-center h-screen text-red-500">Error: {error.message}</div>;
+  const rawItem = (data as any)?.item;
+  const items = Array.isArray(rawItem) ? rawItem[0] : null;
 
-  const items = data.item[0] || {};
+  if (!items) {
+    return <div className="flex justify-center items-center h-screen text-gray-600">책 정보를 찾을 수 없습니다.</div>;
+  }
   return (
     <>
       <div className="w-[1280px] container mx-auto">

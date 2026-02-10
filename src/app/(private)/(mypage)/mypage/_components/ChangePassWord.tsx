@@ -7,13 +7,14 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Input
+  Input,
 } from '@nextui-org/react';
 import { EyeFilledIcon } from './EyeFilledIcon';
 import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
 import { toast } from 'react-toastify';
 import { createClient } from '@/utils/supabase/client';
 import { AuthError } from '@supabase/supabase-js';
+import ButtonComponent from '@/components/ButtonComponent';
 
 const ChangePassWord = (): React.JSX.Element => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -22,26 +23,26 @@ const ChangePassWord = (): React.JSX.Element => {
     confirmPassword: boolean;
   }>({
     newPassword: false,
-    confirmPassword: false
+    confirmPassword: false,
   });
   const [changePassWord, setChangePassWord] = useState<{
     newChangePassWord: string;
     confirmChangePassWord: string;
   }>({
     newChangePassWord: '',
-    confirmChangePassWord: ''
+    confirmChangePassWord: '',
   });
   const supabase = createClient();
   const toggleVisibility = (item: keyof typeof visibility): void => {
     setVisibility((prev) => ({
       ...prev,
-      [item]: !prev[item]
+      [item]: !prev[item],
     }));
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setChangePassWord({
       ...changePassWord,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
   const passwordRegex = useMemo<RegExp>(() => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, []);
@@ -61,7 +62,7 @@ const ChangePassWord = (): React.JSX.Element => {
       }
       try {
         const { data, error } = await supabase.auth.updateUser({
-          password: changePassWord.newChangePassWord
+          password: changePassWord.newChangePassWord,
         });
         if (error) {
           throw error;
@@ -144,13 +145,7 @@ const ChangePassWord = (): React.JSX.Element => {
           )}
         </ModalContent>
       </Modal>
-      <Button
-        onPress={onOpen}
-        className="bg-[#af5858] text-white w-[60px] h-[30px] rounded-full text-xs font-bold"
-        size="sm"
-      >
-        변경
-      </Button>
+      <ButtonComponent type="button" label="변경" style="bg-[#af5858] text-white" onClick={onOpen} />
     </>
   );
 };
