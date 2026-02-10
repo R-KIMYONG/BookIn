@@ -136,14 +136,14 @@ export default function Header() {
               <>
                 <NavbarItem>
                   <ButtonComponent
-                    style="bg-white text-black font-semibold text-[0.6rem] px-2 py-0.5 rounded-md hover:bg-gray-200 transition-colors"
+                    style="bg-white text-black font-semibold text-xs px-2 py-1 rounded-md hover:bg-gray-200 transition-colors"
                     label="로그인"
                     onClick={() => router.push('/login')}
                   />
                 </NavbarItem>
                 <NavbarItem>
                   <ButtonComponent
-                    style="bg-black text-white font-semibold text-[0.6rem] px-2 py-0.5 rounded-md hover:bg-gray-800 transition-colors"
+                    style="bg-black text-white font-semibold text-xs px-2 py-1 rounded-md hover:bg-gray-800 transition-colors"
                     label="회원가입"
                     onClick={() => router.push('/terms')}
                   />

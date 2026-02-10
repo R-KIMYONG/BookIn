@@ -10,6 +10,7 @@ import { UserInfoType } from '@/types/userInfo.type';
 import { Spinner } from '@nextui-org/react';
 import UserInfo from './UserInfo';
 import CommentList from './CommentList';
+import ButtonComponent from '@/components/ButtonComponent';
 
 const Mypage = (): React.JSX.Element => {
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -21,12 +22,12 @@ const Mypage = (): React.JSX.Element => {
   const {
     data: userInfo,
     isPending,
-    isError
+    isError,
   } = useQuery<UserInfoType, Error, UserInfoType, string[]>({
     queryKey: ['userInfo'],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase.auth.getUser();
+        const { data } = await supabase.auth.getUser();
         const userId = data.user?.id as string;
         const { data: user, error: userError } = await supabase.from('users').select('*').eq('id', userId).single();
 
@@ -38,7 +39,7 @@ const Mypage = (): React.JSX.Element => {
           nickname: user.nickname || '',
           id: user.id,
           created_at: user.created_at,
-          avatar: user.avatar || ''
+          avatar: user.avatar || '',
         };
 
         return userData;
@@ -48,7 +49,7 @@ const Mypage = (): React.JSX.Element => {
         }
         throw new Error('예상치못한 에러 발생 from getUser함수부분');
       }
-    }
+    },
   });
   const updateAvatarImg = useMutation<string, Error, string, UserInfoType>({
     mutationFn: async (imgURL) => {
@@ -62,7 +63,7 @@ const Mypage = (): React.JSX.Element => {
     onSuccess: (updatedImgURL) => {
       setLocalUserInfo((prevState) => (prevState ? { ...prevState, avatar: updatedImgURL } : null));
       queryClient.invalidateQueries({ queryKey: ['userInfo'] });
-    }
+    },
   });
 
   const handleAvatarUpload = useCallback(
@@ -72,7 +73,7 @@ const Mypage = (): React.JSX.Element => {
       const maxFileSize = 5 * 1024 * 1024;
       if (!files['0']) {
         toast.error('아바타 업로드 취소하셨습니다.', {
-          position: 'top-right'
+          position: 'top-right',
         });
         return;
       }
@@ -80,14 +81,14 @@ const Mypage = (): React.JSX.Element => {
       if (!fileExtension.includes(`.${userUploadfileExtension}`)) {
         console.error('지원하지 않는 파일 형식입니다. JPG, JPEG, PNG, GIF 파일만 업로드 가능합니다.');
         toast.error('지원하지 않는 파일 형식입니다. JPG, JPEG, PNG, GIF 파일만 업로드 가능합니다.', {
-          position: 'top-right'
+          position: 'top-right',
         });
         return;
       }
       if (files[0].size > maxFileSize) {
         console.error('파일 용량이 초과되었습니다. 5MB 이하의 파일만 업로드 가능합니다.');
         toast.error('파일 용량이 초과되었습니다. 5MB 이하의 파일만 업로드 가능합니다.', {
-          position: 'top-right'
+          position: 'top-right',
         });
         return;
       }
@@ -95,7 +96,7 @@ const Mypage = (): React.JSX.Element => {
         const sanitizedFileName = files[0].name.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
         const { data, error } = await supabase.storage.from('avatars').upload(`avatar_${sanitizedFileName}`, files[0], {
           cacheControl: '3600',
-          upsert: true
+          upsert: true,
         });
 
         if (error) {
@@ -108,12 +109,12 @@ const Mypage = (): React.JSX.Element => {
 
         updateAvatarImg.mutate(imgURL);
         toast.success('아바타 업로드 완료!', {
-          position: 'top-right'
+          position: 'top-right',
         });
       } catch (error) {
         console.error('파일 업로드 또는 데이터 저장 중 에러 발생:');
         toast.error('파일 업로드 또는 데이터 저장 중 에러 발생', {
-          position: 'top-right'
+          position: 'top-right',
         });
       }
     },
@@ -125,13 +126,13 @@ const Mypage = (): React.JSX.Element => {
     router.push('/');
   }, [router, supabase.auth]);
 
-  const taps = [
+  const profileTabs = [
     { label: '회원정보', content: userInfo ? <UserInfo userInfo={userInfo} /> : null },
-    { label: '댓글목록', content: userInfo ? <CommentList userInfo={userInfo} /> : null }
+    { label: '댓글목록', content: userInfo ? <CommentList userInfo={userInfo} /> : null },
   ];
   useEffect(() => {
     const checkSession = async (): Promise<void> => {
-      const { data, error } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push('/login');
       }
@@ -143,29 +144,26 @@ const Mypage = (): React.JSX.Element => {
   if (isError) return <div>Error</div>;
   return (
     <>
-      <div className="flex justify-between sm:w-[1280px] mx-auto items-end">
-        <div className="bg-[#af5858] w-[250px] h-[670px] flex flex-col items-center justify-center rounded-tr-[50px]">
-          <div className="w-20 h-20 rounded-full overflow-hidden mb-[10px] border-3 border-white">
+      <div className="flex justify-between gap-4 sm:w-full mx-auto items-stretch min-h-[calc(100vh-3rem)]">
+        <div className="bg-[#af5858] w-1/6 self-stretch flex flex-col items-center justify-center text-xs gap-5">
+          <div className="relative aspect-square w-14 sm:w-16 md:w-20 lg:w-24 overflow-hidden box-border">
             <Image
               src={localUserInfo?.avatar || userInfo?.avatar || '/images/noImg.png'}
-              width={150}
-              height={150}
               alt="avatarImg"
-              className="block w-[80px] h-[80px] object-cover"
-              fetchPriority="high"
-              decoding="async"
+              className="object-cover"
               priority
+              fill
             />
           </div>
           <div>
-            <label
-              htmlFor="avatarImgUpload"
-              className="text-base text-[#af5858] font-bold text-center mt-[30px] w-[80px] h-[30px] mb-[30px] bg-white rounded-full cursor-pointer flex items-center justify-center"
-            >
-              업로드
-            </label>
+            <ButtonComponent
+              type="button"
+              label="업로드"
+              style="bg-white text-[#af5858]"
+              onClick={() => avatarImgRef.current?.click()}
+            />
+
             <input
-              id="avatarImgUpload"
               ref={avatarImgRef}
               type="file"
               className="hidden"
@@ -173,14 +171,16 @@ const Mypage = (): React.JSX.Element => {
               onChange={handleAvatarUpload}
             />
           </div>
-          <h3 className="text-white text-xl font-bold">환영합니다.</h3>
-          <p className="text-white text-xl font-bold mb-[30px]">{userInfo.nickname}님</p>
+          <div className="text-center text-white font-bold">
+            <h3>환영합니다.</h3>
+            <p>{userInfo.nickname}님</p>
+          </div>
           <nav className="w-full">
             <ul className="w-full">
-              {taps.map((tap, index) => (
+              {profileTabs.map((tap, index) => (
                 <li key={index} className="text-center w-full">
                   <button
-                    className={`text-white w-full text-xl p-4 font-bold transition ${
+                    className={`text-white w-full p-4 font-bold box-border transition ${
                       activeTab === index ? 'bg-[#783A3A]' : 'bg-[#af5858]'
                     }`}
                     onClick={() => setActiveTab(index)}
@@ -191,13 +191,11 @@ const Mypage = (): React.JSX.Element => {
               ))}
             </ul>
           </nav>
-          <form action={handleLogout}>
-            <button className="text-base text-[#af5858] font-bold text-center mt-[30px] w-[80px] h-[30px] rounded-full  bg-white">
-              로그아웃
-            </button>
-          </form>
+          <ButtonComponent type='button' label="로그아웃" style="bg-white text-[#af5858]" onClick={handleLogout} />
         </div>
-        <div className="w-3/4 h-[600px] flex flex-col justify-between">{taps[activeTab].content}</div>
+        <div className="w-5/6 self-stretch flex flex-col justify-between">
+          <div className="flex-1 min-h-0">{profileTabs[activeTab].content}</div>
+        </div>
       </div>
     </>
   );
