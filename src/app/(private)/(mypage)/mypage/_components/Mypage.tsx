@@ -7,7 +7,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 import { useRouter } from 'next/navigation';
 import { UserInfoType } from '@/types/userInfo.type';
-import { Spinner } from '@nextui-org/react';
 import UserInfo from './UserInfo';
 import CommentList from './CommentList';
 import ButtonComponent from '@/components/ButtonComponent';
@@ -19,10 +18,11 @@ const Mypage = (): React.JSX.Element => {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const router = useRouter();
+
   const {
     data: userInfo,
-    isPending,
     isError,
+    error,
   } = useQuery<UserInfoType, Error, UserInfoType, string[]>({
     queryKey: ['userInfo'],
     queryFn: async () => {
@@ -50,6 +50,7 @@ const Mypage = (): React.JSX.Element => {
         throw new Error('예상치못한 에러 발생 from getUser함수부분');
       }
     },
+    throwOnError: true,
   });
   const updateAvatarImg = useMutation<string, Error, string, UserInfoType>({
     mutationFn: async (imgURL) => {
@@ -130,6 +131,7 @@ const Mypage = (): React.JSX.Element => {
     { label: '회원정보', content: userInfo ? <UserInfo userInfo={userInfo} /> : null },
     { label: '댓글목록', content: userInfo ? <CommentList userInfo={userInfo} /> : null },
   ];
+
   useEffect(() => {
     const checkSession = async (): Promise<void> => {
       const { data } = await supabase.auth.getSession();
@@ -140,8 +142,7 @@ const Mypage = (): React.JSX.Element => {
 
     checkSession();
   }, [router, supabase.auth]);
-  if (isPending) return <Spinner className="w-full h-[670px] mx-auto" />;
-  if (isError) return <div>Error</div>;
+  if (isError) throw error;
   return (
     <>
       <div className="flex justify-between gap-4 sm:w-full mx-auto items-stretch min-h-[calc(100vh-3rem)]">
@@ -159,7 +160,8 @@ const Mypage = (): React.JSX.Element => {
             <ButtonComponent
               type="button"
               label="업로드"
-              style="bg-white text-[#af5858]"
+              variant="outline"
+              size="xs"
               onClick={() => avatarImgRef.current?.click()}
             />
 
@@ -173,25 +175,26 @@ const Mypage = (): React.JSX.Element => {
           </div>
           <div className="text-center text-white font-bold">
             <h3>환영합니다.</h3>
-            <p>{userInfo.nickname}님</p>
+            <p>{userInfo?.nickname}님</p>
           </div>
           <nav className="w-full">
             <ul className="w-full">
               {profileTabs.map((tap, index) => (
                 <li key={index} className="text-center w-full">
-                  <button
-                    className={`text-white w-full p-4 font-bold box-border transition ${
-                      activeTab === index ? 'bg-[#783A3A]' : 'bg-[#af5858]'
-                    }`}
+                  <ButtonComponent
+                    className={`!text-white ${activeTab === index ? '!bg-[#783A3A]' : '!bg-[#af5858]'}`}
+                    size="md"
+                    fullWidth={true}
+                    variant="ghost"
                     onClick={() => setActiveTab(index)}
                   >
                     {tap.label}
-                  </button>
+                  </ButtonComponent>
                 </li>
               ))}
             </ul>
           </nav>
-          <ButtonComponent type='button' label="로그아웃" style="bg-white text-[#af5858]" onClick={handleLogout} />
+          <ButtonComponent type="button" label="로그아웃" variant="outline" size="xs" onClick={handleLogout} />
         </div>
         <div className="w-5/6 self-stretch flex flex-col justify-between">
           <div className="flex-1 min-h-0">{profileTabs[activeTab].content}</div>

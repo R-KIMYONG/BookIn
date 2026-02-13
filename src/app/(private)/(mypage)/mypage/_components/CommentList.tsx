@@ -15,7 +15,7 @@ const CommentList = ({ userInfo }: UserInfoPropsType): React.JSX.Element => {
   const {
     data: myCommentslist,
     isPending,
-    isError
+    isError,
   } = useQuery<Mycommentlist, Error, Mycommentlist, [string, number]>({
     queryKey: ['myComments', currentPage],
     queryFn: async () => {
@@ -42,7 +42,7 @@ const CommentList = ({ userInfo }: UserInfoPropsType): React.JSX.Element => {
         throw error;
       }
     },
-    enabled: !!userInfo.id
+    enabled: !!userInfo.id,
   });
   const totalPages: number = Math.ceil(Number(myCommentslist?.total) / pageSize) || 1;
 
@@ -101,10 +101,11 @@ const CommentList = ({ userInfo }: UserInfoPropsType): React.JSX.Element => {
         <div className="flex justify-center items-center h-screen">
           <div className="text-center">
             <p>댓글 남긴 기록이 없습니다.</p>
-            <Link href="/">
-              <button className="mt-4 bg-[#af5858] text-white w-[60px] h-[30px] rounded-full text-xs font-bold hover:bg-opacity-80 transition">
-                홈으로
-              </button>
+            <Link
+              href="/"
+              className="mt-4 inline-flex items-center justify-center bg-[#af5858] text-white w-[60px] h-[30px] rounded-full text-xs font-bold hover:bg-opacity-80 transition"
+            >
+              홈으로
             </Link>
           </div>
         </div>

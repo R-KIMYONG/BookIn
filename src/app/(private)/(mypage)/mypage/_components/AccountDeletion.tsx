@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import ButtonComponent from '@/components/ButtonComponent';
 
-const AccountDeletion = ({ userInfo }: { userInfo: string }): React.JSX.Element => {
+const AccountDeletion = (): React.JSX.Element => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const supabase = createClient();
   const router = useRouter();
@@ -18,12 +18,15 @@ const AccountDeletion = ({ userInfo }: { userInfo: string }): React.JSX.Element 
   }, [supabase, router]);
 
   const deleteUser = async () => {
-    const user_id = userInfo;
     try {
-      const { data, error } = await supabase.rpc('delete_user', { user_id });
-      if (error) {
-        throw error;
-      }
+      const deleteResponse = await fetch('/api/auth/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const deleteResult = await deleteResponse.json();
+
+      if (!deleteResponse.ok) throw new Error(deleteResult?.error ?? '탈퇴실패');
+
       onClose();
       await deleteUserLogout();
     } catch (error) {
@@ -55,7 +58,7 @@ const AccountDeletion = ({ userInfo }: { userInfo: string }): React.JSX.Element 
           )}
         </ModalContent>
       </Modal>
-      <ButtonComponent type="button" label="탈퇴" style="bg-[#af5858] text-white" onClick={onOpen} />
+      <ButtonComponent type="button" label="탈퇴" variant="danger" size="xs" onClick={onOpen} />
     </>
   );
 };

@@ -56,7 +56,7 @@ const UserInfo = ({ userInfo }: UserInfoPropsType) => {
           <p className="text-[8px] text-default-500 mt-1">회원탈퇴는 되돌릴 수 없습니다.</p>
           <span className="text-[8px] text-default-500">계정 및 관련 데이터가 삭제될 수 있어요.</span>
         </div>
-        <AccountDeletion userInfo={userInfo.id} />
+        <AccountDeletion />
       </div>
     </div>
   );

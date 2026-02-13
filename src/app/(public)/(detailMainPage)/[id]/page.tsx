@@ -1,10 +1,10 @@
 'use client';
 import Comment from '@/components/comment/Comment';
+import { Book } from '@/types/book.type';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import Link from 'next/link';
 
-const fetchAladinDetailPage = async (isbn13: string) => {
+const fetchAladinDetailPage = async (isbn13: string): Promise<Book> => {
   const response = await fetch(`/api/AladinApi/${isbn13}`);
   const json = await response.json().catch(() => null);
 
@@ -13,11 +13,11 @@ const fetchAladinDetailPage = async (isbn13: string) => {
     throw new Error(msg);
   }
 
-  return json;
+  return json as Book;
 };
 const MainDetail = ({ params }: { params: { id: string } }) => {
   const { id: paramsId } = params;
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending } = useQuery<Book>({
     queryKey: ['aladinDetailPage', paramsId],
     queryFn: () => fetchAladinDetailPage(paramsId),
     staleTime: 300000,
@@ -31,12 +31,17 @@ const MainDetail = ({ params }: { params: { id: string } }) => {
     );
   if (error)
     return <div className="flex justify-center items-center h-screen text-red-500">Error: {error.message}</div>;
-  const rawItem = (data as any)?.item;
-  const items = Array.isArray(rawItem) ? rawItem[0] : null;
+  const items = data?.item?.[0];
 
   if (!items) {
     return <div className="flex justify-center items-center h-screen text-gray-600">책 정보를 찾을 수 없습니다.</div>;
   }
+  const standard = Number(items.priceStandard ?? 0);
+  const sales = Number(items.priceSales ?? 0);
+  const hasSale = standard > 0 && sales > 0 && sales < standard;
+
+  const discountRate = hasSale ? Math.round(((standard - sales) / standard) * 100) : 0;
+
   return (
     <>
       <div className="w-[1280px] container mx-auto">
@@ -46,7 +51,7 @@ const MainDetail = ({ params }: { params: { id: string } }) => {
             <Image
               src={items.cover}
               alt={items.title}
-              className="rounded-lg shadow-md transform transition duration-200 hover:scale-102"
+              className="rounded-lg shadow-md object-cover transition duration-200 hover:scale-[1.02]"
               height={500}
               width={500}
               objectFit="cover"
@@ -77,12 +82,27 @@ const MainDetail = ({ params }: { params: { id: string } }) => {
               </p>
             </div>
 
-            <Link href={items.link} target="_blank" className="mt-6">
-              <p className="text-2xl font-semibold mb-4">{items.priceStandard.toLocaleString()}원</p>
-              <button className="w-full bg-[#AF5858] text-white px-6 py-3 rounded-lg shadow-md transform transition duration-500 hover:scale-105 hover:bg-[#AF5858]">
-                구매 바로가기
-              </button>
-            </Link>
+            <div className="mb-4">
+              {hasSale ? (
+                <div className="flex items-end gap-3">
+                  <p className="text-sm text-gray-400 line-through">{standard.toLocaleString()}원</p>
+
+                  <p className="text-2xl font-semibold">{sales.toLocaleString()}원</p>
+
+                  <p className="text-sm font-semibold text-red-600">{discountRate}%</p>
+                </div>
+              ) : (
+                <p className="text-2xl font-semibold">{standard.toLocaleString()}원</p>
+              )}
+            </div>
+            <a
+              href={items.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 w-full px-6 py-3 rounded-lg shadow-md bg-[#af5858] text-white hover:bg-[#8f4646] text-center transition-colors block"
+            >
+              구매 바로가기
+            </a>
           </div>
         </div>
       </div>
