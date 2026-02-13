@@ -20,31 +20,13 @@ import ButtonComponent from './ButtonComponent';
 import { useEffect, useState } from 'react';
 import { Genre } from '@/types/genre.type';
 
-export default function Header() {
+export default function Header({ initialIsLoggedIn }: { initialIsLoggedIn: boolean }) {
   const { koreanGenres, foreignGenres, ebookGenres } = useGenres();
 
   const supabase = createClient();
   const router = useRouter();
 
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // 초기값을 null로 설정하여 로딩 상태를 구분
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setIsLoggedIn(session !== null);
-    };
-    checkSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-      setIsLoggedIn(session !== null);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(initialIsLoggedIn); // 초기값을 null로 설정하여 로딩 상태를 구분
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -52,7 +34,30 @@ export default function Header() {
     router.push('/');
   };
 
-  const menus: { key: string; label: string; items?: Genre[] }[] = [
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => authListener.subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  useEffect(() => {
+    setIsLoggedIn(initialIsLoggedIn);
+  }, [initialIsLoggedIn]);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+
+    checkSession();
+  }, []);
+
+  const categoryGroups: { key: string; label: string; items?: Genre[] }[] = [
     { key: 'kr', label: '국내도서', items: koreanGenres },
     { key: 'fr', label: '외국도서', items: foreignGenres },
     { key: 'eb', label: 'eBook', items: ebookGenres },
@@ -60,9 +65,16 @@ export default function Header() {
 
   return (
     <header className="w-full">
-      <Navbar className="w-full mx-auto bg-main px-10 h-12">
+      <Navbar
+        className="w-full mx-auto bg-main px-10"
+        classNames={{
+          base: 'h-12 min-h-12',
+          wrapper: 'h-12 min-h-12 py-0',
+          content: 'h-12',
+        }}
+      >
         <NavbarContent justify="start" className="font-bold justify-between">
-          {menus.map(({ key, label, items }) => (
+          {categoryGroups.map(({ key, label, items }) => (
             <NavbarItem key={key}>
               <Dropdown>
                 <DropdownTrigger>
@@ -119,32 +131,31 @@ export default function Header() {
               <>
                 <NavbarItem>
                   <ButtonComponent
-                    style="bg-white text-black font-semibold text-[0.6rem] px-2 py-0.5 rounded-md hover:bg-gray-200 transition-colors"
+                    variant="navbarLight"
                     label="마이페이지"
+                    size="xs"
                     onClick={() => router.push('/mypage')}
                   />
                 </NavbarItem>
                 <NavbarItem>
-                  <ButtonComponent
-                    style="bg-black text-white font-semibold text-[0.6rem] px-2 py-0.5 rounded-md hover:bg-gray-800 transition-colors"
-                    label="로그아웃"
-                    onClick={handleLogout}
-                  />
+                  <ButtonComponent variant="navbarDark" label="로그아웃" size="xs" onClick={handleLogout} />
                 </NavbarItem>
               </>
             ) : (
               <>
                 <NavbarItem>
                   <ButtonComponent
-                    style="bg-white text-black font-semibold text-xs px-2 py-1 rounded-md hover:bg-gray-200 transition-colors"
+                    variant="navbarLight"
                     label="로그인"
+                    size="xs"
                     onClick={() => router.push('/login')}
                   />
                 </NavbarItem>
                 <NavbarItem>
                   <ButtonComponent
-                    style="bg-black text-white font-semibold text-xs px-2 py-1 rounded-md hover:bg-gray-800 transition-colors"
+                    variant="navbarDark"
                     label="회원가입"
+                    size="xs"
                     onClick={() => router.push('/terms')}
                   />
                 </NavbarItem>

@@ -1,5 +1,5 @@
 'use client';
-import Button from '@/components/ButtonComponent';
+import ButtonComponent from '@/components/ButtonComponent';
 import { createClient } from '@/utils/supabase/client';
 import React, { FormEvent, useCallback, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -74,8 +74,14 @@ const ChangeUserNickName = ({ info }: { info: string }): React.JSX.Element => {
         />
 
         <div className="flex gap-2">
-          <Button type="button" label="취소" style="bg-[#af5858] text-white" onClick={() => setIsEditing(false)} />
-          <Button type="submit" label="저장" style="bg-[#af5858] text-white" />
+          <ButtonComponent
+            type="button"
+            label="취소"
+            variant="secondary"
+            size="xs"
+            onClick={() => setIsEditing(false)}
+          />
+          <ButtonComponent type="submit" label="저장" variant="primary" size="xs" />
         </div>
       </form>
     );
@@ -83,7 +89,7 @@ const ChangeUserNickName = ({ info }: { info: string }): React.JSX.Element => {
   return (
     <div className="flex items-center justify-between gap-2">
       <p className="text-xs">{changeInfoRef.current}</p>
-      <Button type="button" label="변경" style="bg-[#af5858] text-white" onClick={handleEdit} />
+      <ButtonComponent type="button" label="변경" variant="outline" size="xs" onClick={handleEdit} />
     </div>
   );
 };

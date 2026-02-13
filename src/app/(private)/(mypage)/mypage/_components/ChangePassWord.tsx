@@ -9,19 +9,17 @@ import {
   useDisclosure,
   Input,
 } from '@nextui-org/react';
-import { EyeFilledIcon } from './EyeFilledIcon';
-import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
 import { toast } from 'react-toastify';
 import { createClient } from '@/utils/supabase/client';
 import { AuthError } from '@supabase/supabase-js';
 import ButtonComponent from '@/components/ButtonComponent';
+import { PasswordFieldConfig, PasswordFieldKey } from '@/types/passwordFieldKey.type';
+import { EyeSlashFilledIcon } from '@/components/icons/EyeSlashFilledIcon';
+import { EyeFilledIcon } from '@/components/icons/EyeFilledIcon';
 
 const ChangePassWord = (): React.JSX.Element => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [visibility, setVisibility] = useState<{
-    newPassword: boolean;
-    confirmPassword: boolean;
-  }>({
+  const [visibility, setVisibility] = useState<Record<PasswordFieldKey, boolean>>({
     newPassword: false,
     confirmPassword: false,
   });
@@ -61,7 +59,7 @@ const ChangePassWord = (): React.JSX.Element => {
         return;
       }
       try {
-        const { data, error } = await supabase.auth.updateUser({
+        const { error } = await supabase.auth.updateUser({
           password: changePassWord.newChangePassWord,
         });
         if (error) {
@@ -79,65 +77,68 @@ const ChangePassWord = (): React.JSX.Element => {
     },
     [changePassWord, supabase, passwordRegex]
   );
+  const passwordFields: PasswordFieldConfig[] = [
+    {
+      key: 'newPassword',
+      name: 'newChangePassWord',
+      label: '새로운 비밀번호',
+      placeholder: '새로운 비밀번호 입력하세요',
+    },
+    {
+      key: 'confirmPassword',
+      name: 'confirmChangePassWord',
+      label: '비밀번호 확인',
+      placeholder: '새로운 비밀번호 다시 입력하세요',
+    },
+  ];
 
   return (
     <>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="sm" classNames={{ base: 'max-w-sm' }}>
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">비밀번호 변경</ModalHeader>
               <ModalBody>
-                <Input
-                  label="새로운 비밀번호"
-                  placeholder="새로운 비밀번호 입력하세요"
-                  type={visibility.newPassword ? 'text' : 'password'}
-                  variant="bordered"
-                  name="newChangePassWord"
-                  maxLength={15}
-                  onChange={handleChange}
-                  endContent={
-                    <button
-                      className="focus:outline-none"
-                      type="button"
-                      onClick={() => toggleVisibility('newPassword')}
-                    >
-                      {visibility.newPassword ? (
-                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                      ) : (
-                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                      )}
-                    </button>
-                  }
-                />
-                <Input
-                  label="비밀번호 확인"
-                  placeholder="새로운 비밀번호 다시 입력하세요"
-                  type={visibility.confirmPassword ? 'text' : 'password'}
-                  variant="bordered"
-                  name="confirmChangePassWord"
-                  maxLength={15}
-                  onChange={handleChange}
-                  endContent={
-                    <button
-                      className="focus:outline-none"
-                      type="button"
-                      onClick={() => toggleVisibility('confirmPassword')}
-                    >
-                      {visibility.confirmPassword ? (
-                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                      ) : (
-                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                      )}
-                    </button>
-                  }
-                />
+                {passwordFields.map((field) => (
+                  <Input
+                    key={field.name}
+                    size="sm"
+                    label={field.label}
+                    placeholder={field.placeholder}
+                    type={visibility[field.key] ? 'text' : 'password'}
+                    variant="bordered"
+                    name={field.name}
+                    maxLength={15}
+                    onChange={handleChange}
+                    className="[&_input::placeholder]:text-[8px] sm:[&_input::placeholder]:text-[10px] md:[&_input::placeholder]:text-xs"
+                    classNames={{
+                      input: 'text-sm',
+                      label: 'text-sm',
+                      inputWrapper: 'h-12',
+                    }}
+                    endContent={
+                      <ButtonComponent
+                        type="button"
+                        variant="ghost"
+                        onClick={() => toggleVisibility(field.key)}
+                        className="flex items-center justify-center"
+                      >
+                        {visibility[field.key] ? (
+                          <EyeFilledIcon className="w-4 h-4 text-default-400" />
+                        ) : (
+                          <EyeSlashFilledIcon className="w-4 h-4 text-default-400" />
+                        )}
+                      </ButtonComponent>
+                    }
+                  />
+                ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
-                  Close
+                <Button color="danger" variant="flat" onPress={onClose} size="sm">
+                  닫기
                 </Button>
-                <Button color="primary" onPress={() => handleSaveNewPassWord(onClose)}>
+                <Button color="primary" onPress={() => handleSaveNewPassWord(onClose)} size="sm">
                   재설정
                 </Button>
               </ModalFooter>
@@ -145,7 +146,7 @@ const ChangePassWord = (): React.JSX.Element => {
           )}
         </ModalContent>
       </Modal>
-      <ButtonComponent type="button" label="변경" style="bg-[#af5858] text-white" onClick={onOpen} />
+      <ButtonComponent type="button" label="변경" variant="outline" size="xs" onClick={onOpen} />
     </>
   );
 };

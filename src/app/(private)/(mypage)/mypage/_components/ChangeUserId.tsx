@@ -1,5 +1,5 @@
 'use client';
-import Button from '@/components/ButtonComponent';
+import ButtonComponent from '@/components/ButtonComponent';
 import { createClient } from '@/utils/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -191,11 +191,12 @@ const ChangeUserId = ({ info }: { info: string }): React.JSX.Element => {
               maxLength={25}
             />
 
-            <Button type="button" label="취소" style="bg-[#af5858] text-white" onClick={handleCancel} />
-            <Button
+            <ButtonComponent type="button" label="취소" variant="secondary" size="xs" onClick={handleCancel} />
+            <ButtonComponent
               type="submit"
+              size="xs"
               label={isSaving ? '요청중...' : isCooldown ? `대기 (${cooldownSec}s)` : '저장'}
-              style="bg-[#af5858] text-white"
+              variant="primary"
               disabled={isSaving || isCooldown}
             />
           </form>
@@ -208,7 +209,7 @@ const ChangeUserId = ({ info }: { info: string }): React.JSX.Element => {
               인증 대기중: <span className="font-semibold">{pendingEmail}</span>
             </p>
           )}
-          <Button type="button" label="변경" style="bg-[#af5858] text-white" onClick={handleEdit} />
+          <ButtonComponent type="button" label="변경" variant="outline" size="xs" onClick={handleEdit} />
         </>
       )}
     </div>

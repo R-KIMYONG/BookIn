@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
+
+
 export async function GET(request: Request) {
+  console.log('[email-callback] HIT:', request.url);
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/auth/email-confirmed';
@@ -32,5 +35,6 @@ export async function GET(request: Request) {
       }
     }
   }
+  console.log('[email-callback] redirect to:', `${origin}${next}`);
   return NextResponse.redirect(`${origin}${next}`);
 }

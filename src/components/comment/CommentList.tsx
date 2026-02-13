@@ -10,6 +10,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { toast } from 'react-toastify';
 import { TargetValue } from './Comment';
 import CommentPagination from './Pagination';
+import ButtonComponent from '../ButtonComponent';
 
 interface Props {
   isEdit: boolean;
@@ -44,7 +45,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
       id,
       created_at,
       title: isEdit ? '' : title,
-      content: isEdit ? '' : textContent
+      content: isEdit ? '' : textContent,
     }));
   };
 
@@ -52,8 +53,8 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
     const response = await fetch(`/api/comment/?id=${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
     if (!response.ok) {
       const deleteErrorText = await response.text();
@@ -80,7 +81,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       toast.success('삭제 완료');
-    }
+    },
   });
 
   const handleDelete = (id: string) => {
@@ -116,7 +117,7 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
           <p className="text-[#AF5858]">{comments.length}</p>
         </div>
       </div>
-      
+
       {commentsToDisplay?.length === 0 ? (
         <div>No comments yet</div>
       ) : (
@@ -135,12 +136,13 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
                 />
                 <div className="w-[13%] flex flex-col gap-1 items-end text-[13px]">
                   <div className={` ${user?.id === user_id ? 'flex' : 'hidden'} gap-1 transition-opacity duration-300`}>
-                    <button className={`${buttonClass} bg-gray-500`} onClick={() => handleEdit(comment)}>
-                      {isEdit && id === editingId ? '취소' : '수정'}
-                    </button>
-                    <button className={`${buttonClass} bg-[#ad5f5f]`} onClick={() => handleDelete(id as string)}>
-                      삭제
-                    </button>
+                    <ButtonComponent
+                      variant="outline"
+                      size="xs"
+                      label={isEdit && id === editingId ? '취소' : '수정'}
+                      onClick={() => handleEdit(comment)}
+                    />
+                    <ButtonComponent variant="danger" size="xs" label="삭제" onClick={() => handleDelete(id)} />
                   </div>
                   <p className="font-bold">작성자: {writer}</p>
                   <p className="font-bold">{date}</p>
