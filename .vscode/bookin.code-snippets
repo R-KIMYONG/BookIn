@@ -1,0 +1,16 @@
+{
+  "React Arrow Function Component": {
+    "scope": "typescriptreact,javascriptreact",
+    "prefix": "rfce",
+    "body": [
+      "const ${TM_FILENAME_BASE} = () => {",
+      "  return (",
+      "    <div>${TM_FILENAME_BASE}</div>",
+      "  );",
+      "};",
+      "",
+      "export default ${TM_FILENAME_BASE};",
+    ],
+    "description": "React Arrow Function Component",
+  },
+}

@@ -10,6 +10,7 @@ import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { TargetValue } from './Comment';
+import ButtonComponent from '../common/ButtonComponent';
 
 type SubmitItem = Pick<Tables<'comments'>, 'id' | 'title' | 'content' | 'post_id' | 'writer'>;
 
@@ -20,17 +21,19 @@ interface Props {
   setTargetValue: Dispatch<SetStateAction<TargetValue>>;
   comment?: TargetValue | undefined;
   user: any;
+  cover: string;
 }
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: Props) => {
+const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user, cover }: Props) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { id: postId } = useParams<{ id: string }>();
   const handleChange = (value: string) => {
     if (!user) {
       if (confirm('로그인 후 이용 가능합니다. 로그인 하시겠습니까?')) {
+        //  !!!!!!!!!! 이거 모달로 대체
         return router.push('/login');
       } else return;
     }
@@ -44,6 +47,7 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user) {
       if (confirm('로그인 후 이용 가능합니다. 로그인 하시겠습니까?')) {
+        //!!!!!!!!이것도 모달로 대체
         return router.push('/login');
       } else return;
     }
@@ -54,9 +58,9 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
     const response = await fetch('/api/comment', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newComment)
+      body: JSON.stringify(newComment),
     });
 
     return response.json();
@@ -66,9 +70,9 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
     const response = await fetch(`/api/comment`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(updatedComment)
+      body: JSON.stringify(updatedComment),
     });
 
     return response.json();
@@ -83,7 +87,7 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
 
       queryClient.setQueryData(['comments', postId], (old: any) => [...(old || []), { ...newComment, id: uuidv4() }]);
 
-      setTargetValue({ title: '', content: '' });
+      setTargetValue({ title: '', content: '', cover: '', updated_at: '' });
       return { previousComments };
     },
     onError: (err, newComment, context) => {
@@ -93,7 +97,7 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       toast.success('작성 완료');
-    }
+    },
   });
 
   const updateMutation = useMutation({
@@ -108,7 +112,7 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
       );
 
       setIsEdit(false);
-      setTargetValue({ title: '', content: '' });
+      setTargetValue({ title: '', content: '', cover: '', updated_at: '' });
       return { previousComments };
     },
     onError: (err, updatedComment, context) => {
@@ -118,7 +122,7 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       toast.success('수정 완료');
-    }
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,7 +134,9 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
       title: targetValue.title || '',
       content: cleanContent,
       post_id: postId,
-      writer: user.user_metadata.nickname
+      writer: user.user_metadata.nickname,
+      updated_at: Date.now(),
+      cover: cover,
     };
 
     if (isEdit && targetValue.id) {
@@ -142,7 +148,7 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
   };
   const handleCancel = () => {
     setIsEdit(false);
-    setTargetValue({ title: '', content: '' });
+    setTargetValue({ title: '', content: '', cover: '', updated_at: '' });
   };
 
   return (
@@ -163,14 +169,8 @@ const CommentForm = ({ isEdit, setIsEdit, targetValue, setTargetValue, user }: P
         onChange={handleChange}
       />
       <div className="flex gap-2 justify-end mt-6">
-        <button className="bg-[#AF5858] text-white px-4 py-1 rounded-md" type="submit">
-          {isEdit ? '수정' : '업로드'}
-        </button>
-        {isEdit && (
-          <button className="bg-gray-500 px-4 py-1 rounded-md text-white" type="button" onClick={handleCancel}>
-            취소
-          </button>
-        )}
+        <ButtonComponent variant="danger" size="xs" type="submit" label={isEdit ? '수정' : '업로드'} />
+        {isEdit && <ButtonComponent variant="secondary" size="xs" type="button" label="취소" onClick={handleCancel} />}
       </div>
     </form>
   );

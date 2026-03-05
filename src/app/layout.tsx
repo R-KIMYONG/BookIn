@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
+import Header from '@/components/layout/header/Header';
+import Footer from '@/components/layout/Footer';
 import TopButton from '@/components/TopButton';
 import QueryProvider from './provider';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createClient } from '@/utils/supabase/server';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,16 +24,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
   return (
     <html lang="en">
       <body className={inter.className}>
         <ToastContainer autoClose={1000} stacked draggable />
         <QueryProvider>
-          <Header initialIsLoggedIn={!!user} />
+          <Header />
           {children}
           <TopButton />
           <Footer />

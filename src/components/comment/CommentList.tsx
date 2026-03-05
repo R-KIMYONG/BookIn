@@ -10,7 +10,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { toast } from 'react-toastify';
 import { TargetValue } from './Comment';
 import CommentPagination from './Pagination';
-import ButtonComponent from '../ButtonComponent';
+import ButtonComponent from '../common/ButtonComponent';
 
 interface Props {
   isEdit: boolean;
@@ -110,46 +110,78 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
 
   const totalPages: number = comments && Array.isArray(comments) ? Math.ceil(comments.length / pageSize) : 1;
   return (
-    <div>
-      <div className="flex gap-2 items-center my-4">
-        <div className="border-b-2 border-black flex gap-2 items-center">
-          <h3 className=" font-bold text-[20px]">코멘트</h3>
-          <p className="text-[#AF5858]">{comments.length}</p>
+    <div className="flex flex-col gap-4">
+      <div className="mt-6 flex items-end justify-between">
+        <div>
+          <h3 className="text-lg font-extrabold text-gray-900">코멘트</h3>
+          <p className="mt-1 text-xs text-gray-500">
+            총 <span className="font-bold text-[#AF5858]">{comments.length}</span>개
+          </p>
         </div>
       </div>
 
       {commentsToDisplay?.length === 0 ? (
         <div>No comments yet</div>
       ) : (
-        <ul className="border-y-2 border-black mt-[2rem]">
-          {commentsToDisplay?.map((comment) => {
-            const { id, title, content, writer, created_at, user_id } = comment;
-            const date = dayjs(created_at).locale('ko').format('YYYY-MM-DD HH:mm');
-            const buttonClass = 'w-fit px-2 py-1 rounded text-white text-[10px]';
+        <ul className="border-y-2 border-black">
+          {commentsToDisplay?.length === 0 ? (
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-10 text-center">
+              <p className="text-sm font-semibold text-gray-700">아직 댓글이 없어요</p>
+              <p className="mt-1 text-xs text-gray-500">첫 댓글을 남겨보세요.</p>
+            </div>
+          ) : (
+            <ul className="space-y-3 py-6">
+              {commentsToDisplay.map((comment) => {
+                const { id, title, content, writer, created_at, user_id } = comment;
+                const date = dayjs(created_at).locale('ko').format('YYYY-MM-DD HH:mm');
+                const isMine = user?.id === user_id;
 
-            return (
-              <li key={id} className="flex group h-[100px] items-center justify-around border-b-1 border-black">
-                <h3 className="w-[8%] font-bold flex justify-center text-[16px] text-center">{title}</h3>
-                <div
-                  dangerouslySetInnerHTML={{ __html: content || '' }}
-                  className="w-[70%] bg-white text-[16px] break-words"
-                />
-                <div className="w-[13%] flex flex-col gap-1 items-end text-[13px]">
-                  <div className={` ${user?.id === user_id ? 'flex' : 'hidden'} gap-1 transition-opacity duration-300`}>
-                    <ButtonComponent
-                      variant="outline"
-                      size="xs"
-                      label={isEdit && id === editingId ? '취소' : '수정'}
-                      onClick={() => handleEdit(comment)}
-                    />
-                    <ButtonComponent variant="danger" size="xs" label="삭제" onClick={() => handleDelete(id)} />
-                  </div>
-                  <p className="font-bold">작성자: {writer}</p>
-                  <p className="font-bold">{date}</p>
-                </div>
-              </li>
-            );
-          })}
+                return (
+                  <li
+                    key={id}
+                    className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm transition hover:shadow-md"
+                  >
+                    {/* 헤더: 제목 + 날짜 */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-extrabold text-gray-900 sm:text-base">{title}</h3>
+                        <p className="mt-1 text-[11px] text-gray-500">{date}</p>
+                      </div>
+
+                      {isMine ? (
+                        <div className="flex shrink-0 gap-2">
+                          <ButtonComponent
+                            variant="outline"
+                            size="xs"
+                            label={isEdit && id === editingId ? '취소' : '수정'}
+                            onClick={() => handleEdit(comment)}
+                          />
+                          <ButtonComponent variant="danger" size="xs" label="삭제" onClick={() => handleDelete(id)} />
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {/* 본문: 내용 */}
+                    <div className="mt-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-sm leading-6 text-gray-700">
+                      <div
+                        dangerouslySetInnerHTML={{ __html: content || '' }}
+                        className="prose prose-sm max-w-none break-words"
+                      />
+                    </div>
+
+                    {/* 푸터: 작성자 */}
+                    <div className="mt-3 flex items-center justify-between">
+                      <p className="text-xs font-semibold text-gray-600">작성자: {writer}</p>
+
+                      {isEdit && id === editingId ? (
+                        <span className="text-[11px] font-semibold text-[#AF5858]">수정 중…</span>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </ul>
       )}
 

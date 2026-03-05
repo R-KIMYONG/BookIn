@@ -15,22 +15,25 @@ export default function useGenres() {
       queries: [
         {
           queryKey: ['koreanGenres'],
-          queryFn: () => fetchGenres('/json/koreanGenres.json')
+          queryFn: () => fetchGenres('/json/koreanGenres.json'),
+          staleTime: Infinity,
         },
         {
           queryKey: ['foreignGenres'],
-          queryFn: () => fetchGenres('/json/foreignGenres.json')
+          queryFn: () => fetchGenres('/json/foreignGenres.json'),
+          staleTime: Infinity,
         },
         {
           queryKey: ['ebookGenres'],
-          queryFn: () => fetchGenres('/json/ebookGenres.json')
-        }
-      ]
+          queryFn: () => fetchGenres('/json/ebookGenres.json'),
+          staleTime: Infinity,
+        },
+      ],
     });
 
-  const koreanGenres: Genre[] | undefined = queries[0].data;
-  const foreignGenres: Genre[] | undefined = queries[1].data;
-  const ebookGenres: Genre[] | undefined = queries[2].data;
+  const koreanGenres = queries[0].data;
+  const foreignGenres = queries[1].data;
+  const ebookGenres = queries[2].data;
 
   return { koreanGenres, foreignGenres, ebookGenres };
 }

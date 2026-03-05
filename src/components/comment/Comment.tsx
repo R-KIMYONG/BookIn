@@ -18,9 +18,11 @@ export type TargetValue = {
   writer?: string;
   created_at?: string;
   user_id?: string;
+  updated_at: string;
+  cover: string;
 };
 
-const Comment = () => {
+const Comment = ({ cover }: { cover: string }) => {
   const { id: postId } = useParams();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
@@ -32,7 +34,9 @@ const Comment = () => {
     post_id: postId,
     writer: 'fake_nickname',
     created_at: '',
-    user_id: user?.id || ''
+    user_id: user?.id || '',
+    updated_at: '',
+    cover: '',
   });
   useEffect(() => {
     async function getUser() {
@@ -51,7 +55,7 @@ const Comment = () => {
     if (user) {
       setTargetValue((prev) => ({
         ...prev,
-        user_id: user.id
+        user_id: user.id,
       }));
     }
   }, [user]);
@@ -65,7 +69,7 @@ const Comment = () => {
   }
 
   return (
-    <div className="w-[1280px] container mx-auto p-4">
+    <div className="container mx-auto p-4">
       <CommentList isEdit={isEdit} setIsEdit={setIsEdit} setTargetValue={setTargetValue} user={user} />
       <CommentForm
         isEdit={isEdit}
@@ -73,6 +77,7 @@ const Comment = () => {
         targetValue={targetValue}
         setTargetValue={setTargetValue}
         // comment={isEdit ? targetValue : undefined}
+        cover={cover}
         user={user}
       />
     </div>
