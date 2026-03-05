@@ -1,114 +1,124 @@
-'use client';
+import { getAladinDetail } from '@/app/lib/aladin/getAladinDetail';
 import Comment from '@/components/comment/Comment';
-import { Book } from '@/types/book.type';
-import { useQuery } from '@tanstack/react-query';
+
 import Image from 'next/image';
 
-const fetchAladinDetailPage = async (isbn13: string): Promise<Book> => {
-  const response = await fetch(`/api/AladinApi/${isbn13}`);
-  const json = await response.json().catch(() => null);
+export default async function MainDetail({ params }: { params: { id: string } }) {
+  const data = await getAladinDetail(params.id);
 
-  if (!response.ok) {
-    const msg = json?.message ?? json?.error ?? 'Network response was not ok';
-    throw new Error(msg);
-  }
+  const item = data?.item?.[0];
 
-  return json as Book;
-};
-const MainDetail = ({ params }: { params: { id: string } }) => {
-  const { id: paramsId } = params;
-  const { data, error, isPending } = useQuery<Book>({
-    queryKey: ['aladinDetailPage', paramsId],
-    queryFn: () => fetchAladinDetailPage(paramsId),
-    staleTime: 300000,
-  });
-  if (isPending)
+  if (!item) {
+
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
-        Loading...
-      </div>
+      <div className="flex justify-center items-center min-h-[60vh] text-gray-600">책 정보를 찾을 수 없습니다.</div>
     );
-  if (error)
-    return <div className="flex justify-center items-center h-screen text-red-500">Error: {error.message}</div>;
-  const items = data?.item?.[0];
 
-  if (!items) {
-    return <div className="flex justify-center items-center h-screen text-gray-600">책 정보를 찾을 수 없습니다.</div>;
   }
-  const standard = Number(items.priceStandard ?? 0);
-  const sales = Number(items.priceSales ?? 0);
-  const hasSale = standard > 0 && sales > 0 && sales < standard;
 
+  const standard = Number(item.priceStandard ?? 0);
+  const sales = Number(item.priceSales ?? 0);
+  const hasSale = standard > 0 && sales > 0 && sales < standard;
   const discountRate = hasSale ? Math.round(((standard - sales) / standard) * 100) : 0;
 
   return (
     <>
-      <div className="w-[1280px] container mx-auto">
-        <div className="flex flex-col md:flex-row bg-white rounded-lg shadow-lg p-8">
-          {/* 좌측 책 표지 이미지 */}
-          <div className="md:w-1/4 flex justify-center items-center mb-6 md:mb-0">
-            <Image
-              src={items.cover}
-              alt={items.title}
-              className="rounded-lg shadow-md object-cover transition duration-200 hover:scale-[1.02]"
-              height={500}
-              width={500}
-              objectFit="cover"
-            />
-          </div>
-
-          {/* 우측 책 정보 */}
-          <div className="md:w-2/3 md:pl-8 text-lg flex flex-col justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-4">{items.title}</h1>
-              <p className="text-xl mb-2 text-gray-700">{items.author}</p>
-              <p className="text-md text-gray-600 mb-2 font-semibold">
-                출판사: <span className="text-md font-normal">{items.publisher}</span>
-              </p>
-              <p className="text-md text-gray-600 mb-2 font-semibold">{items.categoryName}</p>
-
-              <p className="text-md font-semibold text-gray-600 mb-4">
-                등급:{' '}
-                {items.adult ? (
-                  <span className="text-red-600 border border-red-600 rounded px-2">성인</span>
-                ) : (
-                  <span className="text-blue-600 border border-blue-600 rounded px-2">일반</span>
-                )}
-              </p>
-
-              <p className="text-md font-semibold mb-4">
-                <span className="font-normal text-gray-700">{items.description}</span>
-              </p>
-            </div>
-
-            <div className="mb-4">
-              {hasSale ? (
-                <div className="flex items-end gap-3">
-                  <p className="text-sm text-gray-400 line-through">{standard.toLocaleString()}원</p>
-
-                  <p className="text-2xl font-semibold">{sales.toLocaleString()}원</p>
-
-                  <p className="text-sm font-semibold text-red-600">{discountRate}%</p>
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
+        <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
+          <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[360px_1fr]">
+            <div className="flex justify-center lg:justify-start">
+              <div className="w-full max-w-[320px]">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl ring-1 ring-black/10">
+                  <Image
+                    src={item.cover}
+                    alt={item.title}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 640px) 90vw, (max-width: 1024px) 400px, 720px"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                 </div>
-              ) : (
-                <p className="text-2xl font-semibold">{standard.toLocaleString()}원</p>
-              )}
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-700">
+                    {item.publisher ?? '출판사 정보 없음'}
+                  </span>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                      item.adult
+                        ? 'bg-red-50 text-red-700 ring-1 ring-red-200'
+                        : 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
+                    }`}
+                  >
+                    {item.adult ? '성인' : '일반'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <a
-              href={items.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 w-full px-6 py-3 rounded-lg shadow-md bg-[#af5858] text-white hover:bg-[#8f4646] text-center transition-colors block"
-            >
-              구매 바로가기
-            </a>
+            <div className="min-w-0">
+              <div className="flex flex-col gap-4">
+                <div className="min-w-0">
+                  <h1 className="text-xl font-extrabold leading-snug text-gray-900 sm:text-2xl lg:text-3xl">
+                    {item.title}
+                  </h1>
+                  <p className="mt-2 text-sm text-gray-700 sm:text-base">{item.author ?? '저자 정보 없음'}</p>
+
+                  <p className="mt-2 text-xs text-gray-500 sm:text-sm">{item.categoryName ?? ''}</p>
+                </div>
+
+                {item.description ? (
+                  <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
+                    <p className="text-sm leading-6 text-gray-700 line-clamp-6">{item.description}</p>
+                  </div>
+                ) : null}
+                {/* 가격 */}
+                <div className="rounded-2xl border border-gray-200 px-4 py-4">
+                  {hasSale ? (
+                    <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
+                      <p className="text-sm text-gray-400 line-through">{standard.toLocaleString()}원</p>
+                      <p className="text-2xl font-extrabold text-gray-900">{sales.toLocaleString()}원</p>
+                      <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-700 ring-1 ring-red-200">
+                        {discountRate}% 할인
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-2xl font-extrabold text-gray-900">{standard.toLocaleString()}원</p>
+                  )}
+
+                  <p className="mt-2 text-[11px] text-gray-400">
+                    가격 정보는 제공처 기준이며, 실제 판매가와 다를 수 있어요.
+                  </p>
+                </div>
+
+                {/* 버튼 */}
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-[#af5858] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#8f4646] sm:w-auto"
+                  >
+                    구매 바로가기
+                  </a>
+
+                  <a
+                    href="/"
+                    className="inline-flex w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-700 shadow-sm transition hover:bg-gray-50 sm:w-auto"
+                  >
+                    목록으로
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* 댓글부분 */}
+        <div className="mt-8">
+          <Comment cover={item.cover} />
+        </div>
       </div>
-      <Comment />
     </>
   );
-};
-
-export default MainDetail;
+}

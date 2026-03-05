@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import ButtonComponent from '@/components/ButtonComponent';
+import ButtonComponent from '@/components/common/ButtonComponent';
 
 type Props = {
   error: Error & { digest?: string };

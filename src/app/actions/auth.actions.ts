@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function logout() {
@@ -20,26 +21,52 @@ export async function logout() {
 
 export async function login(formData: FormData) {
   const supabase = createClient();
-
+  const remember = formData.get('remember') === 'on';
   const email = String(formData.get('email') ?? '');
   const password = String(formData.get('password') ?? '');
   const redirectTo = String(formData.get('redirectTo') ?? '/').trim();
 
-   if (!email || !password) {
+
+  const cookieStore = cookies();
+
+  if (!email || !password) {
     // 여기서 redirect로 에러 페이지 보내도 되고,
     // login 페이지에서 query param으로 처리해도 됨.
     redirect(`/login?error=empty`);
   }
-
-  const { error } = await supabase.auth.signInWithPassword({email, password});
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     redirect(`/login?error=invalid`);
   }
 
+
   revalidatePath('/', 'layout');
 
   if (redirectTo === '/' || redirectTo === '') redirect('/mypage');
+
+  if (!remember) {
+    const maxAge = 2 * 60 * 60; // 2시간(초)
+    const expiresAt = Date.now() + maxAge * 1000;
+
+    cookieStore.set('bookin_session_mode', 'temp', {
+      path: '/',
+      maxAge,
+      sameSite: 'lax',
+    });
+
+    cookieStore.set('bookin_session_expires_at', String(expiresAt), {
+      path: '/',
+      maxAge,
+      sameSite: 'lax',
+    });
+  } else {
+    cookieStore.set('bookin_session_mode', '', { path: '/', maxAge: 0, sameSite: 'lax' });
+    cookieStore.set('bookin_session_expires_at', '', { path: '/', maxAge: 0, sameSite: 'lax' });
+  }
+  revalidatePath('/', 'layout');
+
+  if (redirectTo) redirect(redirectTo);
   redirect(redirectTo);
 }
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -66,17 +93,13 @@ export async function signup(formData: FormData) {
     .maybeSingle();
 
   if (emailExist) redirect('/signup?error=email-exists');
-  
+
+  if (emailExist) redirect('/signup?error=email-exists');
 
   // 닉네임 중복 체크
-  const { data: nicknameExist } = await supabase
-    .from('users')
-    .select('id')
-    .eq('nickname', nickname)
-    .maybeSingle();
+  const { data: nicknameExist } = await supabase.from('users').select('id').eq('nickname', nickname).maybeSingle();
 
   if (nicknameExist) redirect('/signup?error=nickname-exists');
-  
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -89,9 +112,8 @@ export async function signup(formData: FormData) {
   if (error || !data.user?.id) redirect('/signup?error=auth');
 
 
-
-  const { error: loginError } = await supabase.auth.signInWithPassword({email,password});
-if (loginError) redirect('/signup?error=auth');
+  const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+  if (loginError) redirect('/signup?error=auth');
 
   const userId = data.user.id;
 
@@ -101,8 +123,65 @@ if (loginError) redirect('/signup?error=auth');
     nickname,
   });
 
-    if (insertError) redirect('/signup?error=profile');
+
+  if (insertError) redirect('/signup?error=profile');
   
   revalidatePath('/', 'layout');
   redirect('/mypage');
 }
+
+export async function deleteAccount() {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { ok: false, error: 'not authenticated' };
+  }
+
+  const userId = user.id;
+
+  const { error: publicError } = await supabase.from('users').delete().eq('id', userId);
+
+  if (publicError) {
+    return { ok: false, error: publicError.message };
+  }
+
+  const { error: rpcError } = await supabase.rpc('delete_user', {
+    user_id: userId,
+  });
+
+  if (rpcError) {
+    return { ok: false, error: rpcError.message };
+  }
+  await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
+  revalidatePath('/mypage', 'page');
+  return { ok: true };
+}
+export async function resetTempSession() {
+  const cookieStore = cookies();
+
+  const mode = cookieStore.get('bookin_session_mode')?.value;
+  if (mode !== 'temp') return;
+
+  const nextExpiresAt = Date.now() + 2 * 60 * 60 * 1000; // 지금부터 2시간
+
+  cookieStore.set('bookin_session_mode', 'temp', {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+
+  cookieStore.set('bookin_session_expires_at', String(nextExpiresAt), {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+
+  revalidatePath('/', 'layout');
+}
+

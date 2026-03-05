@@ -1,69 +1,84 @@
 'use client';
 
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Navbar,
-  NavbarContent,
-  Pagination,
-} from '@nextui-org/react';
 import CategoryItem from './CategoryItem';
 import { Book, Item, SearchResult } from '@/types/book.type';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
 import SkeletonItem from './SkeletonItem';
 import Link from 'next/link';
-import type { FormEvent } from 'react';
-import { toast } from 'react-toastify';
-type QueryType = 'Bestseller' | 'ItemNewAll' | 'ItemNewSpecial' | 'BlogBest' | 'ItemEditorChoice';
+import AppPagination from '../common/AppPagination';
+import getTotalPages from '@/utils/pagination';
+import { QueryType } from '@/types/useListUrlState.type';
+import QueryTypeTabs from '../common/filters/QueryTypeTabs';
+import SearchBar from '../common/filters/SearchBar';
+import useHomeListUrlState from '@/hooks/url/useHomeListUrlState';
+import { SearchQueryType } from '@/types/searchBar.type';
+
+type PagedResult<T> = {
+  items: T[];
+  totalResults: number;
+  itemsPerPage: number;
+};
+
+const emptyPaged = <T,>(itemsPerPage = 20): PagedResult<T> => ({
+  items: [],
+  totalResults: 0,
+  itemsPerPage,
+});
 
 export default function Category() {
-  const [queryType, setQueryType] = useState<QueryType>('Bestseller');
-  const [page, setPage] = useState<number>(1);
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [searchPage, setSearchPage] = useState<number>(1);
-  const [searchKeyWord, setSearchKeyWord] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const ALADIN_MAX_PAGES = 50;
-  const { data: bookItem, isPending } = useQuery<Book, Error>({
-    queryKey: ['books', queryType, page, categoryId],
-    queryFn: async ({ queryKey }) => {
-      const [_, qt, p, cat] = queryKey as [string, QueryType, number, string];
+  const { queryType, page, searchKeyWord, searchQueryType, setHomeUrl } = useHomeListUrlState();
 
+  const isSearching = searchKeyWord.length > 0;
+
+  const {
+    data: listData,
+    isPending: bookItemPending,
+    isFetching: bookItemFetching,
+  } = useQuery<PagedResult<Item>, Error>({
+    queryKey: ['books', queryType, page],
+    queryFn: async ({ queryKey }) => {
+      const [_, qt, p] = queryKey as [string, QueryType, number];
       const url =
-        `/api/AladinApi?QueryType=${qt}` +
-        `&page=${p}` +
-        (qt === 'ItemEditorChoice' && cat ? `&CategoryId=${encodeURIComponent(cat)}` : '');
+        `/api/aladin/list?QueryType=${qt}` + `&page=${p}` + (qt === 'ItemEditorChoice' ? `&CategoryId=170` : '');
       const res = await fetch(url, { cache: 'no-store' });
 
       if (!res.ok) throw new Error(`AladinApi ${res.status}`);
-      return await res.json();
+      const data: Book = await res.json();
+      return {
+        items: data.item ?? [],
+        totalResults: Number(data.totalResults ?? 0),
+        itemsPerPage: Number(data.itemsPerPage ?? 20),
+      };
     },
     retry: 0,
     refetchOnWindowFocus: false,
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 3000 * 60,
     placeholderData: keepPreviousData,
   });
-
-  const { data: searchData, isPending: searchPending } = useQuery<SearchResult>({
-    queryKey: ['search', searchKeyWord, searchPage],
+  const {
+    data: searchData,
+    isPending: searchPending,
+    isFetching: searchFetching,
+  } = useQuery<PagedResult<Item>, Error>({
+    queryKey: ['search', searchKeyWord, page],
     queryFn: async ({ queryKey }) => {
-      const [_, searchKeyWord, searchPage] = queryKey as [string, string, number];
+      const [_, searchKeyWord, searchQueryType, page] = queryKey as [string, string | null, SearchQueryType, number];
 
-      if (!searchKeyWord?.trim()) return { item: [], totalResults: 0 };
+      if (!searchKeyWord?.trim()) return emptyPaged<Item>(20);
       const res = await fetch(
-        `/api/SearchAladin?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${searchPage}`
+        `/api/aladin/search?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${page}&QueryType=${searchQueryType}`
       );
       if (!res.ok) throw new Error('검색 실패');
-      const searchResult = await res.json();
-      return searchResult;
+      const data: SearchResult = await res.json();
+      return {
+        items: data.item ?? [],
+        totalResults: Number(data.totalResults ?? 0),
+        itemsPerPage: Number(data.itemsPerPage ?? 20),
+      };
     },
     staleTime: 30000,
-    enabled: !!searchKeyWord?.trim(),
+    enabled: isSearching,
+    placeholderData: keepPreviousData,
   });
   const searchTotal = searchData?.totalResults ?? 0;
 
@@ -78,7 +93,7 @@ export default function Category() {
     return `${base}-${index}`;
   };
 
-  const makeHref = (it: Item) => {
+  const makeHref = (it: Item): string | undefined => {
     const isbn13 = it.isbn13?.trim();
     const isbn10 = it.isbn?.trim();
     const itemId = it.itemId;
@@ -86,135 +101,78 @@ export default function Category() {
     if (isbn13) return `/${isbn13}?type=isbn13`;
     if (isbn10) return `/${isbn10}?type=isbn`;
     if (itemId != null && String(itemId).trim()) return `/${itemId}?type=itemid`;
-    return '#';
+    return undefined;
   };
 
-  const tabs: { key: QueryType; label: string }[] = [
-    { key: 'Bestseller', label: '베스트셀러' },
-    { key: 'ItemNewAll', label: '새로 나온 책' },
-    { key: 'ItemNewSpecial', label: '화제의 책' },
-    { key: 'BlogBest', label: '베스트 예감' },
-    { key: 'ItemEditorChoice', label: '편집자 추천' },
-  ];
-  const activeTabLabel = tabs.find((t) => t.key === queryType)?.label ?? '카테고리';
+  const isFetching = isSearching ? searchFetching : bookItemFetching;
+  //데이터 새로 가져오기 검색중이면 검색의 데이터 다시 가져오기아닐 시 전체 리스트 리패칭
+  const isPending = isSearching ? searchPending : bookItemPending;
 
-  const isSearching = !!searchKeyWord?.trim();
-  const list = isSearching ? searchData?.item ?? [] : bookItem?.item ?? [];
-  const totalResults = isSearching ? Number(searchData?.totalResults ?? 0) : Number(bookItem?.totalResults ?? 0);
+  const list = isSearching ? (searchData?.items ?? []) : (listData?.items ?? []);
+  //현재 화면에서 리스트카드의 정보 즉 각각의 카드
 
-  const perPage = isSearching ? Number((searchData as any)?.itemsPerPage ?? 20) : Number(bookItem?.itemsPerPage ?? 20);
+  const totalResults = isSearching ? (searchData?.totalResults ?? 0) : (listData?.totalResults ?? 0);
+  //패칭해온 총결과
 
-  const safePerPage = Number.isFinite(perPage) && perPage > 0 ? perPage : 20;
-  const safeTotalResults = Number.isFinite(totalResults) && totalResults > 0 ? totalResults : 0;
+  const perPage = isSearching ? (searchData?.itemsPerPage ?? 20) : (listData?.itemsPerPage ?? 20);
+  //API 응답의 itemsPerPage(페이지당 개수). 없거나 이상하면 20으로 fallback.
 
-  const rawTotalPages = Math.max(1, Math.ceil(safeTotalResults / safePerPage));
-  const totalPages = Math.min(ALADIN_MAX_PAGES, rawTotalPages);
+  const totalPages = getTotalPages(totalResults, perPage);
+
   return (
     <section className="max-w-7xl mx-auto flex flex-col gap-2">
-      {/* <div className="w-full h-10 bg-red-500"></div> */}
-      <Navbar maxWidth="full" position="static" className="[--navbar-height:auto] py-4 searchInput">
-        <NavbarContent justify="start" className="flex flex-wrap items-center gap-2 gap-y-2 w-full">
-          <Dropdown>
-            <DropdownTrigger>
-              <Button className="capitalize" color="danger" variant="solid" size="sm">
-                {activeTabLabel}
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="카테고리 선택"
-              selectionMode="single"
-              selectedKeys={new Set([queryType])}
-              disallowEmptySelection
-              color="danger"
-              variant="solid"
-              onAction={(key) => {
-                const k = key as QueryType;
-                setQueryType(k);
-                setPage(1);
-                if (k === 'ItemEditorChoice' && !categoryId) {
-                  setCategoryId('170');
-                }
-              }}
-            >
-              {tabs.map((t) => (
-                <DropdownItem key={t.key} className={'!text-xs'}>
-                  {t.label}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
-          <form
-            onSubmit={(e: FormEvent<HTMLFormElement>) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
+      <div className="flex flex-col flex-wrap gap-2 md:flex-row md:items-start md:justify-between py-4 box-border">
+        <div className="md:flex-1 md:pr-3">
+          <QueryTypeTabs
+            value={queryType}
+            onChange={(k) => setHomeUrl({ queryType: k, searchKeyWord: null })}
+            disable={isSearching}
+          />
+        </div>
 
-              const keyword = (formData.get('keyword') as string | null)?.trim() ?? '';
-              if (!keyword) {
-                toast.warn('검색어를 입력해주세요');
-                return;
-              }
-              setSearchKeyWord(keyword.trim());
-              setSearchPage(1);
-            }}
-            ref={formRef}
-            className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-1.5 shadow-sm"
-          >
-            <input
-              type="search"
-              name="keyword"
-              autoComplete="off"
-              autoFocus
-              placeholder="책 제목 또는 저자를 입력하세요"
-              className="bg-transparent outline-none w-36 sm:w-40 text-xs placeholder-gray-400 placeholder:text-[9px]"
-            />
-            <button
-              type="submit"
-              className="px-4 py-1.5 bg-black text-white rounded-full hover:bg-black/70 transition-colors text-xs"
-            >
-              검색
-            </button>
-            <button
-              type="button"
-              className="px-4 py-1.5 bg-red-500 text-white rounded-full hover:bg-red-500/70 transition-colors text-xs"
-              onClick={() => {
-                setSearchKeyWord(null);
-                setSearchPage(1);
-                formRef.current?.reset();
-              }}
-            >
-              초기화
-            </button>
-          </form>
-          {searchData &&
-            (searchTotal > 0 ? (
-              <p className="text-sm">검색결과 {searchTotal}개</p>
-            ) : (
-              <p className="text-sm">검색결과 없습니다.</p>
-            ))}
-        </NavbarContent>
-      </Navbar>
+        <div className="flex flex-col items-start md:items-end gap-1">
+          <SearchBar
+            value={searchKeyWord}
+            isSearching={isFetching}
+            searchQueryType={searchQueryType}
+            onSubmit={(keyword) => setHomeUrl({ searchKeyWord: keyword, page: 1 })}
+            onReset={() => setHomeUrl({ searchKeyWord: null, page: 1 })}
+            onChangeSearchQueryType={(sq) => setHomeUrl({ searchQueryType: sq, page: 1 })}
+          />
+
+          {typeof (isSearching ? searchTotal : undefined) === 'number' && (
+            <p className="text-[12px] text-gray-600 text-nowrap md:pr-4 box-border pl-2">
+              {searchTotal > 0 ? `검색결과 ${searchTotal}개` : '검색결과 없습니다.'}
+            </p>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-y-6 gap-x-4 sm:gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-auto">
-        {(isSearching ? searchPending : isPending)
+        {isPending
           ? Array.from({ length: 20 }).map((_, index) => <SkeletonItem key={index} />)
-          : list.map((item, index) => (
-              <Link key={makeItemKey(item, index)} href={makeHref(item)}>
-                <CategoryItem item={item} />
-              </Link>
-            ))}
+          : list.map((item, index) => {
+              const href = makeHref(item);
+              const key = makeItemKey(item, index);
+
+              return href ? (
+                <Link href={href} key={key}>
+                  <CategoryItem item={item} />
+                </Link>
+              ) : (
+                <div key={key} className="opacity-60 cursor-not-allowed" title="상세 페이지가 없어서 이동할 수 없어요">
+                  <CategoryItem item={item} disabled={true} />
+                </div>
+              );
+            })}
       </div>
       {/* 페이지 네이션 */}
       <div className="mt-6 flex justify-center">
-        <Pagination
-          key={isSearching ? `search-${searchKeyWord}` : `list-${queryType}-${categoryId}`}
-          isCompact
-          showControls
-          total={totalPages}
-          page={isSearching ? searchPage : page}
-          onChange={(p) => {
-            const next = Math.min(totalPages, p);
-            if (isSearching) setSearchPage(next);
-            else setPage(next);
-          }}
+        <AppPagination
+          totalPages={totalPages}
+          page={page}
+          disabled={isFetching}
+          onChange={(p) => setHomeUrl({ page: p })}
         />
       </div>
     </section>
