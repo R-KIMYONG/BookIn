@@ -60,10 +60,9 @@ export default function Category() {
     isPending: searchPending,
     isFetching: searchFetching,
   } = useQuery<PagedResult<Item>, Error>({
-    queryKey: ['search', searchKeyWord, page],
+    queryKey: ['search', searchKeyWord, searchQueryType, page],
     queryFn: async ({ queryKey }) => {
       const [_, searchKeyWord, searchQueryType, page] = queryKey as [string, string | null, SearchQueryType, number];
-
       if (!searchKeyWord?.trim()) return emptyPaged<Item>(20);
       const res = await fetch(
         `/api/aladin/search?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${page}&QueryType=${searchQueryType}`
