@@ -3,7 +3,6 @@
 import CategoryItem from './CategoryItem';
 import { Book, Item, SearchResult } from '@/types/book.type';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import SkeletonItem from './SkeletonItem';
 import Link from 'next/link';
 import AppPagination from '../common/AppPagination';
 import getTotalPages from '@/utils/pagination';
@@ -12,6 +11,7 @@ import QueryTypeTabs from '../common/filters/QueryTypeTabs';
 import SearchBar from '../common/filters/SearchBar';
 import useHomeListUrlState from '@/hooks/url/useHomeListUrlState';
 import { SearchQueryType } from '@/types/searchBar.type';
+import SkeletonGrid from '../common/SkeletonGrid';
 
 type PagedResult<T> = {
   items: T[];
@@ -53,7 +53,6 @@ export default function Category() {
     retry: 0,
     refetchOnWindowFocus: false,
     staleTime: 3000 * 60,
-    placeholderData: keepPreviousData,
   });
   const {
     data: searchData,
@@ -146,25 +145,27 @@ export default function Category() {
           )}
         </div>
       </div>
+      {isPending ? (
+        <SkeletonGrid count={20} />
+      ) : (
+        // <div className="grid gap-y-6 gap-x-4 sm:gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-auto">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {list.map((item, index) => {
+            const href = makeHref(item);
+            const key = makeItemKey(item, index);
 
-      <div className="grid gap-y-6 gap-x-4 sm:gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-auto">
-        {isPending
-          ? Array.from({ length: 20 }).map((_, index) => <SkeletonItem key={index} />)
-          : list.map((item, index) => {
-              const href = makeHref(item);
-              const key = makeItemKey(item, index);
-
-              return href ? (
-                <Link href={href} key={key}>
-                  <CategoryItem item={item} />
-                </Link>
-              ) : (
-                <div key={key} className="opacity-60 cursor-not-allowed" title="상세 페이지가 없어서 이동할 수 없어요">
-                  <CategoryItem item={item} disabled={true} />
-                </div>
-              );
-            })}
-      </div>
+            return href ? (
+              <Link href={href} key={key}>
+                <CategoryItem item={item} />
+              </Link>
+            ) : (
+              <div key={key} className="opacity-60 cursor-not-allowed" title="상세 페이지가 없어서 이동할 수 없어요">
+                <CategoryItem item={item} disabled={true} />
+              </div>
+            );
+          })}
+        </div>
+      )}
       {/* 페이지 네이션 */}
       <div className="mt-6 flex justify-center">
         <AppPagination

@@ -2,18 +2,18 @@
 
 import useCountdown from '@/hooks/useCountdown';
 import TempSessionBadge from './TempSessionBadge';
-import TempSessionModal from './TempSessionModal';
+import TempSessionModal from '../../modal/TempSessionModal';
 import { TempSessionState } from '@/types/useCountDownOptions.type';
 import { startTransition, useEffect, useState } from 'react';
-import { resetTempSession } from '@/app/actions/auth.actions';
+import { logout, resetTempSession } from '@/app/actions/auth.actions';
 import { usePathname, useRouter } from 'next/navigation';
 
-type Props = {
+type TempSessionControllerProps = {
   isLoggedIn: boolean;
   tempSessionExpiresAt: number | null;
 };
 
-export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt }: Props) {
+export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt }: TempSessionControllerProps) {
   const [dismissedSoon, setDismissedSoon] = useState<boolean>(false);
   const [dismissedExpired, setDismissedExpired] = useState<boolean>(false);
   const router = useRouter();
@@ -29,6 +29,15 @@ export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt
     if (remainingSec > 60) setDismissedSoon(false);
     if (remainingSec > 0) setDismissedExpired(false);
   }, [remainingSec]);
+
+  useEffect(() => {
+    if (!isExpired) return;
+
+    startTransition(async () => {
+      await logout();
+      router.push(`/login?reason=expired&redirectTo=${encodeURIComponent(pathname)}`);
+    });
+  }, [isExpired, pathname, router]);
 
   if (!isTempSession || remainingSec === null) return null;
 
@@ -52,8 +61,12 @@ export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt
   };
 
   const onClose = () => {
-    if (isExpired) setDismissedExpired(true);
-    else setDismissedSoon(true);
+    if (isExpired) {
+      onGoLogin();
+      return;
+    }
+
+    setDismissedSoon(true);
   };
 
   return (

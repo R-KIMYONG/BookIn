@@ -7,7 +7,6 @@ import { login } from '@/app/actions/auth.actions';
 
 export default function LoginPage({ searchParams }: { searchParams: { error?: string; redirectTo?: string } }) {
   const redirectTo = searchParams.redirectTo ?? '/';
-
   const errorMessage =
     searchParams.error === 'empty'
       ? '이메일과 비밀번호를 입력해주세요.'

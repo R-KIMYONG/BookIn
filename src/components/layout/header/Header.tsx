@@ -1,9 +1,9 @@
-import HeaderCategories from './HeaderCategories';
 import HeaderLogo from './HeaderLogo';
 import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import TempSessionController from './TempSessionController';
+import HeaderCategoriesServer from './HeaderCategoriesSever';
 
 const Header = async () => {
   const cookieStore = cookies();
@@ -27,10 +27,10 @@ const Header = async () => {
 
   const isLoggedIn = !!user;
   return (
-    <header className="w-full bg-main">
+    <header className="w-full bg-main sticky top-0 z-20 backdrop-blur">
       <nav className="relative max-w-7xl mx-auto h-12 px-10 flex items-center">
         <div className="flex items-center">
-          <HeaderCategories />
+          <HeaderCategoriesServer />
         </div>
         <div className="absolute left-1/2 -translate-x-1/2">
           <HeaderLogo className="hidden md:block" />
