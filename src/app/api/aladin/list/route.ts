@@ -31,14 +31,12 @@ export async function GET(request: NextRequest) {
   if (categoryId) params.set('CategoryId', categoryId);
 
   const API_URL = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
-
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {
       return new NextResponse('Aladin API Error', { status: 502 });
     }
     const data = await response.json();
-
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching data:', error);

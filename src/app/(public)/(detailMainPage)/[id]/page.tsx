@@ -1,5 +1,6 @@
 import { getAladinDetail } from '@/app/lib/aladin/getAladinDetail';
 import Comment from '@/components/comment/Comment';
+import EmptyState from '@/components/common/EmptyState';
 
 import Image from 'next/image';
 
@@ -8,13 +9,7 @@ export default async function MainDetail({ params }: { params: { id: string } })
 
   const item = data?.item?.[0];
 
-  if (!item) {
-
-    return (
-      <div className="flex justify-center items-center min-h-[60vh] text-gray-600">책 정보를 찾을 수 없습니다.</div>
-    );
-
-  }
+  if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
 
   const standard = Number(item.priceStandard ?? 0);
   const sales = Number(item.priceSales ?? 0);
@@ -116,7 +111,7 @@ export default async function MainDetail({ params }: { params: { id: string } })
 
         {/* 댓글부분 */}
         <div className="mt-8">
-          <Comment cover={item.cover} />
+          <Comment cover={item.cover} book_title={item.title} />
         </div>
       </div>
     </>

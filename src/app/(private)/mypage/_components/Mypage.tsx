@@ -1,35 +1,42 @@
 'use client';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { createClient } from '@/utils/supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
-import { useRouter } from 'next/navigation';
 import { UserInfoType } from '@/types/userInfo.type';
 import UserInfo from './UserInfo';
-import CommentList from './CommentList';
+import BookComments from './BookComments';
 import ButtonComponent from '@/components/common/ButtonComponent';
+import useMypageUrlState from '@/hooks/url/useMypageUrlState';
+import { MypageQueryType } from '@/types/useMypageUrlState.type';
+import { logout } from '@/app/actions/auth.actions';
+import useUser from '@/hooks/useUser';
+import MypageSkeleton from './MypageSkeleton';
 
 const Mypage = (): React.JSX.Element => {
-  const [activeTab, setActiveTab] = useState<number>(0);
   const avatarImgRef = useRef<HTMLInputElement>(null);
   const [localUserInfo, setLocalUserInfo] = useState<UserInfoType | null>(null);
   const supabase = createClient();
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const { mypageQueryType, setMypageUrl } = useMypageUrlState();
+  const { data: authUser, isPending: isUserPending } = useUser();
 
   const {
     data: userInfo,
+    isPending: isUserInfoPending,
     isError,
     error,
-  } = useQuery<UserInfoType, Error, UserInfoType, string[]>({
-    queryKey: ['userInfo'],
+  } = useQuery<UserInfoType, Error>({
+    queryKey: ['userInfo', authUser?.id],
     queryFn: async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        const userId = data.user?.id as string;
-        const { data: user, error: userError } = await supabase.from('users').select('*').eq('id', userId).single();
+        const { data: user, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', authUser!.id)
+          .single();
 
         if (userError || !user) {
           throw new Error('User data retrieval error');
@@ -51,6 +58,7 @@ const Mypage = (): React.JSX.Element => {
       }
     },
     throwOnError: true,
+    enabled: !!authUser?.id,
   });
   const updateAvatarImg = useMutation<string, Error, string, UserInfoType>({
     mutationFn: async (imgURL) => {
@@ -63,7 +71,7 @@ const Mypage = (): React.JSX.Element => {
     },
     onSuccess: (updatedImgURL) => {
       setLocalUserInfo((prevState) => (prevState ? { ...prevState, avatar: updatedImgURL } : null));
-      queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+      queryClient.invalidateQueries({ queryKey: ['userInfo', authUser?.id] });
     },
   });
 
@@ -121,17 +129,14 @@ const Mypage = (): React.JSX.Element => {
     },
     [supabase, updateAvatarImg]
   );
-  const handleLogout = useCallback(async () => {
-    await supabase.auth.signOut();
-    toast.success('로그아웃 되었습니다.');
-    router.push('/');
-  }, [router, supabase.auth]);
 
   const profileTabs = [
-    { label: '회원정보', content: userInfo && <UserInfo userInfo={userInfo} /> },
-    { label: '댓글목록', content: userInfo && <CommentList userInfo={userInfo} /> },
+    { label: '회원정보', queryType: 'userInfo' as MypageQueryType },
+    { label: '댓글목록', queryType: 'commentList' as MypageQueryType },
   ];
-
+  if (isUserPending || isUserInfoPending) {
+    return <MypageSkeleton />;
+  }
   if (isError) throw error;
   return (
     <>
@@ -169,25 +174,32 @@ const Mypage = (): React.JSX.Element => {
           </div>
           <nav className="w-full">
             <ul className="w-full">
-              {profileTabs.map((tap, index) => (
+              {profileTabs.map((tab, index) => (
                 <li key={index} className="text-center w-full">
                   <ButtonComponent
-                    className={`!text-white ${activeTab === index ? '!bg-[#783A3A]' : '!bg-[#af5858]'}`}
+                    className={`!text-white ${mypageQueryType === tab.queryType ? '!bg-[#783A3A]' : '!bg-[#af5858]'}`}
                     size="md"
                     fullWidth={true}
                     variant="ghost"
-                    onClick={() => setActiveTab(index)}
-                  >
-                    {tap.label}
-                  </ButtonComponent>
+                    onClick={() =>
+                      setMypageUrl({ queryType: tab.queryType, page: tab.queryType !== 'userInfo' ? 1 : null })
+                    }
+                    label={tab.label}
+                  />
                 </li>
               ))}
             </ul>
           </nav>
-          <ButtonComponent type="button" label="로그아웃" variant="outline" size="xs" onClick={handleLogout} />
+          <form action={logout}>
+            <ButtonComponent type="button" label="로그아웃" variant="outline" size="xs" />
+          </form>
         </div>
         <div className="w-5/6 self-stretch flex flex-col justify-between">
-          <div className="flex-1 min-h-0">{profileTabs[activeTab].content}</div>
+          <div className="flex-1 min-h-0">
+            {mypageQueryType === 'userInfo'
+              ? userInfo && <UserInfo userInfo={userInfo} />
+              : userInfo && <BookComments userInfo={userInfo} />}
+          </div>
         </div>
       </div>
     </>

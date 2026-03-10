@@ -4,20 +4,21 @@ import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { clearTempSessionCookies, setTempSessionCookies } from '../lib/auth/sessionCookies';
 
 export async function logout() {
   const supabase = createClient();
-
   const { error } = await supabase.auth.signOut();
 
   if (error) {
     redirect('/error');
   }
 
+  clearTempSessionCookies();
+
   revalidatePath('/', 'layout');
   redirect('/');
 }
-
 
 export async function login(formData: FormData) {
   const supabase = createClient();
@@ -25,10 +26,6 @@ export async function login(formData: FormData) {
   const email = String(formData.get('email') ?? '');
   const password = String(formData.get('password') ?? '');
   const redirectTo = String(formData.get('redirectTo') ?? '/').trim();
-
-
-  const cookieStore = cookies();
-
   if (!email || !password) {
     // 여기서 redirect로 에러 페이지 보내도 되고,
     // login 페이지에서 query param으로 처리해도 됨.
@@ -40,34 +37,15 @@ export async function login(formData: FormData) {
     redirect(`/login?error=invalid`);
   }
 
-
-  revalidatePath('/', 'layout');
-
-  if (redirectTo === '/' || redirectTo === '') redirect('/mypage');
-
-  if (!remember) {
-    const maxAge = 2 * 60 * 60; // 2시간(초)
-    const expiresAt = Date.now() + maxAge * 1000;
-
-    cookieStore.set('bookin_session_mode', 'temp', {
-      path: '/',
-      maxAge,
-      sameSite: 'lax',
-    });
-
-    cookieStore.set('bookin_session_expires_at', String(expiresAt), {
-      path: '/',
-      maxAge,
-      sameSite: 'lax',
-    });
+  if (remember) {
+    clearTempSessionCookies();
   } else {
-    cookieStore.set('bookin_session_mode', '', { path: '/', maxAge: 0, sameSite: 'lax' });
-    cookieStore.set('bookin_session_expires_at', '', { path: '/', maxAge: 0, sameSite: 'lax' });
+    setTempSessionCookies();
   }
   revalidatePath('/', 'layout');
 
-  if (redirectTo) redirect(redirectTo);
-  redirect(redirectTo);
+  const nextPath = redirectTo === '/' || redirectTo === '' ? '/mypage' : redirectTo;
+  redirect(nextPath);
 }
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const isValidPassword = (pw: string) => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(pw);
@@ -86,13 +64,7 @@ export async function signup(formData: FormData) {
   if (password !== confirmPassword) redirect('/signup?error=password-mismatch');
 
   // 이메일 중복 체크
-  const { data: emailExist } = await supabase
-    .from('users')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle();
-
-  if (emailExist) redirect('/signup?error=email-exists');
+  const { data: emailExist } = await supabase.from('users').select('id').eq('email', email).maybeSingle();
 
   if (emailExist) redirect('/signup?error=email-exists');
 
@@ -111,7 +83,6 @@ export async function signup(formData: FormData) {
 
   if (error || !data.user?.id) redirect('/signup?error=auth');
 
-
   const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
   if (loginError) redirect('/signup?error=auth');
 
@@ -123,9 +94,8 @@ export async function signup(formData: FormData) {
     nickname,
   });
 
-
   if (insertError) redirect('/signup?error=profile');
-  
+
   revalidatePath('/', 'layout');
   redirect('/mypage');
 }
@@ -184,4 +154,3 @@ export async function resetTempSession() {
 
   revalidatePath('/', 'layout');
 }
-

@@ -7,6 +7,8 @@ export type Mycommentlist = {
     title: string;
     user_id: string;
     writer: string;
+    cover: string;
+    updated_at: string;
   }[];
   total: number;
 };

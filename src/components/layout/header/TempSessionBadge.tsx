@@ -24,12 +24,11 @@ const TempSessionBadge = ({ remainingSec, countDownText, isExpired }: TempSessio
   }, [remainingSec]);
   return (
     <>
-      <div className="text-xs text-white/90" suppressHydrationWarning>
+      <div className="text-xs text-white/90 flex items-center gap-2" suppressHydrationWarning>
         <b>{countDownText ?? '--:--:--'}</b>
         {isExpired ? <span className="ml-2 text-red-200">(만료됨)</span> : null}
+        <ExtendButton />
       </div>
-
-      <ExtendButton />
     </>
   );
 };
