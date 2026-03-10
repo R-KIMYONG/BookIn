@@ -14,7 +14,7 @@ const UserInfo = ({ userInfo }: UserInfoPropsType) => {
     {
       label: '닉네임',
       desc: '게시글/댓글에 표시됩니다',
-      value: <ChangeUserNickName info={userInfo.nickname} />,
+      value: <ChangeUserNickName nickname={userInfo.nickname} userId={userInfo.id} />,
     },
     {
       label: '아이디',

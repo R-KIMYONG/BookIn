@@ -1,35 +1,7 @@
+import { getAladinItemList, MAX_RESULTS } from '@/app/lib/aladin/getAladinItemList';
 import { TARGET_LIST, TargetTypes } from '@/types/category.type';
 import { QT_LIST, QueryType } from '@/types/useListUrlState.type';
 import { NextRequest, NextResponse } from 'next/server';
-
-const MAX_RESULTS = 20;
-const fetchItemList = async (args: {
-  target: TargetTypes; //'Book' | 'Foreign' | 'eBook' SerchTarget에필요함
-  queryType: QueryType; // Bestseller' | 'ItemNewAll' | 'ItemNewSpecial' | 'BlogBest' | 'ItemEditorChoice'; QueryType에 필요함
-  categoryId: string | undefined; //예시)'12345'CategoryId에 넣을때 필요함 소분류고 문자열로옴
-  page: number; //몇페이지의 아이템을 가져올지 결정하는데 숫자로 옴
-}) => {
-  const params = new URLSearchParams({
-    ttbkey: process.env.ALADIN_TTB_KEY ?? '',
-    QueryType: args.queryType,
-    SearchTarget: args.target,
-    Start: String(args.page),
-    MaxResults: String(MAX_RESULTS),
-    Cover: 'Big',
-    Output: 'js',
-    Version: '20131101',
-  });
-  if (args.categoryId) params.set('CategoryId', args.categoryId);
-
-  const url = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
-
-  const response = await fetch(url, { cache: 'no-store' });
-  if (!response.ok) throw new Error(`Aladin API ${response.status}`);
-
-  const data = await response.json();
-  const items = Array.isArray(data.item) ? data.item : [];
-  return { data, itemsCount: items.length };
-};
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -43,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   const MAX_PAGE = 50; //알라딘 정책상 한페이지20개라면 최대 50페이지까지인 하드 제한 걸려있기때문에 50을두고 찾음
 
-  const first = await fetchItemList({ target, queryType, categoryId, page: 1 }); //여기서 이미 첫페이지 요청해서 탐색했으니 아래에서 startPage는 1로 일단 두고 for문은 2부터 시작하면 요청한번 줄어든다.
+  const first = await getAladinItemList({ target, queryType, categoryId, page: 1 }); //여기서 이미 첫페이지 요청해서 탐색했으니 아래에서 startPage는 1로 일단 두고 for문은 2부터 시작하면 요청한번 줄어든다.
 
   if (first.itemsCount === 0) {
     return NextResponse.json({ lastPage: 0 }); // 아예 없을때 안전장치
@@ -59,7 +31,7 @@ export async function GET(request: NextRequest) {
   for (let i = 2; i <= MAX_PAGE; i *= 2) {
     //1,2,4,8,16,32처럼 순환하는데 itemsCount가 0보다크면 start 업데이트
     //itemsCount가 0
-    const { itemsCount } = await fetchItemList({ target, queryType, categoryId, page: i });
+    const { itemsCount } = await getAladinItemList({ target, queryType, categoryId, page: i });
     if (itemsCount > 0) {
       startPage = i;
     } else {
@@ -77,19 +49,20 @@ export async function GET(request: NextRequest) {
   //startPage가 마지막 true로 계산되고 25가 마지막true로 계산된다.그럼 이렇게까지 계산해서 어떻게 멈추지?
   //26-25=1
   //end-start해서 1보다 크면 순환하고 아니면 찾은거니까 종료 조건
-  if (endPage === 0) { //2,4,8,16,32까지 탐색하고 여전히 못찾으면 50페이지를 찔러본다 찔려서 있으면 50페이지가 마지막페이지고 없으면 50을 endPage로 해서 추가 탐색을 한다.
-    const { itemsCount } = await fetchItemList({ target, queryType, categoryId, page: MAX_PAGE });
+  if (endPage === 0) {
+    //2,4,8,16,32까지 탐색하고 여전히 못찾으면 50페이지를 찔러본다 찔려서 있으면 50페이지가 마지막페이지고 없으면 50을 endPage로 해서 추가 탐색을 한다.
+    const { itemsCount } = await getAladinItemList({ target, queryType, categoryId, page: MAX_PAGE });
 
     if (itemsCount > 0) {
       return NextResponse.json({ lastPage: MAX_PAGE });
     }
 
     // 50은 비었으니, 마지막은 startPage(=32) ~ 50 사이에 있음
-    endPage = MAX_PAGE; 
+    endPage = MAX_PAGE;
   }
   while (endPage - startPage > 1) {
     let mid = Math.floor((startPage + endPage) / 2);
-    const { itemsCount } = await fetchItemList({ target, queryType, categoryId, page: mid });
+    const { itemsCount } = await getAladinItemList({ target, queryType, categoryId, page: mid });
 
     if (itemsCount > 0) startPage = mid;
     else endPage = mid;

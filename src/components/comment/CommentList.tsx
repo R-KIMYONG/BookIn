@@ -1,53 +1,32 @@
 'use client';
 
-import useCommentQuery from '@/hooks/useCommentQuery';
-import { Tables } from '@/types/supabase';
-import { Spinner } from '@nextui-org/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Spinner, useDisclosure } from '@nextui-org/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useParams } from 'next/navigation';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { TargetValue } from './Comment';
-import CommentPagination from './Pagination';
 import ButtonComponent from '../common/ButtonComponent';
+import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
+import AppPagination from '../common/AppPagination';
+import { CommentListProps, CommentListResult } from '@/types/commentList.type';
+import ConfirmModal from '../modal/ConfirmModal';
 
-interface Props {
-  isEdit: boolean;
-  setIsEdit: Dispatch<SetStateAction<boolean>>;
-  setTargetValue: Dispatch<SetStateAction<TargetValue>>;
-  user: any;
-}
-
-const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
+const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, postId }: CommentListProps) => {
+  const pageSize = 10;
   const queryClient = useQueryClient();
+  const { page, setCommentsUrl } = useCommentsUrlState();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [targetDeleteId, setTargetDeleteId] = useState<string | null>(null);
 
-  const { id: postId } = useParams<{ id: string }>();
-  const { comments, isPending } = useCommentQuery({ postId });
-
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(6);
-  const offset: number = (page - 1) * pageSize;
-  const commentsToDisplay = Array.isArray(comments) ? comments.slice(offset, offset + pageSize) : [];
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  const handleEdit = (comment: Tables<'comments'>) => {
-    setEditingId(comment.id);
-    setIsEdit(false);
-    setIsEdit(!isEdit);
-    const { id, title, content, created_at }: any = comment;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-    const textContent = doc.body.textContent || '';
-
-    setTargetValue((prev) => ({
-      ...prev,
-      id,
-      created_at,
-      title: isEdit ? '' : title,
-      content: isEdit ? '' : textContent,
-    }));
-  };
+  const { data: comments, isPending } = useQuery<CommentListResult>({
+    queryKey: ['comments', postId, page],
+    queryFn: async () => {
+      const res = await fetch(`/api/comment?post_id=${postId}&page=${page}`);
+      if (!res.ok) throw new Error('댓글 조회 실패');
+      return res.json();
+    },
+    enabled: !!postId,
+  });
 
   const deleteComment = async (id: string) => {
     const response = await fetch(`/api/comment/?id=${id}`, {
@@ -65,34 +44,15 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
 
   const deleteMutation = useMutation({
     mutationFn: deleteComment,
-    onMutate: async (id: string) => {
-      await queryClient.cancelQueries({ queryKey: ['comments', postId] });
-
-      const previousComments = queryClient.getQueryData(['comments', postId]);
-
-      queryClient.setQueryData(['comments', postId], (old: any) => old.filter((comment: any) => comment.id !== id));
-
-      return { previousComments };
-    },
-    onError: (error, id, context) => {
-      queryClient.setQueryData(['comments', postId], context?.previousComments);
-      toast.error(error.message);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
+      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId, page] });
       toast.success('삭제 완료');
     },
   });
 
   const handleDelete = (id: string) => {
-    if (!confirm('삭제시 복구가 어렵습니다. 정말 삭제하시겠습니까?')) {
-      return;
-    }
     deleteMutation.mutate(id);
-  };
-
-  const handlePageChange = (page: number) => {
-    setPage(page);
   };
 
   if (!comments)
@@ -108,33 +68,31 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
       </div>
     );
 
-  const totalPages: number = comments && Array.isArray(comments) ? Math.ceil(comments.length / pageSize) : 1;
+  const totalPages = Math.max(1, Math.ceil((comments.total ?? 0) / pageSize));
   return (
     <div className="flex flex-col gap-4">
       <div className="mt-6 flex items-end justify-between">
         <div>
           <h3 className="text-lg font-extrabold text-gray-900">코멘트</h3>
           <p className="mt-1 text-xs text-gray-500">
-            총 <span className="font-bold text-[#AF5858]">{comments.length}</span>개
+            총 <span className="font-bold text-[#AF5858]">{comments.total}</span>개
           </p>
         </div>
       </div>
 
-      {commentsToDisplay?.length === 0 ? (
-        <div>No comments yet</div>
-      ) : (
-        <ul className="border-y-2 border-black">
-          {commentsToDisplay?.length === 0 ? (
+      {
+        <div className="border-y-2 border-black py-6">
+          {comments.data.length === 0 ? (
             <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-10 text-center">
               <p className="text-sm font-semibold text-gray-700">아직 댓글이 없어요</p>
               <p className="mt-1 text-xs text-gray-500">첫 댓글을 남겨보세요.</p>
             </div>
           ) : (
             <ul className="space-y-3 py-6">
-              {commentsToDisplay.map((comment) => {
+              {comments.data.map((comment) => {
                 const { id, title, content, writer, created_at, user_id } = comment;
                 const date = dayjs(created_at).locale('ko').format('YYYY-MM-DD HH:mm');
-                const isMine = user?.id === user_id;
+                const isMine = userId === user_id;
 
                 return (
                   <li
@@ -154,9 +112,23 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
                             variant="outline"
                             size="xs"
                             label={isEdit && id === editingId ? '취소' : '수정'}
-                            onClick={() => handleEdit(comment)}
+                            onClick={() => {
+                              if (isEdit && editingId === id) {
+                                handleCancelEdit();
+                              } else {
+                                handleStartEdit(comment);
+                              }
+                            }}
                           />
-                          <ButtonComponent variant="danger" size="xs" label="삭제" onClick={() => handleDelete(id)} />
+                          <ButtonComponent
+                            variant="danger"
+                            size="xs"
+                            label="삭제"
+                            onClick={() => {
+                              setTargetDeleteId(id);
+                              onOpen();
+                            }}
+                          />
                         </div>
                       ) : null}
                     </div>
@@ -182,10 +154,24 @@ const CommentList = ({ isEdit, setIsEdit, setTargetValue, user }: Props) => {
               })}
             </ul>
           )}
-        </ul>
-      )}
+        </div>
+      }
+      <ConfirmModal
+        isOpen={isOpen}
+        title="댓글 삭제"
+        message="삭제 시 복구가 어렵습니다. 정말 삭제하시겠습니까?"
+        confirmColor="danger"
+        confirmLabel="삭제"
+        cancelLabel="취소"
+        onConfirm={() => {
+          if (!targetDeleteId) return;
+          handleDelete(targetDeleteId);
+          onClose();
+        }}
+        onClose={onClose}
+      />
 
-      <CommentPagination page={page} totalComments={totalPages} onPageChange={handlePageChange} />
+      <AppPagination page={page} totalPages={totalPages} onChange={(p) => setCommentsUrl({ page: p })} />
     </div>
   );
 };

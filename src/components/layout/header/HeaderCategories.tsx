@@ -1,17 +1,22 @@
 'use client';
 
-import useGenres from '@/hooks/useGenres';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
 import { Genre } from '@/types/genre.type';
 import { useRouter } from 'next/navigation';
 
-export default function HeaderCategories() {
+type HeaderCategoriesProps = {
+  koGenres: Genre[];
+  foGenres: Genre[];
+  ebGenres: Genre[];
+};
+
+const HeaderCategories = ({ koGenres, foGenres, ebGenres }: HeaderCategoriesProps) => {
   const router = useRouter();
-  const { koreanGenres, foreignGenres, ebookGenres } = useGenres();
-  const groups: { key: string; label: string; items?: Genre[] }[] = [
-    { key: 'kr', label: '국내도서', items: koreanGenres },
-    { key: 'fr', label: '외국도서', items: foreignGenres },
-    { key: 'eb', label: 'eBook', items: ebookGenres },
+
+  const groups: { key: string; label: string; items: Genre[] }[] = [
+    { key: 'kr', label: '국내도서', items: koGenres },
+    { key: 'fr', label: '외국도서', items: foGenres },
+    { key: 'eb', label: 'eBook', items: ebGenres },
   ];
 
   return (
@@ -21,12 +26,13 @@ export default function HeaderCategories() {
           <DropdownTrigger>
             <p className="text-white text-xs cursor-pointer">{label}</p>
           </DropdownTrigger>
+
           <DropdownMenu
             aria-label={`${label} 메뉴`}
-            items={items ?? []}
+            items={items}
             className="max-h-[200px] overflow-y-auto w-[200px]"
             onAction={(genreId) => {
-              const target = key === 'kr' ? 'Book' : key === 'fr' ? 'Foreign' : 'ebook';
+              const target = key === 'kr' ? 'Book' : key === 'fr' ? 'Foreign' : 'eBook';
               router.push(`/category/${genreId}?target=${target}&page=1`);
             }}
           >
@@ -40,4 +46,6 @@ export default function HeaderCategories() {
       ))}
     </div>
   );
-}
+};
+
+export default HeaderCategories;

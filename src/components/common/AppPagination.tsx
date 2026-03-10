@@ -102,11 +102,10 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
               name="pageInput"
               type="text"
               inputMode="numeric"
-              // pattern="[0-9]*"
               autoComplete="off"
               placeholder="예: 12"
               className={cn(
-                'w-16 bg-transparent text-sm font-semibold outline-none text-center',
+                'w-10 bg-transparent text-sm font-semibold outline-none text-center h-4 placeholder:text-xs',
                 error && 'border-red-400 text-red-500'
               )}
               onChange={(e) => {
