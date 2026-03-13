@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Aladin API Error', { status: 502 });
     }
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error('Error fetching data:', error);
     return new NextResponse('Internal Server Error', { status: 500 });

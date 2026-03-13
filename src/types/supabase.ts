@@ -49,7 +49,7 @@ export type Database = {
           {
             foreignKeyName: "comment_books_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -104,22 +104,31 @@ export type Database = {
           avatar: string | null
           created_at: string
           email: string | null
+          email_change_token_hash: string | null
           id: string
           nickname: string | null
+          pending_email: string | null
+          pending_email_expires_at: string | null
         }
         Insert: {
           avatar?: string | null
           created_at?: string
           email?: string | null
+          email_change_token_hash?: string | null
           id?: string
           nickname?: string | null
+          pending_email?: string | null
+          pending_email_expires_at?: string | null
         }
         Update: {
           avatar?: string | null
           created_at?: string
           email?: string | null
+          email_change_token_hash?: string | null
           id?: string
           nickname?: string | null
+          pending_email?: string | null
+          pending_email_expires_at?: string | null
         }
         Relationships: []
       }

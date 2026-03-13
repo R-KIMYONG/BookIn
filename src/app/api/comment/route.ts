@@ -108,10 +108,6 @@ export const PUT = async (request: NextRequest) => {
   try {
     const updateComment = await request.json();
     const { id, book_title, ...commentFields } = updateComment;
-    console.log(updateComment);
-    if (!id) {
-      return NextResponse.json({ error: 'id가 올바르지 않습니다' }, { status: 400 });
-    }
 
     if (!id) {
       return NextResponse.json({ error: 'id가 올바르지 않습니다' }, { status: 400 });
