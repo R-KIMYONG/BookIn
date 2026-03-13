@@ -3,30 +3,34 @@ import ChangePassWord from './ChangePassWord';
 import ChangeUserId from './ChangeUserId';
 import ChangeUserNickName from './ChangeUserNickName';
 import AccountDeletion from './AccountDeletion';
+import { useMemo } from 'react';
 
 const UserInfo = ({ userInfo }: UserInfoPropsType) => {
-  const userInfoRows = [
-    {
-      label: '회원번호',
-      desc: '고유 식별자 (변경 불가)',
-      value: <span className="font-semibold">{userInfo?.id.split('-')[0].toUpperCase()}</span>,
-    },
-    {
-      label: '닉네임',
-      desc: '게시글/댓글에 표시됩니다',
-      value: <ChangeUserNickName nickname={userInfo.nickname} userId={userInfo.id} />,
-    },
-    {
-      label: '아이디',
-      desc: '로그인에 사용됩니다',
-      value: <ChangeUserId info={userInfo.email} />,
-    },
-    {
-      label: '비밀번호',
-      desc: '보안을 위해 주기적으로 변경하세요',
-      value: <ChangePassWord />,
-    },
-  ];
+  const userInfoRows = useMemo(
+    () => [
+      {
+        label: '회원번호',
+        desc: '고유 식별자 (변경 불가)',
+        value: <span className="font-semibold">{userInfo?.id.split('-')[0].toUpperCase()}</span>,
+      },
+      {
+        label: '닉네임',
+        desc: '게시글/댓글에 표시됩니다',
+        value: <ChangeUserNickName nickname={userInfo.nickname} userId={userInfo.id} />,
+      },
+      {
+        label: '아이디',
+        desc: '로그인에 사용됩니다',
+        value: <ChangeUserId email={userInfo.email} userId={userInfo.id} />,
+      },
+      {
+        label: '비밀번호',
+        desc: '보안을 위해 주기적으로 변경하세요',
+        value: <ChangePassWord />,
+      },
+    ],
+    [userInfo]
+  );
 
   return (
     <div className="h-full rounded-2xl border border-default-200 bg-white overflow-hidden flex flex-col">

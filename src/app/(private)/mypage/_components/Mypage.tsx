@@ -22,7 +22,6 @@ const Mypage = (): React.JSX.Element => {
   const queryClient = useQueryClient();
   const { mypageQueryType, setMypageUrl } = useMypageUrlState();
   const { data: authUser, isPending: isUserPending } = useUser();
-
   const {
     data: userInfo,
     isPending: isUserInfoPending,
@@ -47,6 +46,8 @@ const Mypage = (): React.JSX.Element => {
           id: user.id,
           created_at: user.created_at,
           avatar: user.avatar || '',
+          pending_email: user.pending_email || '',
+          pending_email_expires_at: user.pending_email_expires_at || '',
         };
 
         return userData;
@@ -141,7 +142,7 @@ const Mypage = (): React.JSX.Element => {
   return (
     <>
       <div className="flex justify-between gap-4 sm:w-full mx-auto items-stretch min-h-[calc(100vh-3rem)]">
-        <div className="bg-[#af5858] w-1/6 self-stretch flex flex-col items-center justify-center text-xs gap-5">
+        <div className="bg-[#af5858] w-1/6 self-stretch flex flex-col items-center justify-center gap-5 text-xs [transform:translateZ(0)]">
           <div className="relative aspect-square w-14 sm:w-16 md:w-20 lg:w-24 overflow-hidden box-border">
             <Image
               src={localUserInfo?.avatar || userInfo?.avatar || '/images/noImg.png'}
@@ -194,7 +195,7 @@ const Mypage = (): React.JSX.Element => {
             <ButtonComponent type="button" label="로그아웃" variant="outline" size="xs" />
           </form>
         </div>
-        <div className="w-5/6 self-stretch flex flex-col justify-between">
+        <div className="w-5/6 min-w-0 self-stretch flex flex-col justify-between [contain:layout_paint]">
           <div className="flex-1 min-h-0">
             {mypageQueryType === 'userInfo'
               ? userInfo && <UserInfo userInfo={userInfo} />
