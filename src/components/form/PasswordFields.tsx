@@ -5,8 +5,9 @@ import { EyeSlashFilledIcon } from '@/components/icons/EyeSlashFilledIcon';
 import { PasswordFieldsProps } from '@/types/passwordField.type';
 import { useState } from 'react';
 import ButtonComponent from '../common/ButtonComponent';
+import cn from '@/utils/cn';
 
-export default function PasswordFields({
+const PasswordFields = ({
   withConfirm = false, //비밀번호 확인하는 필드 렌더링할지 여부 (로그인에서는 false)
   passwordLabel = 'Password',
   confirmLabel = 'Confirm Password',
@@ -14,10 +15,13 @@ export default function PasswordFields({
   confirmPlaceholder = '비밀번호 다시 입력',
   passwordName = 'password',
   confirmName = 'confirmPassword',
-  required = true, //브라우저 자도 제출 방지
+  required = true, //브라우저 자동 제출 방지
   showHint = true, //비밀번호 규칙 렌더링여부
   className,
-}: PasswordFieldsProps) {
+  passwordValue,
+  confirmValue,
+  onChange,
+}: PasswordFieldsProps) => {
   const [showPw, setShowPw] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
@@ -28,7 +32,7 @@ export default function PasswordFields({
 
   return (
     <>
-      <div className={className}>
+      <div>
         <label htmlFor={passwordName} className="mb-1.5 block text-xs font-semibold text-gray-700">
           {withConfirm && <span className="ml-1 text-red-500">*</span>}
           {passwordLabel}
@@ -36,13 +40,15 @@ export default function PasswordFields({
 
         <div className="relative">
           <input
-            className={inputBase}
+            className={cn(inputBase, className)}
             id={passwordName}
             name={passwordName}
             type={showPw ? 'text' : 'password'}
             placeholder={passwordPlaceholder}
             autoComplete={withConfirm ? 'new-password' : 'current-password'}
             required={required}
+            {...(passwordValue !== undefined ? { value: passwordValue } : {})}
+            {...(onChange ? { onChange } : {})}
           />
           <ButtonComponent
             type="button"
@@ -67,13 +73,15 @@ export default function PasswordFields({
 
           <div className="relative">
             <input
-              className={inputBase}
+              className={cn(inputBase, className)}
               id={confirmName}
               name={confirmName}
               type={showConfirm ? 'text' : 'password'}
               placeholder={confirmPlaceholder}
               autoComplete="new-password"
               required={required}
+              {...(confirmValue !== undefined ? { value: confirmValue } : {})}
+              {...(onChange ? { onChange } : {})}
             />
             <ButtonComponent
               type="button"
@@ -88,4 +96,6 @@ export default function PasswordFields({
       ) : null}
     </>
   );
-}
+};
+
+export default PasswordFields;

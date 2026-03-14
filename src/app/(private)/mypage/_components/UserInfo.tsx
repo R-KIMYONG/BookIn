@@ -26,7 +26,7 @@ const UserInfo = ({ userInfo }: UserInfoPropsType) => {
       {
         label: '비밀번호',
         desc: '보안을 위해 주기적으로 변경하세요',
-        value: <ChangePassWord />,
+        value: <ChangePassWord userId={userInfo.id} />,
       },
     ],
     [userInfo]
