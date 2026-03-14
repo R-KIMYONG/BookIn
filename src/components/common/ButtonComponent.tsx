@@ -62,10 +62,10 @@ const ButtonComponent = forwardRef<HTMLButtonElement, ButtonComponentProps>(
         {...props}
       >
         {isLoading ? (
-          <p className='text-center pt-1'>
+          <span className="text-center flex items-center">
             <ButtonSpinner />
             <span className="leading-none">{loadingText}</span>
-          </p>
+          </span>
         ) : (
           <>
             {leftIcon ? <span className="pointer-events-none">{leftIcon}</span> : null}

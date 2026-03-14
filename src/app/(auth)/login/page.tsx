@@ -5,7 +5,7 @@ import SocialLoginButtons from './_components/SocialLoginButtons';
 import PasswordFields from '@/components/form/PasswordFields';
 import { login } from '@/app/actions/auth.actions';
 
-export default function LoginPage({ searchParams }: { searchParams: { error?: string; redirectTo?: string } }) {
+const LoginPage = ({ searchParams }: { searchParams: { error?: string; redirectTo?: string } }) => {
   const redirectTo = searchParams.redirectTo ?? '/';
   const errorMessage =
     searchParams.error === 'empty'
@@ -91,4 +91,6 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
