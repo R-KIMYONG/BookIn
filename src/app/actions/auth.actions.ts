@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { clearTempSessionCookies, setTempSessionCookies } from '../lib/auth/sessionCookies';
+import { isValidEmail } from '../lib/validation/isEmail';
+import { isValidPassword } from '../lib/validation/isPassword';
 
 export async function logout() {
   const supabase = createClient();
@@ -47,8 +49,6 @@ export async function login(formData: FormData) {
   const nextPath = redirectTo === '/' || redirectTo === '' ? '/mypage' : redirectTo;
   redirect(nextPath);
 }
-const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const isValidPassword = (pw: string) => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(pw);
 
 export async function signup(formData: FormData) {
   const supabase = createClient();

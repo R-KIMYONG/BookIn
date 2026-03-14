@@ -20,4 +20,7 @@ export type PasswordFieldsProps = {
   required?: boolean;
   showHint?: boolean;
   className?: string;
+  passwordValue?: string;
+  confirmValue?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
