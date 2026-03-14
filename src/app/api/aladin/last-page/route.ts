@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
   const first = await getAladinItemList({ target, queryType, categoryId, page: 1 }); //여기서 이미 첫페이지 요청해서 탐색했으니 아래에서 startPage는 1로 일단 두고 for문은 2부터 시작하면 요청한번 줄어든다.
 
   if (first.itemsCount === 0) {
-    return NextResponse.json({ lastPage: 0 }); // 아예 없을때 안전장치
+    return NextResponse.json({ lastPage: 0 }, { status: 200 }); // 아예 없을때 안전장치
   }
 
   if (first.itemsCount < MAX_RESULTS) {
-    return NextResponse.json({ lastPage: 1 }); // 1페이지가 마지막 안전장치 이렇게 확인되면 아래 코드 안돌려도되니까
+    return NextResponse.json({ lastPage: 1 }, { status: 200 }); // 1페이지가 마지막 안전장치 이렇게 확인되면 아래 코드 안돌려도되니까
   }
 
   let startPage: number = 1;
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     const { itemsCount } = await getAladinItemList({ target, queryType, categoryId, page: MAX_PAGE });
 
     if (itemsCount > 0) {
-      return NextResponse.json({ lastPage: MAX_PAGE });
+      return NextResponse.json({ lastPage: MAX_PAGE }, { status: 200 });
     }
 
     // 50은 비었으니, 마지막은 startPage(=32) ~ 50 사이에 있음
@@ -67,5 +67,5 @@ export async function GET(request: NextRequest) {
     if (itemsCount > 0) startPage = mid;
     else endPage = mid;
   }
-  return NextResponse.json({ lastPage: startPage });
+  return NextResponse.json({ lastPage: startPage }, { status: 200 });
 }

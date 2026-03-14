@@ -1,4 +1,4 @@
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'|'navbarLight'|'navbarDark';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'|'navbarLight'|'navbarDark';
  
 //  primary   : 가장 중요한 주요 액션 (저장, 제출, 결제 등)
 //  secondary : 보조 액션 (취소, 뒤로가기 등)

@@ -4,6 +4,8 @@ export type UserInfoType = {
   created_at: string;
   avatar: string;
   id: string;
+  pending_email: string;
+  pending_email_expires_at: string;
 };
 
 export interface UserInfoPropsType {

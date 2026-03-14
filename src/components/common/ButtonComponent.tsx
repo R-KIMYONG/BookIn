@@ -21,15 +21,15 @@ const sizeClasses: Record<NonNullable<ButtonComponentProps['size']>, string> = {
   md: 'text-sm px-4 py-2 h-10',
 };
 
-function ButtonSpinner({ size = 14 }: { size?: number }) {
+const ButtonSpinner = ({ size = 14 }: { size?: number }) => {
   return (
     <span
-      className="inline-block animate-spin rounded-full border-2 border-current/70 border-t-transparent"
+      className="inline-block animate-spin rounded-full border-1 border-current/70 border-t-transparent"
       style={{ width: size, height: size }}
       aria-hidden="true"
     />
   );
-}
+};
 
 const ButtonComponent = forwardRef<HTMLButtonElement, ButtonComponentProps>(
   (
@@ -62,10 +62,10 @@ const ButtonComponent = forwardRef<HTMLButtonElement, ButtonComponentProps>(
         {...props}
       >
         {isLoading ? (
-          <>
+          <p className='text-center pt-1'>
             <ButtonSpinner />
             <span className="leading-none">{loadingText}</span>
-          </>
+          </p>
         ) : (
           <>
             {leftIcon ? <span className="pointer-events-none">{leftIcon}</span> : null}
