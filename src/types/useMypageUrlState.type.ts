@@ -1,7 +1,10 @@
-export type MypageQueryType = 'userInfo' | 'commentList' | 'commentByBook' | 'commentAll';
+export type MypageSectionType = 'userInfo' | 'commentList';
+export type CommentTabType = 'commentAll' | 'commentByBook';
 
-export const MYPAGE_QT_LIST: MypageQueryType[] = ['userInfo', 'commentList', 'commentByBook', 'commentAll'];
+export const MYPAGE_SECTION_LIST: MypageSectionType[] = ['userInfo', 'commentList'];
+export const COMMENT_TAB_LIST: CommentTabType[] = ['commentAll', 'commentByBook'];
 
-export const MYPAGE_DEFAULT_QT: MypageQueryType = 'userInfo';
+export const MYPAGE_DEFAULT_SECTION: MypageSectionType = 'userInfo';
+export const COMMENT_DEFAULT_TAB: CommentTabType = 'commentByBook';
 
 export type MypageModalType = 'changePassword' | null;

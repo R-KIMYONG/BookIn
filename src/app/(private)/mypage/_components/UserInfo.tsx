@@ -1,11 +1,11 @@
-import { UserInfoPropsType } from '@/types/userInfo.type';
+import { MypageUserInfo } from '@/types/userInfo.type';
 import ChangePassWord from './ChangePassWord';
 import ChangeUserId from './ChangeUserId';
 import ChangeUserNickName from './ChangeUserNickName';
 import AccountDeletion from './AccountDeletion';
 import { useMemo } from 'react';
 
-const UserInfo = ({ userInfo }: UserInfoPropsType) => {
+const UserInfo = ({ userInfo }: { userInfo: MypageUserInfo }) => {
   const userInfoRows = useMemo(
     () => [
       {

@@ -1,14 +1,14 @@
 import { BookGroup } from './commentBooks.type';
-import { UserInfoType } from './userInfo.type';
-export type CommentsTabType = 'byBook' | 'all';
+import { CommentTabType } from './useMypageUrlState.type';
+import { MypageUserInfo } from './userInfo.type';
 
 export type CommentTabsProps = {
-  activeTab: CommentsTabType;
-  setActiveTab: (item: CommentsTabType) => void;
+  activeTab: CommentTabType;
+  setActiveTab: (item: CommentTabType) => void;
 };
 
 export type CommentsListProps = {
-  userInfo: UserInfoType;
+  userInfo: MypageUserInfo;
   currentPage: number;
   setTotalPages: (page: number) => void;
 };
