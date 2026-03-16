@@ -103,30 +103,30 @@ export type Database = {
         Row: {
           avatar: string | null
           created_at: string
-          email: string | null
+          email: string
           email_change_token_hash: string | null
           id: string
-          nickname: string | null
+          nickname: string
           pending_email: string | null
           pending_email_expires_at: string | null
         }
         Insert: {
           avatar?: string | null
           created_at?: string
-          email?: string | null
+          email: string
           email_change_token_hash?: string | null
           id?: string
-          nickname?: string | null
+          nickname: string
           pending_email?: string | null
           pending_email_expires_at?: string | null
         }
         Update: {
           avatar?: string | null
           created_at?: string
-          email?: string | null
+          email?: string
           email_change_token_hash?: string | null
           id?: string
-          nickname?: string | null
+          nickname?: string
           pending_email?: string | null
           pending_email_expires_at?: string | null
         }

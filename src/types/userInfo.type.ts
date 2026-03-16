@@ -21,3 +21,5 @@ export type MyCommentsListType = {
   user_id: string;
   writer: string;
 };
+
+export type MypageUserInfo = Pick<UserInfoType, 'id' | 'email' | 'nickname' | 'avatar'>;
