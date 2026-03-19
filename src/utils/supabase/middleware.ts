@@ -38,18 +38,21 @@ export async function updateSession(request: NextRequest) {
     const isExpired = !Number.isFinite(expiresAt) || Date.now() >= expiresAt;
 
     if (isExpired) {
-      supabaseResponse.cookies.delete('bookin_session_mode');
-      supabaseResponse.cookies.delete('bookin_session_expires_at');
       await supabase.auth.signOut();
 
       if (isProtected) {
         const url = request.nextUrl.clone();
         url.pathname = '/login';
-        url.searchParams.set('reason', 'expired');
+        url.searchParams.set('session', 'expired');
         url.searchParams.set('redirectTo', pathname);
-        return NextResponse.redirect(url);
-      }
 
+        const response = NextResponse.redirect(url);
+        response.cookies.delete('bookin_session_mode');
+        response.cookies.delete('booin_sesson_expires_at');
+        return response;
+      }
+      supabaseResponse.cookies.delete('bookin_session_mode');
+      supabaseResponse.cookies.delete('bookin_session_expires_at');
       return supabaseResponse;
     }
   }

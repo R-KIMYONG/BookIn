@@ -75,8 +75,7 @@ export const POST = async (req: NextRequest) => {
     body: JSON.stringify({ email: user.email, password: password.trim() }),
   });
 
-  if (!tokenResp.ok) {
-    return NextResponse.json({ message: '현재 비밀번호가 올바르지 않습니다.' }, { status: 400 });
-  }
+  if (!tokenResp.ok) return NextResponse.json({ message: '현재 비밀번호가 올바르지 않습니다.' }, { status: 400 });
+
   return NextResponse.json({ message: '현재 비밀번호가 확인되었습니다.' }, { status: 200 });
 };

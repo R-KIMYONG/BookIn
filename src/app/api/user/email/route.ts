@@ -108,14 +108,12 @@ export const DELETE = async () => {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
+  if (userError || !user)
     return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
-  }
+
   const { error: clearPendingError } = await clearPendingEmail(supabase, user.id);
 
-  if (clearPendingError) {
-    return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
-  }
+  if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
 
   return NextResponse.json({ message: '이메일 변경 요청이 취소되었습니다.' }, { status: 200 });
 };

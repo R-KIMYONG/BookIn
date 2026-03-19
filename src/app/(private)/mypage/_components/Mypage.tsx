@@ -1,7 +1,6 @@
 'use client';
 import { createClient } from '@/utils/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 import { MypageUserInfo } from '@/types/userInfo.type';
 import UserInfo from './UserInfo';
 import BookComments from './BookComments';
@@ -25,28 +24,29 @@ const Mypage = (): React.JSX.Element => {
   } = useQuery<MypageUserInfo, Error>({
     queryKey: ['userInfo', authUser?.id],
     queryFn: async () => {
-      try {
-        const { data: user, error: userError } = await supabase
-          .from('users')
-          .select('id,email,nickname,avatar')
-          .eq('id', authUser!.id)
-          .single();
-
-        if (userError || !user) {
-          throw new Error('[Mypage] user data retrieval error');
-        }
-        return {
-          id: user.id,
-          email: user.email,
-          nickname: user.nickname,
-          avatar: user.avatar ?? '',
-        };
-      } catch (error) {
-        if (error instanceof SupabaseAuthClient) {
-          throw new Error('supabase error');
-        }
-        throw new Error('[Mypage] 예상치못한 에러 발생 from getUser함수부분');
+      if (!authUser?.id) {
+        throw new Error('[Mypage] 로그인 사용자 정보가 없습니다.');
       }
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('id,email,nickname,avatar')
+        .eq('id', authUser.id)
+        .maybeSingle();
+
+      if (userError) {
+        throw new Error(userError.message);
+      }
+      //회원가입하고 회원탈퇴 그리고 다시 회원가입 시 오류 발생
+      if (!user) {
+        throw new Error('[Mypage] 사용자 프로필 정보를 찾을 수 없습니다.');
+      }
+
+      return {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        avatar: user.avatar ?? '',
+      };
     },
     throwOnError: true,
     enabled: !!authUser?.id,
@@ -59,7 +59,10 @@ const Mypage = (): React.JSX.Element => {
   if (isUserPending || isUserInfoPending) {
     return <MypageSkeleton />;
   }
-  if (isError) throw error;
+  if (isError) {
+    console.error(error);
+    throw error;
+  }
   return (
     <>
       <div className="flex justify-between gap-4 sm:w-full mx-auto items-stretch min-h-[calc(100vh-3rem)]">
@@ -88,6 +91,7 @@ const Mypage = (): React.JSX.Element => {
             </ul>
           </nav>
           <form action={logout}>
+            <input type="hidden" name="next" value="/login" />
             <ButtonComponent type="button" label="로그아웃" variant="outline" size="xs" />
           </form>
         </div>

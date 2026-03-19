@@ -48,13 +48,13 @@ const SearchBar = ({
           onSubmit(keyword);
         }}
         ref={formRef}
-        className="flex gap-2 rounded-2xl border border-gray-200 px-2 h-9 box-border"
+        className="flex gap-2 rounded-2xl border border-gray-200 px-2 h-10 box-border"
       >
-        <div className="relative shrink-0 flex items-center">
+        <div className="relative shrink-0 flex items-center ">
           <select
             value={searchQueryType}
             onChange={(e) => onChangeSearchQueryType(e.target.value as SearchQueryType)}
-            className="h-6 w-auto min-w-0 appearance-none text-[11px] text-gray-700 border-r border-gray-200 pr-4 focus:outline-none text-center"
+            className="h-6 w-auto min-w-0 appearance-none text-[11px] text-gray-700 border-r border-gray-200 pr-4 focus:outline-none text-center bg-white"
           >
             <option value="Keyword">제목or저자</option>
             <option value="Title">제목</option>
