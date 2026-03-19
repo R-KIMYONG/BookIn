@@ -1,19 +1,20 @@
 'use client';
 
 import useCountdown from '@/hooks/useCountdown';
-import TempSessionBadge from './TempSessionBadge';
+import TempSessionBadge, { TEMP_SESSION_SOON_TOAST_ID } from './TempSessionBadge';
 import TempSessionModal from '../../modal/TempSessionModal';
 import { TempSessionState } from '@/types/useCountDownOptions.type';
 import { startTransition, useEffect, useState } from 'react';
-import { logout, resetTempSession } from '@/app/actions/auth.actions';
+import { logoutExpiredSession, resetTempSession } from '@/app/actions/auth.actions';
 import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 type TempSessionControllerProps = {
   isLoggedIn: boolean;
   tempSessionExpiresAt: number | null;
 };
 
-export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt }: TempSessionControllerProps) {
+const TempSessionController = ({ isLoggedIn, tempSessionExpiresAt }: TempSessionControllerProps) => {
   const [dismissedSoon, setDismissedSoon] = useState<boolean>(false);
   const [dismissedExpired, setDismissedExpired] = useState<boolean>(false);
   const router = useRouter();
@@ -34,20 +35,25 @@ export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt
     if (!isExpired) return;
 
     startTransition(async () => {
-      await logout();
-      router.push(`/login?reason=expired&redirectTo=${encodeURIComponent(pathname)}`);
+      await logoutExpiredSession(pathname);
     });
-  }, [isExpired, pathname, router]);
+  }, [isExpired, pathname]);
 
   if (!isTempSession || remainingSec === null) return null;
 
   const isSoon = remainingSec > 0 && remainingSec <= 60;
 
   const isModalOpen = (isExpired && !dismissedExpired) || (isSoon && !dismissedSoon);
+  useEffect(() => {
+    if (isModalOpen) {
+      toast.dismiss(TEMP_SESSION_SOON_TOAST_ID);
+    }
+  }, [isModalOpen]);
   const state: TempSessionState = { remainingSec, countDownText, isExpired };
 
   const onExtend = () => {
     startTransition(async () => {
+      toast.dismiss(TEMP_SESSION_SOON_TOAST_ID);
       await resetTempSession();
       router.refresh();
       setDismissedSoon(false);
@@ -57,7 +63,7 @@ export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt
 
   const onGoLogin = () => {
     setDismissedExpired(true);
-    router.push(`/login?reason=expired&redirectTo=${encodeURIComponent(pathname)}`);
+    router.push(`/login?redirectTo=${encodeURIComponent(pathname)}`);
   };
 
   const onClose = () => {
@@ -87,4 +93,6 @@ export default function TempSessionController({ isLoggedIn, tempSessionExpiresAt
       ) : null}
     </>
   );
-}
+};
+
+export default TempSessionController;

@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { logout } from '@/app/actions/auth.actions';
 import ButtonComponent from '@/components/common/ButtonComponent';
 import LoginLink from './LoginLink';
+import HeaderLogoutForm from './HeaderLogoutForm';
 
 const HeaderAuth = async ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   return (
@@ -12,9 +12,7 @@ const HeaderAuth = async ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             <ButtonComponent variant="navbarLight" label="마이페이지" size="xs" />
           </Link>
 
-          <form action={logout}>
-            <ButtonComponent type="submit" variant="navbarDark" label="로그아웃" size="xs" />
-          </form>
+          <HeaderLogoutForm />
         </>
       ) : (
         <>

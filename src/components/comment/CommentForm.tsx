@@ -13,6 +13,7 @@ import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
 import ConfirmModal from '../modal/ConfirmModal';
 import { useDisclosure } from '@nextui-org/react';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
+import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
 type SubmitItem = Pick<
   Tables<'comments'>,
@@ -51,7 +52,7 @@ const CommentForm = ({
     if (value.length <= 200) {
       setTargetValue((prev) => ({ ...prev, content: value }));
     } else {
-      toast.error('230자 이상은 작성 불가능합니다');
+      toast.error('200자 이상은 작성 불가능합니다');
     }
   };
 
@@ -63,47 +64,45 @@ const CommentForm = ({
     setTargetValue((prev) => ({ ...prev, title: e.target.value }));
   };
 
-  const addComment = async (newComment: SubmitItem) => {
-    const response = await fetch('/api/comment', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newComment),
-    });
+  const addCommentMutation = useMutation({
+    mutationFn: async (newComment: SubmitItem) => {
+      const res = await fetch('/api/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newComment),
+      });
 
-    return response.json();
-  };
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message ?? '댓글 작성 실패하였습니다.');
 
-  const addMutation = useMutation({
-    mutationFn: addComment,
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
       queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId, page] });
       handleCancelEdit();
-      toast.success('작성 완료');
     },
   });
 
-  const updateComment = async (updatedComment: UpdateSubmitItem) => {
-    const response = await fetch(`/api/comment`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedComment),
-    });
-
-    return response.json();
-  };
-
-  const updateMutation = useMutation({
-    mutationFn: updateComment,
+  const updateCommentMutation = useMutation({
+    mutationFn: async (updatedComment: UpdateSubmitItem) => {
+      const res = await fetch(`/api/comment`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedComment),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message ?? '댓글수정 싶패');
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
       queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId, page] });
       handleCancelEdit();
-      toast.success('수정 완료');
     },
   });
 
@@ -111,8 +110,13 @@ const CommentForm = ({
     e.preventDefault();
     const cleanContent: string = DOMPurify.sanitize(targetValue.content || '');
 
+    if (!userId) {
+      handleRequireLogin();
+      return;
+    }
+
     const newComment: SubmitItem = {
-      user_id: userId || '',
+      user_id: userId,
       title: targetValue.title || '',
       content: cleanContent,
       post_id: postId,
@@ -122,11 +126,17 @@ const CommentForm = ({
       book_title,
     };
 
-    if (isEdit && targetValue.id) {
-      const updatedComment = { ...newComment, id: targetValue.id };
-      updateMutation.mutate(updatedComment);
-    } else {
-      addMutation.mutate(newComment);
+    const requestPromise =
+      isEdit && targetValue.id
+        ? updateCommentMutation.mutateAsync({ ...newComment, id: targetValue.id })
+        : addCommentMutation.mutateAsync(newComment);
+
+    const pendingMessage = isEdit ? '댓글 수정중...' : '댓글 업로드중...';
+
+    try {
+      await toastMutationPromise(requestPromise, pendingMessage);
+    } catch (error) {
+      console.error(error);
     }
   };
 

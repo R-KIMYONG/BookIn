@@ -6,13 +6,14 @@ import PasswordFields from '@/components/form/PasswordFields';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isValidPassword } from '@/app/lib/validation/isPassword';
 import useMypageUrlState from '@/hooks/url/useMypageUrlState';
+import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
 const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
   const { modalType, setMypageUrl } = useMypageUrlState();
   const isOpen = modalType === 'changePassword';
   const queryClient = useQueryClient();
-  const [passwordMissMatch, setPasswordMissMatch] = useState<boolean>(false);
-  const [checkPrevPW, setCheckPrevPW] = useState<boolean>(false);
+  const [checkPrevPW, setCheckPrevPW] = useState<'idle' | 'success' | 'error'>('idle');
+
   const [passwordForm, setPasswordForm] = useState<{
     newPassword: string;
     confirmPassword: string;
@@ -22,14 +23,19 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
     confirmPassword: '',
     prevPassword: '',
   });
+
+  const passwordMissMatch =
+    checkPrevPW === 'success' &&
+    passwordForm.confirmPassword.length > 0 &&
+    passwordForm.newPassword.slice(0, passwordForm.confirmPassword.length) !== passwordForm.confirmPassword;
+
   const handleOpen = () => {
     setMypageUrl({ modal: 'changePassword' });
   };
 
   const handleClose = () => {
     setMypageUrl({ modal: null });
-    setPasswordMissMatch(false);
-    setCheckPrevPW(false);
+    setCheckPrevPW('idle');
     setPasswordForm({
       newPassword: '',
       confirmPassword: '',
@@ -39,27 +45,14 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setPasswordForm((prev) => {
-      const nextChangePassword = {
-        ...prev,
-        [name]: value,
-      };
-      //비밀번호 컨펌 디스매치 기준
-      //컨펌 비밀번호 입력할때
-      //입력한 컨펌비밀번호가 8자리이상일때(비밀번호 정책에 맞게)
-      //컨펌빔리번호 비여있지않을때 검증시작
-      if (
-        name === 'confirmPassword' &&
-        nextChangePassword.confirmPassword.length >= 8 &&
-        nextChangePassword.confirmPassword.trim() !== ''
-      ) {
-        setPasswordMissMatch(nextChangePassword.newPassword !== nextChangePassword.confirmPassword);
-      } else {
-        setPasswordMissMatch(false);
-      }
 
-      return nextChangePassword;
-    });
+    if (name === 'prevPassword' && checkPrevPW === 'error') {
+      setCheckPrevPW('idle');
+    }
+    setPasswordForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const changePassWordMutation = useMutation({
@@ -75,14 +68,10 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
-      toast.success('비밀번호 변경 완료', { position: 'top-right' });
       handleClose();
     },
-    onError: (error: Error) => {
-      toast.error(error.message, { position: 'top-right' });
-    },
   });
-  const handleSaveNewPassWord = useCallback<() => Promise<void>>(async () => {
+  const handleSaveNewPassWord = useCallback(async () => {
     if (passwordForm.newPassword.trim() === '') {
       toast.error('비밀번호를 입력해주세요.');
       return;
@@ -101,8 +90,15 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
       return;
     }
 
-    changePassWordMutation.mutate(passwordForm.newPassword);
-  }, [passwordForm, changePassWordMutation, queryClient, userId, handleClose]);
+    try {
+      await toastMutationPromise(
+        changePassWordMutation.mutateAsync(passwordForm.newPassword),
+        '비밀번호 업데이트중...'
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }, [passwordForm, changePassWordMutation]);
 
   const checkPrevPassWordMutation = useMutation({
     mutationFn: async (prevPassword: string) => {
@@ -115,22 +111,23 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
       if (!res.ok) throw new Error(result.message ?? '현재 비밀번호 확인 실패');
       return result;
     },
-    onSuccess: () => {
-      setCheckPrevPW(true);
-      toast.success('현재 비밀번호가 확인되었습니다.', { position: 'top-right' });
-    },
-    onError: (error) => {
-      toast.error(error.message, { position: 'top-right' });
-      setCheckPrevPW(false);
-    },
   });
-  const handleCheckPrevPassWord = () => {
+  const handleCheckPrevPassWord = async () => {
     if (passwordForm.prevPassword.trim() === '') {
       toast.error('현재 비밀번호를 입력해주세요.');
       return;
     }
 
-    checkPrevPassWordMutation.mutate(passwordForm.prevPassword);
+    try {
+      await toastMutationPromise(
+        checkPrevPassWordMutation.mutateAsync(passwordForm.prevPassword),
+        '현재 비밀번호 확인중...'
+      );
+      setCheckPrevPW('success');
+    } catch (error) {
+      console.error(error);
+      setCheckPrevPW('error');
+    }
   };
   return (
     <>
@@ -147,11 +144,14 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
           {() => (
             <>
               <ModalHeader className="flex flex-col gap-1">비밀번호 변경</ModalHeader>
-              {passwordMissMatch && checkPrevPW ? (
+              {passwordMissMatch ? (
                 <p className="text-xs text-red-500 text-center">비밀번호 일치하지 않습니다.</p>
               ) : null}
+              {checkPrevPW === 'error' && (
+                <p className="text-xs text-red-500 text-center">현재 비밀번호가 올바르지 않습니다.</p>
+              )}
               <ModalBody>
-                {!checkPrevPW ? (
+                {checkPrevPW !== 'success' ? (
                   <PasswordFields
                     passwordLabel="현재 비밀번호"
                     passwordPlaceholder="현재 비밀번호를 입력하세요"
@@ -179,7 +179,7 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
               </ModalBody>
               <ModalFooter>
                 <ButtonComponent type="button" variant="danger" size="xs" label="닫기" onClick={handleClose} />
-                {!checkPrevPW ? (
+                {checkPrevPW !== 'success' ? (
                   <ButtonComponent
                     type="button"
                     variant="primary"

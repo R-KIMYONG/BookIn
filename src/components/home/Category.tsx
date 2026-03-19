@@ -28,7 +28,7 @@ const emptyPaged = <T,>(itemsPerPage = 20): PagedResult<T> => ({
 export default function Category() {
   const { queryType, page, searchKeyWord, searchQueryType, setHomeUrl } = useHomeListUrlState();
 
-  const isSearching = searchKeyWord.length > 0;
+  const isSearching = Boolean(searchKeyWord?.trim());
 
   const {
     data: listData,
@@ -64,7 +64,8 @@ export default function Category() {
       const [_, searchKeyWord, searchQueryType, page] = queryKey as [string, string | null, SearchQueryType, number];
       if (!searchKeyWord?.trim()) return emptyPaged<Item>(20);
       const res = await fetch(
-        `/api/aladin/search?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${page}&QueryType=${searchQueryType}`
+        `/api/aladin/search?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${page}&QueryType=${searchQueryType}`,
+        { cache: 'no-store' }
       );
       if (!res.ok) throw new Error('검색 실패');
       const data: SearchResult = await res.json();
@@ -138,9 +139,9 @@ export default function Category() {
             onChangeSearchQueryType={(sq) => setHomeUrl({ searchQueryType: sq, page: 1 })}
           />
 
-          {typeof (isSearching ? searchTotal : undefined) === 'number' && (
+          {isSearching && (
             <p className="text-[12px] text-gray-600 text-nowrap md:pr-4 box-border pl-2">
-              {searchTotal > 0 ? `검색결과 ${searchTotal}개` : '검색결과 없습니다.'}
+              {searchTotal > 0 ? `검색결과 ${searchTotal}개` : '검색결과가 없습니다.'}
             </p>
           )}
         </div>

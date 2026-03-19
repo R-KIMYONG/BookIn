@@ -7,7 +7,7 @@ import { FaGithub } from 'react-icons/fa';
 import { SiKakaotalk } from 'react-icons/si';
 import { SocialConfig } from '@/types/button.type';
 
-export default function SocialLoginButtons({ redirectTo }: { redirectTo: string }) {
+const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
   const supabase = createClient();
   const signIn = async (provider: 'google' | 'github' | 'kakao') => {
     await supabase.auth.signInWithOAuth({
@@ -53,4 +53,6 @@ export default function SocialLoginButtons({ redirectTo }: { redirectTo: string 
       ))}
     </div>
   );
-}
+};
+
+export default SocialLoginButtons;
