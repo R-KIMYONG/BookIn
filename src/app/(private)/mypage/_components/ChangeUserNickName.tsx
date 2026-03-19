@@ -57,7 +57,7 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
     } catch (error) {
       console.error(error);
     }
-  }, [changeNickNameMutation, draftNickname]);
+  }, [changeNickNameMutation, draftNickname, nickname]);
 
   const handleOpenEdit = () => {
     setDraftNickname(nickname);

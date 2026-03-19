@@ -25,6 +25,11 @@ const TempSessionController = ({ isLoggedIn, tempSessionExpiresAt }: TempSession
     enabled: isTempSession,
     stopOnExpire: true,
   });
+
+  const isSoon = remainingSec !== null && remainingSec > 0 && remainingSec <= 60;
+
+  const isModalOpen = (isExpired && !dismissedExpired) || (isSoon && !dismissedSoon);
+
   useEffect(() => {
     if (remainingSec === null) return;
     if (remainingSec > 60) setDismissedSoon(false);
@@ -39,16 +44,13 @@ const TempSessionController = ({ isLoggedIn, tempSessionExpiresAt }: TempSession
     });
   }, [isExpired, pathname]);
 
-  if (!isTempSession || remainingSec === null) return null;
-
-  const isSoon = remainingSec > 0 && remainingSec <= 60;
-
-  const isModalOpen = (isExpired && !dismissedExpired) || (isSoon && !dismissedSoon);
   useEffect(() => {
     if (isModalOpen) {
       toast.dismiss(TEMP_SESSION_SOON_TOAST_ID);
     }
   }, [isModalOpen]);
+
+  if (!isTempSession || remainingSec === null) return null;
   const state: TempSessionState = { remainingSec, countDownText, isExpired };
 
   const onExtend = () => {
