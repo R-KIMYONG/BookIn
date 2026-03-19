@@ -1,4 +1,3 @@
-import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import SubmitButton from './_components/SubmitButton';
 import SocialLoginButtons from './_components/SocialLoginButtons';
@@ -7,12 +6,6 @@ import { login } from '@/app/actions/auth.actions';
 
 const LoginPage = ({ searchParams }: { searchParams: { error?: string; redirectTo?: string } }) => {
   const redirectTo = searchParams.redirectTo ?? '/';
-  const errorMessage =
-    searchParams.error === 'empty'
-      ? '이메일과 비밀번호를 입력해주세요.'
-      : searchParams.error === 'invalid'
-        ? '이메일 또는 비밀번호가 올바르지 않습니다.'
-        : null;
 
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">
@@ -21,14 +14,6 @@ const LoginPage = ({ searchParams }: { searchParams: { error?: string; redirectT
         <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
           <form action={login} className="p-6 sm:p-7">
             <input type="hidden" name="redirectTo" value={redirectTo} />
-
-            {/* 에러 메세지 */}
-            {errorMessage ? (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {errorMessage}
-              </div>
-            ) : null}
-
             {/* Email */}
             <div className="mb-3">
               <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-gray-700">

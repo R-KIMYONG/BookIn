@@ -8,6 +8,7 @@ import PendingEmailCountdown from './PendingEmailCountdown';
 import { createClient } from '@/utils/supabase/client';
 import { isValidEmail } from '@/app/lib/validation/isEmail';
 import { ActionButtons, PendingEmailData } from '@/types/changeUserId.type';
+import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
 const ChangeUserId = ({ email, userId }: { email: string; userId: string }): React.JSX.Element => {
   const queryClient = useQueryClient();
@@ -17,11 +18,13 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
   const [isEditing, setIsEditing] = useState<boolean>(false); // 편집상태로 전환여부 상태
 
-  const [isSaving, setIsSaving] = useState<boolean>(false); //저장눌렀는지 아닌지의 상태
-
   const [draftEmail, setDraftEmail] = useState<string>(''); // input에 수정중인 상태
 
-  const { data: pendingData } = useQuery<PendingEmailData>({
+  const {
+    data: pendingData,
+    isError,
+    error,
+  } = useQuery<PendingEmailData>({
     //조회이니까 컴포넌트에서 직접 supabase로 요청
     queryKey: ['pendingEmail', userId],
     queryFn: async () => {
@@ -29,7 +32,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
         .from('users')
         .select('pending_email,pending_email_expires_at')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       const pendingEmail = data?.pending_email ?? '';
       const emailExpireAt = data?.pending_email_expires_at ? new Date(data.pending_email_expires_at).getTime() : null;
@@ -48,10 +51,43 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     return 'default';
   }, [isEditing, isPendingValid, isExpired]);
 
+  const changeUserEmailMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const res = await fetch('/api/user/email', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result?.message ?? '이메일 변경 실패');
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+      queryClient.invalidateQueries({ queryKey: ['pendingEmail', userId] });
+      setDraftEmail('');
+      setIsEditing(false);
+    },
+  });
+  const isSaving = changeUserEmailMutation.isPending;
   const handleSave = async (): Promise<void> => {
     if (isSaving) return;
 
     const newEmail = draftEmail.trim();
+
+    if (newEmail === email) {
+      toast.info('현재 사용 중인 이메일입니다.', {
+        position: 'top-right',
+      });
+      return;
+    }
 
     if (!newEmail) {
       toast.warning('빈칸으로 변경할 수 없습니다.', {
@@ -67,7 +103,11 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
       return;
     }
 
-    changeUserEmailMutation.mutate(newEmail);
+    try {
+      await toastMutationPromise(changeUserEmailMutation.mutateAsync(newEmail), '이메일변경 요청중...');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const clearPendingEmailMutation = useMutation({
@@ -90,43 +130,14 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     },
   });
 
-  const changeUserEmailMutation = useMutation({
-    mutationFn: async (email: string) => {
-      const res = await fetch('/api/user/email', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result?.message ?? '이메일 변경 실패');
-      }
-
-      return result;
-    },
-    onMutate: () => {
-      setIsSaving(true);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
-      queryClient.invalidateQueries({ queryKey: ['pendingEmail', userId] });
-      setDraftEmail('');
-      setIsEditing(false);
-      toast.success('인증 메일이 발송되었습니다.', { position: 'top-right' });
-    },
-    onError: (error: Error) => {
-      console.log(error.message);
-      toast.error(error.message, { position: 'top-right' });
-    },
-    onSettled: () => {
-      setIsSaving(false);
-    },
-  });
-
+  //인증 대기 취소
+  const handleCancelPending = async () => {
+    try {
+      await toastMutationPromise(clearPendingEmailMutation.mutateAsync(), '인증 대기 취소중...');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   //편집 취소
   const handleCancelEdit = () => {
     setDraftEmail('');
@@ -136,36 +147,36 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
   //편집 시작
   const handleOpenEdit = () => {
     setIsEditing(true);
-  };
-  //인증 대기 취소
-  const handleCancelPending = () => {
-    clearPendingEmailMutation.mutate();
+    setDraftEmail('');
   };
 
   //인증 재요청
-  const handleRetry = () => {
-    if (pendingData?.pendingEmail) {
-      changeUserEmailMutation.mutate(pendingData.pendingEmail);
+  const handleRetry = async () => {
+    if (!pendingData?.pendingEmail) return;
+    try {
+      await toastMutationPromise(changeUserEmailMutation.mutateAsync(pendingData.pendingEmail), '재요청중...');
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const actionButtons = useMemo<ActionButtons>(() => {
+  const getActionButtons = (): ActionButtons => {
     switch (viewState) {
       case 'pending':
         return [
           {
             key: 'cancel-pending',
             label: '인증 취소',
-            variant: 'secondary',
-            type: 'button',
+            variant: 'secondary' as const,
+            type: 'button' as const,
             disabled: false,
             onClick: handleCancelPending,
           },
           {
             key: 'pending-status',
             label: '인증 대기중',
-            variant: 'outline',
-            type: 'button',
+            variant: 'outline' as const,
+            type: 'button' as const,
             disabled: true,
             onClick: handleOpenEdit,
           },
@@ -176,16 +187,16 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
           {
             key: 'cancel-expired',
             label: '취소',
-            variant: 'secondary',
-            type: 'button',
+            variant: 'secondary' as const,
+            type: 'button' as const,
             disabled: false,
             onClick: handleCancelPending,
           },
           {
             key: 'retry',
             label: '재요청',
-            variant: 'primary',
-            type: 'button',
+            variant: 'primary' as const,
+            type: 'button' as const,
             disabled: false,
             onClick: handleRetry,
           },
@@ -196,14 +207,21 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
           {
             key: 'edit',
             label: '변경',
-            variant: 'outline',
-            type: 'button',
+            variant: 'outline' as const,
+            type: 'button' as const,
             disabled: false,
             onClick: handleOpenEdit,
           },
         ];
     }
-  }, [viewState, handleCancelPending, handleRetry, handleOpenEdit]);
+  };
+  const actionButtons = getActionButtons();
+
+  useEffect(() => {
+    if (isError) {
+      console.error(error);
+    }
+  }, [isError, error]);
 
   //인증대기 시간 만료될경우 UI변경용 상태 업데이트
   useEffect(() => {

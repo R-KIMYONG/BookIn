@@ -7,22 +7,38 @@ import { redirect } from 'next/navigation';
 import { clearTempSessionCookies, setTempSessionCookies } from '../lib/auth/sessionCookies';
 import { isValidEmail } from '../lib/validation/isEmail';
 import { isValidPassword } from '../lib/validation/isPassword';
+import { AUTH_CODE } from '../lib/auth/authActionFeedback';
 
-export async function logout() {
+export const logout = async (formData: FormData) => {
   const supabase = createClient();
+  const next = String(formData.get('next') ?? '/');
   const { error } = await supabase.auth.signOut();
 
+  const buildRedirectUrl = (path: string, key: 'error' | 'message', value: string) => {
+    const url = new URL(path, 'http://example.com');
+    url.searchParams.set(key, value);
+    return `${url.pathname}${url.search}`;
+  };
+
   if (error) {
-    redirect('/error');
+    redirect(`${next}?error=${AUTH_CODE.logout.FAILED}`);
   }
-
   clearTempSessionCookies();
-
   revalidatePath('/', 'layout');
-  redirect('/');
-}
 
-export async function login(formData: FormData) {
+  const successPath = next === '/mypage' ? '/' : next;
+  redirect(buildRedirectUrl(successPath, 'message', AUTH_CODE.logout.SUCCESS));
+};
+
+export const logoutExpiredSession = async (redirectTo: string) => {
+  const supabase = createClient();
+  await supabase.auth.signOut();
+  clearTempSessionCookies();
+  revalidatePath('/', 'layout');
+  redirect(`/login?redirectTo=${encodeURIComponent(redirectTo)}`);
+};
+
+export const login = async (formData: FormData) => {
   const supabase = createClient();
   const remember = formData.get('remember') === 'on';
   const email = String(formData.get('email') ?? '');
@@ -31,12 +47,12 @@ export async function login(formData: FormData) {
   if (!email || !password) {
     // 여기서 redirect로 에러 페이지 보내도 되고,
     // login 페이지에서 query param으로 처리해도 됨.
-    redirect(`/login?error=empty`);
+    redirect(`/login?error=${AUTH_CODE.login.EMPTY}`);
   }
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect(`/login?error=invalid`);
+    redirect(`/login?error=${AUTH_CODE.login.INVALID}&redirectTo=${encodeURIComponent(redirectTo)}`);
   }
 
   if (remember) {
@@ -48,9 +64,9 @@ export async function login(formData: FormData) {
 
   const nextPath = redirectTo === '/' || redirectTo === '' ? '/mypage' : redirectTo;
   redirect(nextPath);
-}
+};
 
-export async function signup(formData: FormData) {
+export const signup = async (formData: FormData) => {
   const supabase = createClient();
 
   const email = String(formData.get('email') ?? '').trim();
@@ -58,20 +74,41 @@ export async function signup(formData: FormData) {
   const confirmPassword = String(formData.get('confirmPassword') ?? '');
   const nickname = String(formData.get('nickname') ?? '').trim();
 
-  if (!email || !password || !confirmPassword || !nickname) redirect('/signup?error=empty');
-  if (!isValidEmail(email)) redirect('/signup?error=email');
-  if (!isValidPassword(password)) redirect('/signup?error=password');
-  if (password !== confirmPassword) redirect('/signup?error=password-mismatch');
+  if (!email || !password || !confirmPassword || !nickname) redirect(`/signup?error=${AUTH_CODE.signup.EMPTY}`);
+
+  if (!isValidEmail(email)) redirect(`/signup?error=${AUTH_CODE.signup.EMAIL_INVALID}`);
+
+  if (!isValidPassword(password)) redirect(`/signup?error=${AUTH_CODE.signup.PASSWORD_INVALID}`);
+
+  if (password !== confirmPassword) redirect(`/signup?error=${AUTH_CODE.signup.PASSWORD_MISMATCH}`);
 
   // 이메일 중복 체크
-  const { data: emailExist } = await supabase.from('users').select('id').eq('email', email).maybeSingle();
+  const { data: emailExist, error: emailCheckError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
 
-  if (emailExist) redirect('/signup?error=email-exists');
+  if (emailCheckError) {
+    console.error(emailCheckError);
+    redirect(`/signup?error=${AUTH_CODE.common.UNKNOWN}`);
+  }
+
+  if (emailExist) redirect(`/signup?error=${AUTH_CODE.signup.EMAIL_EXISTS}`);
 
   // 닉네임 중복 체크
-  const { data: nicknameExist } = await supabase.from('users').select('id').eq('nickname', nickname).maybeSingle();
+  const { data: nicknameExist, error: nicknameCheckError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('nickname', nickname)
+    .maybeSingle();
 
-  if (nicknameExist) redirect('/signup?error=nickname-exists');
+  if (nicknameCheckError) {
+    console.error(nicknameCheckError);
+    redirect(`/signup?error=${AUTH_CODE.common.UNKNOWN}`);
+  }
+
+  if (nicknameExist) redirect(`/signup?error=${AUTH_CODE.signup.NICKNAME_EXISTS}`);
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -81,10 +118,10 @@ export async function signup(formData: FormData) {
     },
   });
 
-  if (error || !data.user?.id) redirect('/signup?error=auth');
+  if (error || !data.user?.id) redirect(`/signup?error=${AUTH_CODE.signup.AUTH_FAILED}`);
 
   const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-  if (loginError) redirect('/signup?error=auth');
+  if (loginError) redirect(`/signup?error=${AUTH_CODE.signup.AUTH_FAILED}`);
 
   const userId = data.user.id;
 
@@ -94,13 +131,15 @@ export async function signup(formData: FormData) {
     nickname,
   });
 
-  if (insertError) redirect('/signup?error=profile');
+  if (insertError) redirect(`/signup?error=${AUTH_CODE.signup.PROFILE_FAILED}`);
+
+  setTempSessionCookies();
 
   revalidatePath('/', 'layout');
   redirect('/mypage');
-}
+};
 
-export async function deleteAccount() {
+export const deleteAccount = async () => {
   const supabase = createClient();
 
   const {
@@ -109,15 +148,28 @@ export async function deleteAccount() {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return { ok: false, error: 'not authenticated' };
+    redirect(`/login?error=${AUTH_CODE.login.UNAUTHORIZED}`);
   }
 
   const userId = user.id;
 
+  const possibleFiles = [
+    `${userId}/avatar.jpg`,
+    `${userId}/avatar.jpeg`,
+    `${userId}/avatar.png`,
+    `${userId}/avatar.gif`,
+  ];
+  const { error: avatarError } = await supabase.storage.from('avatars').remove(possibleFiles);
+
+  if (avatarError) {
+    console.error(avatarError);
+  }
+
   const { error: publicError } = await supabase.from('users').delete().eq('id', userId);
 
   if (publicError) {
-    return { ok: false, error: publicError.message };
+    console.error(publicError);
+    redirect(`/mypage?error=${AUTH_CODE.delete.USER_FAILED}`);
   }
 
   const { error: rpcError } = await supabase.rpc('delete_user', {
@@ -125,14 +177,20 @@ export async function deleteAccount() {
   });
 
   if (rpcError) {
-    return { ok: false, error: rpcError.message };
+    console.error(rpcError);
+    redirect(`/mypage?error=${AUTH_CODE.delete.AUTH_FAILED}`);
   }
-  await supabase.auth.signOut();
+  const { error: signOutError } = await supabase.auth.signOut();
+  if (signOutError) {
+    console.error(signOutError);
+  }
+  clearTempSessionCookies();
   revalidatePath('/', 'layout');
   revalidatePath('/mypage', 'page');
-  return { ok: true };
-}
-export async function resetTempSession() {
+  redirect(`/?message=${AUTH_CODE.delete.SUCCESS}`);
+};
+
+export const resetTempSession = async () => {
   const cookieStore = cookies();
 
   const mode = cookieStore.get('bookin_session_mode')?.value;
@@ -153,4 +211,4 @@ export async function resetTempSession() {
   });
 
   revalidatePath('/', 'layout');
-}
+};

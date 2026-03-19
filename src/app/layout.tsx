@@ -8,6 +8,8 @@ import TopButton from '@/components/TopButton';
 import QueryProvider from './provider';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AuthToastHandler from '@/components/common/AuthToastHandler';
+import { Suspense } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,6 +31,9 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ToastContainer autoClose={1000} stacked draggable />
         <QueryProvider>
+          <Suspense fallback={null}>
+            <AuthToastHandler />
+          </Suspense>
           <Header />
           {children}
           <TopButton />

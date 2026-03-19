@@ -6,8 +6,8 @@ const ALLOWED_TARGETS: SearchTarget[] = ['Book', 'Foreign', 'eBook'] as const;
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const rowQueryType = (searchParams.get('QueryType') ?? 'Bestseller').trim();
-  const queryType = QT_LIST.includes(rowQueryType as QueryType) ? (rowQueryType as QueryType) : 'Bestseller';
+  const rawQueryType = (searchParams.get('QueryType') ?? 'Bestseller').trim();
+  const queryType = QT_LIST.includes(rawQueryType as QueryType) ? (rawQueryType as QueryType) : 'Bestseller';
 
   const rawTarget = (searchParams.get('target') ?? 'Book').trim() as SearchTarget;
   const target: SearchTarget = ALLOWED_TARGETS.includes(rawTarget) ? rawTarget : 'Book';
@@ -17,8 +17,11 @@ export async function GET(request: NextRequest) {
 
   const categoryId = (searchParams.get('CategoryId') ?? '').trim();
 
+  const ttbKey = process.env.ALADIN_TTB_KEY;
+  if (!ttbKey) return NextResponse.json({ message: '알라딘 API 설정이 올바르지 않습니다.' }, { status: 500 });
+
   const params = new URLSearchParams({
-    ttbkey: process.env.ALADIN_TTB_KEY ?? '',
+    ttbkey: ttbKey,
     QueryType: queryType,
     SearchTarget: target,
     Start: String(page),
@@ -34,12 +37,12 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {
-      return new NextResponse('Aladin API Error', { status: 502 });
+      return NextResponse.json({ message: '알라딘 도서 목록을 불러오지 못했습니다.' }, { status: 502 });
     }
     const data = await response.json();
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error('Error fetching data:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json({ message: '알라딘 도서 목록 조회 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }

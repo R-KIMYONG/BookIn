@@ -3,21 +3,24 @@ import { Bounce, toast } from 'react-toastify';
 import { TempSessionState } from '@/types/useCountDownOptions.type';
 import ExtendButton from './ExtendButton';
 type TempSessionBadgeProps = TempSessionState;
-const TempSessionBadge = ({ remainingSec, countDownText, isExpired }: TempSessionBadgeProps) => {
+export const TEMP_SESSION_SOON_TOAST_ID = 'temp-session-soon';
+const TempSessionBadge = ({ remainingSec, countDownText, isExpired,  }: TempSessionBadgeProps) => {
   const prevRemainingRef = useRef<number | null>(null);
-
   useEffect(() => {
     if (remainingSec === null || remainingSec <= 0) return;
 
     const prev = prevRemainingRef.current;
 
     if (prev !== null && prev > 300 && remainingSec <= 300) {
-      toast.info('로그인 시간이 곧 만료됩니다. 원하시면 지금 연장할 수 있어요.', {
-        position: 'top-right',
-        autoClose: false,
-        draggable: true,
-        transition: Bounce,
-      });
+      if (!toast.isActive(TEMP_SESSION_SOON_TOAST_ID)) {
+        toast.info('로그인 시간이 곧 만료됩니다. 원하시면 지금 연장할 수 있어요.', {
+          toastId: TEMP_SESSION_SOON_TOAST_ID,
+          position: 'top-right',
+          autoClose: false,
+          draggable: true,
+          transition: Bounce,
+        });
+      }
     }
 
     prevRemainingRef.current = remainingSec;

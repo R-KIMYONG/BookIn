@@ -10,7 +10,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
   const avatarImgRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
-  const updateAvatarImg = useMutation({
+  const updateAvatarImgMutation = useMutation({
     mutationFn: async (imgFile: File) => {
       const formData = new FormData();
       formData.append('imgFile', imgFile);
@@ -25,9 +25,6 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message, { position: 'top-right' });
-    },
     onSettled: () => {
       if (avatarImgRef.current) {
         avatarImgRef.current.value = '';
@@ -36,8 +33,8 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
   });
 
   const handleAvatarUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files!;
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
       const maxFileSize = 5 * 1024 * 1024;
 
       if (!files || !files[0]) {
@@ -61,9 +58,13 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
         });
         return;
       }
-      toastMutationPromise(updateAvatarImg.mutateAsync(file), '아바타 업로드 중...');
+      try {
+        await toastMutationPromise(updateAvatarImgMutation.mutateAsync(file), '아바타 업로드 중...');
+      } catch (error) {
+        console.error(error);
+      }
     },
-    [updateAvatarImg]
+    [updateAvatarImgMutation]
   );
   return (
     <>
@@ -77,7 +78,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
           variant="outline"
           size="xs"
           onClick={() => avatarImgRef.current?.click()}
-          disabled={updateAvatarImg.isPending}
+          disabled={updateAvatarImgMutation.isPending}
         />
 
         <input

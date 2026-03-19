@@ -13,7 +13,6 @@ const useUser = () => {
 
       return data.user ?? null;
     },
-    staleTime: Infinity,
   });
 };
 

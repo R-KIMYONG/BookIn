@@ -6,10 +6,11 @@ type ConfirmModalProps = {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   onClose: () => void;
   confirmColor?: 'primary' | 'danger' | 'default';
   isLoading?: boolean;
+  formAction?: (formData: FormData) => void | Promise<void>;
 };
 const ConfirmModal = ({
   isOpen,
@@ -21,6 +22,7 @@ const ConfirmModal = ({
   onClose,
   confirmColor = 'primary',
   isLoading = false,
+  formAction,
 }: ConfirmModalProps) => {
   return (
     <Modal
@@ -45,9 +47,19 @@ const ConfirmModal = ({
               <Button color="default" variant="flat" size="sm" onPress={onClose} isDisabled={isLoading}>
                 {cancelLabel}
               </Button>
-              <Button color={confirmColor} size="sm" onPress={onConfirm} isLoading={isLoading}>
-                {confirmLabel}
-              </Button>
+              {formAction ? (
+                //  server action용
+                <form action={formAction} className="contents">
+                  <Button type="submit" color={confirmColor} size="sm" isLoading={isLoading}>
+                    {confirmLabel}
+                  </Button>
+                </form>
+              ) : (
+                // 기존 방식 유지
+                <Button color={confirmColor} size="sm" onPress={onConfirm} isLoading={isLoading}>
+                  {confirmLabel}
+                </Button>
+              )}
             </ModalFooter>
           </>
         )}
