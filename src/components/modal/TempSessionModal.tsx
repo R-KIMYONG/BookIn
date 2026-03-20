@@ -9,6 +9,7 @@ const TempSessionModal = ({
   onClose,
   onExtend,
   onGoLogin,
+  showGoLoginButton,
 }: TempSessionModalProps) => {
   const isReallyExpired = isExpired || remainingSec <= 0;
 
@@ -47,9 +48,11 @@ const TempSessionModal = ({
                   <Button color="default" variant="flat" size="sm" onPress={onClose}>
                     닫기
                   </Button>
-                  <Button color="primary" size="sm" onPress={onGoLogin}>
-                    로그인 하러가기
-                  </Button>
+                  {showGoLoginButton ? (
+                    <Button color="primary" size="sm" onPress={onGoLogin}>
+                      로그인 하러가기
+                    </Button>
+                  ) : null}
                 </>
               ) : (
                 <>

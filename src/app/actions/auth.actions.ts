@@ -2,40 +2,25 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { clearTempSessionCookies, setTempSessionCookies } from '../lib/auth/sessionCookies';
 import { isValidEmail } from '../lib/validation/isEmail';
 import { isValidPassword } from '../lib/validation/isPassword';
 import { AUTH_CODE } from '../lib/auth/authActionFeedback';
+import { createRedirectUrl } from '../lib/navigation/createRedirectUrl';
 
 export const logout = async (formData: FormData) => {
   const supabase = createClient();
   const next = String(formData.get('next') ?? '/');
   const { error } = await supabase.auth.signOut();
 
-  const buildRedirectUrl = (path: string, key: 'error' | 'message', value: string) => {
-    const url = new URL(path, 'http://example.com');
-    url.searchParams.set(key, value);
-    return `${url.pathname}${url.search}`;
-  };
-
   if (error) {
-    redirect(`${next}?error=${AUTH_CODE.logout.FAILED}`);
+    redirect(createRedirectUrl(next, { error: AUTH_CODE.logout.FAILED }));
   }
   clearTempSessionCookies();
   revalidatePath('/', 'layout');
-
   const successPath = next === '/mypage' ? '/' : next;
-  redirect(buildRedirectUrl(successPath, 'message', AUTH_CODE.logout.SUCCESS));
-};
-
-export const logoutExpiredSession = async (redirectTo: string) => {
-  const supabase = createClient();
-  await supabase.auth.signOut();
-  clearTempSessionCookies();
-  revalidatePath('/', 'layout');
-  redirect(`/login?redirectTo=${encodeURIComponent(redirectTo)}`);
+  redirect(createRedirectUrl(successPath, { message: AUTH_CODE.logout.SUCCESS }));
 };
 
 export const login = async (formData: FormData) => {
@@ -47,12 +32,12 @@ export const login = async (formData: FormData) => {
   if (!email || !password) {
     // 여기서 redirect로 에러 페이지 보내도 되고,
     // login 페이지에서 query param으로 처리해도 됨.
-    redirect(`/login?error=${AUTH_CODE.login.EMPTY}`);
+    redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.EMPTY }));
   }
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect(`/login?error=${AUTH_CODE.login.INVALID}&redirectTo=${encodeURIComponent(redirectTo)}`);
+    redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.INVALID, redirectTo }));
   }
 
   if (remember) {
@@ -74,13 +59,15 @@ export const signup = async (formData: FormData) => {
   const confirmPassword = String(formData.get('confirmPassword') ?? '');
   const nickname = String(formData.get('nickname') ?? '').trim();
 
-  if (!email || !password || !confirmPassword || !nickname) redirect(`/signup?error=${AUTH_CODE.signup.EMPTY}`);
+  if (!email || !password || !confirmPassword || !nickname)
+    redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.EMPTY }));
 
-  if (!isValidEmail(email)) redirect(`/signup?error=${AUTH_CODE.signup.EMAIL_INVALID}`);
+  if (!isValidEmail(email)) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.EMAIL_INVALID }));
 
-  if (!isValidPassword(password)) redirect(`/signup?error=${AUTH_CODE.signup.PASSWORD_INVALID}`);
+  if (!isValidPassword(password)) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.PASSWORD_INVALID }));
 
-  if (password !== confirmPassword) redirect(`/signup?error=${AUTH_CODE.signup.PASSWORD_MISMATCH}`);
+  if (password !== confirmPassword)
+    redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.PASSWORD_MISMATCH }));
 
   // 이메일 중복 체크
   const { data: emailExist, error: emailCheckError } = await supabase
@@ -91,10 +78,10 @@ export const signup = async (formData: FormData) => {
 
   if (emailCheckError) {
     console.error(emailCheckError);
-    redirect(`/signup?error=${AUTH_CODE.common.UNKNOWN}`);
+    redirect(createRedirectUrl('/signup', { error: AUTH_CODE.common.UNKNOWN }));
   }
 
-  if (emailExist) redirect(`/signup?error=${AUTH_CODE.signup.EMAIL_EXISTS}`);
+  if (emailExist) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.EMAIL_EXISTS }));
 
   // 닉네임 중복 체크
   const { data: nicknameExist, error: nicknameCheckError } = await supabase
@@ -105,10 +92,10 @@ export const signup = async (formData: FormData) => {
 
   if (nicknameCheckError) {
     console.error(nicknameCheckError);
-    redirect(`/signup?error=${AUTH_CODE.common.UNKNOWN}`);
+    redirect(createRedirectUrl('/signup', { error: AUTH_CODE.common.UNKNOWN }));
   }
 
-  if (nicknameExist) redirect(`/signup?error=${AUTH_CODE.signup.NICKNAME_EXISTS}`);
+  if (nicknameExist) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.NICKNAME_EXISTS }));
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -118,10 +105,10 @@ export const signup = async (formData: FormData) => {
     },
   });
 
-  if (error || !data.user?.id) redirect(`/signup?error=${AUTH_CODE.signup.AUTH_FAILED}`);
+  if (error || !data.user?.id) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.AUTH_FAILED }));
 
   const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-  if (loginError) redirect(`/signup?error=${AUTH_CODE.signup.AUTH_FAILED}`);
+  if (loginError) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.AUTH_FAILED }));
 
   const userId = data.user.id;
 
@@ -131,7 +118,7 @@ export const signup = async (formData: FormData) => {
     nickname,
   });
 
-  if (insertError) redirect(`/signup?error=${AUTH_CODE.signup.PROFILE_FAILED}`);
+  if (insertError) redirect(createRedirectUrl('/signup', { error: AUTH_CODE.signup.PROFILE_FAILED }));
 
   setTempSessionCookies();
 
@@ -148,7 +135,7 @@ export const deleteAccount = async () => {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect(`/login?error=${AUTH_CODE.login.UNAUTHORIZED}`);
+    redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.UNAUTHORIZED }));
   }
 
   const userId = user.id;
@@ -169,7 +156,7 @@ export const deleteAccount = async () => {
 
   if (publicError) {
     console.error(publicError);
-    redirect(`/mypage?error=${AUTH_CODE.delete.USER_FAILED}`);
+    redirect(createRedirectUrl('/mypage', { error: AUTH_CODE.delete.USER_FAILED }));
   }
 
   const { error: rpcError } = await supabase.rpc('delete_user', {
@@ -178,7 +165,7 @@ export const deleteAccount = async () => {
 
   if (rpcError) {
     console.error(rpcError);
-    redirect(`/mypage?error=${AUTH_CODE.delete.AUTH_FAILED}`);
+    redirect(createRedirectUrl('/mypage', { error: AUTH_CODE.delete.AUTH_FAILED }));
   }
   const { error: signOutError } = await supabase.auth.signOut();
   if (signOutError) {
@@ -187,28 +174,5 @@ export const deleteAccount = async () => {
   clearTempSessionCookies();
   revalidatePath('/', 'layout');
   revalidatePath('/mypage', 'page');
-  redirect(`/?message=${AUTH_CODE.delete.SUCCESS}`);
-};
-
-export const resetTempSession = async () => {
-  const cookieStore = cookies();
-
-  const mode = cookieStore.get('bookin_session_mode')?.value;
-  if (mode !== 'temp') return;
-
-  const nextExpiresAt = Date.now() + 2 * 60 * 60 * 1000; // 지금부터 2시간
-
-  cookieStore.set('bookin_session_mode', 'temp', {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-  });
-
-  cookieStore.set('bookin_session_expires_at', String(nextExpiresAt), {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-  });
-
-  revalidatePath('/', 'layout');
+  redirect(createRedirectUrl('/', { message: AUTH_CODE.delete.SUCCESS }));
 };

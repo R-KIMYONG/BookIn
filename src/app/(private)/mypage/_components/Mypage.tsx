@@ -91,8 +91,8 @@ const Mypage = (): React.JSX.Element => {
             </ul>
           </nav>
           <form action={logout}>
-            <input type="hidden" name="next" value="/login" />
-            <ButtonComponent type="button" label="로그아웃" variant="outline" size="xs" />
+            <input type="hidden" name="next" value="/" />
+            <ButtonComponent type="submit" label="로그아웃" variant="outline" size="xs" />
           </form>
         </div>
         <div className="w-5/6 min-w-0 self-stretch flex flex-col justify-between [contain:layout_paint]">
