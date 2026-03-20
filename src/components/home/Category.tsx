@@ -53,6 +53,7 @@ export default function Category() {
     retry: 0,
     refetchOnWindowFocus: false,
     staleTime: 3000 * 60,
+    placeholderData: keepPreviousData,
   });
   const {
     data: searchData,

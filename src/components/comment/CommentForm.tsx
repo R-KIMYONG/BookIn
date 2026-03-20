@@ -81,7 +81,8 @@ const CommentForm = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
-      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId, page] });
+      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
+      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
       handleCancelEdit();
     },
   });
@@ -101,7 +102,8 @@ const CommentForm = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
-      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId, page] });
+      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
+      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
       handleCancelEdit();
     },
   });
