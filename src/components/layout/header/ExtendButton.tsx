@@ -1,6 +1,6 @@
 import React from 'react';
-import { resetTempSession } from '@/app/actions/auth.actions';
 import ButtonComponent from '../../common/ButtonComponent';
+import { resetTempSession } from '@/app/actions/session.actions';
 
 const ExtendButton = React.memo(() => {
   return (

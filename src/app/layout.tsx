@@ -10,6 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthToastHandler from '@/components/common/AuthToastHandler';
 import { Suspense } from 'react';
+import SessionExpiredModalHandler from '@/components/common/SessionExpiredModalHandler';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,6 +34,9 @@ export default async function RootLayout({
         <QueryProvider>
           <Suspense fallback={null}>
             <AuthToastHandler />
+          </Suspense>
+          <Suspense fallback={null}>
+            <SessionExpiredModalHandler />
           </Suspense>
           <Header />
           {children}

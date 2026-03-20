@@ -3,12 +3,15 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { AUTH_FEEDBACK_TEXT } from '@/app/lib/auth/authActionFeedback';
+import { AUTH_CODE, AUTH_FEEDBACK_TEXT } from '@/app/lib/auth/authActionFeedback';
+import { useQueryClient } from '@tanstack/react-query';
+import useUser from '@/hooks/useUser';
 
 const AuthToastHandler = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -27,6 +30,11 @@ const AuthToastHandler = () => {
       toast.success(text, { position: 'top-right' });
     }
 
+    if (message === AUTH_CODE.logout.SUCCESS) {
+      queryClient.removeQueries({ queryKey: ['user'] });
+      queryClient.removeQueries({ queryKey: ['userInfo'] });
+      queryClient.removeQueries({ queryKey: ['pendingEmail'] });
+    }
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete('error');
     nextParams.delete('message');
@@ -35,7 +43,7 @@ const AuthToastHandler = () => {
     const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
 
     router.replace(nextUrl, { scroll: false });
-  }, [searchParams, pathname, router]);
+  }, [searchParams, pathname, router, queryClient]);
 
   return null;
 };
