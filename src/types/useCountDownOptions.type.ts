@@ -12,10 +12,8 @@ export type TempSessionState = {
 
 export type TempSessionModalProps = TempSessionState & {
   isOpen: boolean;
-  remainingSec: number;
-  countDownText: string | null;
-  isExpired: boolean;
   onClose: () => void;
-  onExtend: () => void;
-  onGoLogin: () => void;
+  onExtend?: () => void;
+  onGoLogin?: () => void;
+  showGoLoginButton?: boolean;
 };
