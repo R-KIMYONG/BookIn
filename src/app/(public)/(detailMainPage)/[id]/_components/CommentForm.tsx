@@ -7,11 +7,9 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
-import ButtonComponent from '../common/ButtonComponent';
+import ButtonComponent from '../../../../../components/common/ButtonComponent';
 import { CommentFormProps } from '@/types/commentList.type';
 import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
-import ConfirmModal from '../modal/ConfirmModal';
-import { useDisclosure } from '@nextui-org/react';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
@@ -36,19 +34,9 @@ const CommentForm = ({
 }: CommentFormProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { page } = useCommentsUrlState();
   const currentUrl = useCurrentUrl();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const handleRequireLogin = () => {
-    onOpen();
-  };
 
   const handleContentChange = (value: string) => {
-    if (!userId) {
-      handleRequireLogin();
-      return;
-    }
     if (value.length <= 200) {
       setTargetValue((prev) => ({ ...prev, content: value }));
     } else {
@@ -57,10 +45,6 @@ const CommentForm = ({
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!userId) {
-      handleRequireLogin();
-      return;
-    }
     setTargetValue((prev) => ({ ...prev, title: e.target.value }));
   };
 
@@ -80,7 +64,7 @@ const CommentForm = ({
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
       queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
       handleCancelEdit();
@@ -101,7 +85,7 @@ const CommentForm = ({
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
       queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
       queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
       handleCancelEdit();
@@ -113,7 +97,7 @@ const CommentForm = ({
     const cleanContent: string = DOMPurify.sanitize(targetValue.content || '');
 
     if (!userId) {
-      handleRequireLogin();
+      toast.error('로그인 후 댓글을 작성할 수 있습니다.');
       return;
     }
 
@@ -141,45 +125,62 @@ const CommentForm = ({
       console.error(error);
     }
   };
-
   return (
     <>
-      <form onSubmit={handleSubmit} className="bg-[#D9D9D9] p-6 mt-2 flex flex-col h-280px">
-        <input
-          type="text"
-          placeholder="제목 입력"
-          value={targetValue.title}
-          onChange={handleTitleChange}
-          required
-          maxLength={20}
-          className="w-[100%] h-[40px] p-2 text-lg"
-        />
-        <ReactQuill
-          className="bg-white h-[150px] overflow-hidden"
-          theme="snow"
-          value={targetValue.content}
-          onChange={handleContentChange}
-        />
-        <div className="flex gap-2 justify-end mt-6">
-          <ButtonComponent variant="danger" size="xs" type="submit" label={isEdit ? '완료' : '업로드'} />
-          {isEdit && (
-            <ButtonComponent variant="secondary" size="xs" type="button" label="취소" onClick={handleCancelEdit} />
-          )}
+      {userId ? (
+        <form onSubmit={handleSubmit} className="bg-[#D9D9D9] p-6 mt-2 flex flex-col h-280px">
+          <input
+            type="text"
+            placeholder="제목 입력"
+            value={targetValue.title}
+            onChange={handleTitleChange}
+            required
+            maxLength={20}
+            className="w-[100%] h-[40px] p-2 text-lg"
+          />
+          <ReactQuill
+            className="bg-white h-[150px] overflow-hidden"
+            theme="snow"
+            value={targetValue.content}
+            onChange={handleContentChange}
+          />
+          <div className="flex gap-2 justify-end mt-6">
+            <ButtonComponent variant="danger" size="xs" type="submit" label={isEdit ? '완료' : '업로드'} />
+            {isEdit && (
+              <ButtonComponent variant="secondary" size="xs" type="button" label="취소" onClick={handleCancelEdit} />
+            )}
+          </div>
+        </form>
+      ) : (
+        <div className="mt-2 rounded-xl border border-gray-200 bg-gray-50 px-6 py-8 text-center">
+          <p className="text-sm font-semibold text-gray-700">댓글 작성은 로그인 후 이용할 수 있습니다.</p>
+          <p className="mt-1 text-xs text-gray-500">회원가입 후 로그인하면 댓글을 남길 수 있어요.</p>
+
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <ButtonComponent
+              type="button"
+              variant="primary"
+              size="sm"
+              label="로그인"
+              onClick={() => router.push(`/login?redirectTo=${encodeURIComponent(currentUrl)}`)}
+            />
+            <ButtonComponent
+              type="button"
+              variant="outline"
+              size="sm"
+              label="회원가입"
+              onClick={() => router.push(`/signup?redirectTo=${encodeURIComponent(currentUrl)}`)}
+            />
+            <ButtonComponent
+              type="button"
+              variant="secondary"
+              size="sm"
+              label="홈으로"
+              onClick={() => router.push('/')}
+            />
+          </div>
         </div>
-      </form>
-      <ConfirmModal
-        isOpen={isOpen}
-        title="로그인 필요"
-        message="로그인 후 이용 가능합니다. 로그인 하시겠습니까?"
-        confirmColor="primary"
-        confirmLabel="로그인"
-        cancelLabel="취소"
-        onConfirm={() => {
-          onClose();
-          router.push(`/login?redirectTo=${encodeURIComponent(currentUrl)}`);
-        }}
-        onClose={onClose}
-      />
+      )}
     </>
   );
 };
