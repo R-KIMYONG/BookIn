@@ -1,14 +1,14 @@
 'use client';
 
 import { Spinner, useDisclosure } from '@nextui-org/react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import ButtonComponent from '../common/ButtonComponent';
+import ButtonComponent from '../../../../../components/common/ButtonComponent';
 import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
-import AppPagination from '../common/AppPagination';
+import AppPagination from '../../../../../components/common/AppPagination';
 import { CommentListProps, CommentListResult } from '@/types/commentList.type';
-import ConfirmModal from '../modal/ConfirmModal';
+import ConfirmModal from '../../../../../components/modal/ConfirmModal';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 import { createClient } from '@/utils/supabase/client';
 
@@ -23,6 +23,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
   const {
     data: comments,
     isPending,
+    isFetching,
     isError,
     error,
   } = useQuery<CommentListResult>({
@@ -48,6 +49,9 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
       };
     },
     enabled: !!postId,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
   });
 
   const deleteCommentMutation = useMutation({
@@ -63,8 +67,9 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId, page] });
-      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId, page] });
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
+      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
     },
   });
 
@@ -200,7 +205,12 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
         onClose={handleCloseModal}
       />
 
-      <AppPagination page={page} totalPages={totalPages} onChange={(p) => setCommentsUrl({ page: p })} />
+      <AppPagination
+        page={page}
+        totalPages={totalPages}
+        disabled={isFetching}
+        onChange={(p) => setCommentsUrl({ page: p })}
+      />
     </div>
   );
 };

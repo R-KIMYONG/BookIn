@@ -1,10 +1,10 @@
 import { getAladinDetail } from '@/app/lib/aladin/getAladinDetail';
-import Comment from '@/components/comment/Comment';
 import EmptyState from '@/components/common/EmptyState';
-
 import Image from 'next/image';
+import CommentSection from './_components/CommentSection';
+import Comment from './_components/Comment';
 
-export default async function MainDetail({ params }: { params: { id: string } }) {
+const MainDetail = async ({ params }: { params: { id: string } }) => {
   const data = await getAladinDetail(params.id);
 
   const item = data?.item?.[0];
@@ -111,9 +111,11 @@ export default async function MainDetail({ params }: { params: { id: string } })
 
         {/* 댓글부분 */}
         <div className="mt-8">
-          <Comment cover={item.cover} book_title={item.title} />
+          <CommentSection postId={params.id} cover={item.cover} book_title={item.title} />
         </div>
       </div>
     </>
   );
-}
+};
+
+export default MainDetail;

@@ -1,23 +1,16 @@
 'use client';
-import { createClient } from '@/utils/supabase/client';
-import { Spinner } from '@nextui-org/react';
+
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import CommentForm from './CommentForm';
-import CommentList from './CommentList';
 import { Tables } from '@/types/supabase';
 import useUser from '@/hooks/useUser';
 import { TargetValue } from '@/types/commentList.type';
-
-export type NowUser = {
-  nickname: string;
-  user_id: string;
-};
-
+import CommentList from './CommentList';
 
 const Comment = ({ cover, book_title }: { cover: string; book_title: string }) => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const { data: user, isPending } = useUser();
+  const { data: user } = useUser();
   const [editingId, setEditingId] = useState<string | null>(null);
   const { id: postId } = useParams<{ id: string }>();
   const [targetValue, setTargetValue] = useState<TargetValue>({
@@ -52,14 +45,6 @@ const Comment = ({ cover, book_title }: { cover: string; book_title: string }) =
       created_at: '',
     });
   };
-  if (isPending) {
-    return (
-      <div className="w-[100%] flex justify-center">
-        <Spinner />
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto p-4">
       <CommentList
