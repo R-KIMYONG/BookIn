@@ -16,7 +16,7 @@ const CommentTabs = ({ activeTab, setActiveTab }: CommentTabsProps) => {
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className="!flex-1 !font-medium !transition"
+            size='xs'
             variant={active ? 'primary' : 'secondary'}
             aria-pressed={active}
             label={tab.label}
