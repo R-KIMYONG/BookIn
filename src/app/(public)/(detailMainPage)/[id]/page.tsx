@@ -2,7 +2,6 @@ import { getAladinDetail } from '@/app/lib/aladin/getAladinDetail';
 import EmptyState from '@/components/common/EmptyState';
 import Image from 'next/image';
 import CommentSection from './_components/CommentSection';
-import Comment from './_components/Comment';
 
 const MainDetail = async ({ params }: { params: { id: string } }) => {
   const data = await getAladinDetail(params.id);

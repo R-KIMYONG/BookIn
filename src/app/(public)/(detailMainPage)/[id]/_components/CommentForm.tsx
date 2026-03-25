@@ -9,7 +9,6 @@ import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
 import ButtonComponent from '../../../../../components/common/ButtonComponent';
 import { CommentFormProps } from '@/types/commentList.type';
-import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
