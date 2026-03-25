@@ -4,13 +4,13 @@ import { Spinner, useDisclosure } from '@nextui-org/react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import ButtonComponent from '../../../../../components/common/ButtonComponent';
 import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
-import AppPagination from '../../../../../components/common/AppPagination';
 import { CommentListProps, CommentListResult } from '@/types/commentList.type';
-import ConfirmModal from '../../../../../components/modal/ConfirmModal';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 import { createClient } from '@/utils/supabase/client';
+import ButtonComponent from '@/components/common/ButtonComponent';
+import AppPagination from '@/components/common/AppPagination';
+import ConfirmModal from '@/components/modal/ConfirmModal';
 
 const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, postId }: CommentListProps) => {
   const pageSize = 10;
@@ -32,20 +32,29 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
-      const { data, count, error } = await supabase
-        .from('comments')
-        .select('*', { count: 'exact' })
-        .eq('post_id', postId)
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (error) {
-        throw new Error(error.message ?? '댓글 조회 실패');
+      const [{ data: commentData, error: commentDataError }, { data: statsData, error: statsError }] =
+        await Promise.all([
+          supabase
+            .from('comments')
+            .select('*')
+            .eq('post_id', postId)
+            .order('created_at', { ascending: false })
+            .range(from, to),
+          supabase.from('post_stats').select('comment_count').eq('post_id', postId).maybeSingle(),
+        ]);
+      if (commentDataError) {
+        throw new Error(commentDataError.message ?? '댓글 조회 실패');
       }
 
+      if (statsError) {
+        throw new Error(statsError.message ?? '댓글 수 조회 실패');
+      }
+      console.log(commentData);
+      console.log(statsData);
+
       return {
-        data: data ?? [],
-        total: count ?? 0,
+        data: commentData ?? [],
+        total: statsData?.comment_count ?? 0,
       };
     },
     enabled: !!postId,

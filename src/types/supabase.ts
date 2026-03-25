@@ -57,6 +57,7 @@ export type Database = {
       }
       comments: {
         Row: {
+          book_title: string | null
           content: string | null
           cover: string | null
           created_at: string
@@ -68,6 +69,7 @@ export type Database = {
           writer: string | null
         }
         Insert: {
+          book_title?: string | null
           content?: string | null
           cover?: string | null
           created_at?: string
@@ -79,6 +81,7 @@ export type Database = {
           writer?: string | null
         }
         Update: {
+          book_title?: string | null
           content?: string | null
           cover?: string | null
           created_at?: string
@@ -98,6 +101,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      post_stats: {
+        Row: {
+          comment_count: number | null
+          created_at: string
+          like_count: number | null
+          post_id: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          comment_count?: number | null
+          created_at?: string
+          like_count?: number | null
+          post_id: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          comment_count?: number | null
+          created_at?: string
+          like_count?: number | null
+          post_id?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: []
       }
       users: {
         Row: {
