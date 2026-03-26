@@ -22,4 +22,4 @@ export type MyCommentsListType = {
   writer: string;
 };
 
-export type MypageUserInfo = Pick<UserInfoType, 'id' | 'email' | 'nickname' | 'avatar'>;
+export type MypageUserInfo = Pick<UserInfoType, 'id' | 'email' | 'nickname' | 'avatar' | 'created_at'>;

@@ -263,8 +263,6 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
   return (
     <div className="flex items-center justify-between gap-4">
-      <div className="flex flex-col items-start gap-1">
-        <p className="text-xs">{email}</p>
         {(viewState === 'pending' || viewState === 'expired') && (
           <PendingEmailCountdown
             email={pendingData?.pendingEmail}
@@ -272,7 +270,6 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
             onExpiredChange={setHasExpired}
           />
         )}
-      </div>
       <div className="flex shrink-0 gap-2 items-center">
         {actionButtons.map((item) => {
           return (

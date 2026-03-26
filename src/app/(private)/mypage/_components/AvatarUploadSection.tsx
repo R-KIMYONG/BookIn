@@ -67,29 +67,29 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
     [updateAvatarImgMutation]
   );
   return (
-    <>
-      <div className="relative aspect-square w-14 sm:w-16 md:w-20 lg:w-24 overflow-hidden box-border">
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative h-20 w-20 overflow-hidden rounded-full border-4 border-white/80 bg-white shadow-md sm:h-24 sm:w-24">
         <Image src={userAvatar || '/images/noImg.png'} alt="avatarImg" className="object-cover" priority fill />
       </div>
-      <div>
-        <ButtonComponent
-          type="button"
-          label="업로드"
-          variant="outline"
-          size="xs"
-          onClick={() => avatarImgRef.current?.click()}
-          disabled={updateAvatarImgMutation.isPending}
-        />
 
-        <input
-          ref={avatarImgRef}
-          type="file"
-          className="hidden"
-          accept=".jpg,.jpeg,.png,.gif"
-          onChange={handleAvatarUpload}
-        />
-      </div>
-    </>
+      {/* <ButtonComponent
+        type="button"
+        label={updateAvatarImgMutation.isPending ? '업로드 중...' : '프로필 변경'}
+        variant="outline"
+        size="xs"
+        className="!rounded-full !border-white/60 !bg-white/10 !px-4 !text-white hover:!bg-white hover:!text-[#7f3f3f]"
+        onClick={() => avatarImgRef.current?.click()}
+        disabled={updateAvatarImgMutation.isPending}
+      /> */}
+
+      <input
+        ref={avatarImgRef}
+        type="file"
+        className="hidden"
+        accept=".jpg,.jpeg,.png,.gif"
+        onChange={handleAvatarUpload}
+      />
+    </div>
   );
 };
 
