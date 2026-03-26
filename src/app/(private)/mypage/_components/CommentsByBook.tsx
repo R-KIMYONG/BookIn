@@ -25,7 +25,7 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
       const from = (currentPage - 1) * pageSize;
       const to = from + pageSize - 1;
       const { data, count, error } = await supabase
-        .from('comment_books')
+        .from('user_book_comments')
         .select('post_id,book_title,book_cover,comment_count,last_commented_at', { count: 'exact' })
         .eq('user_id', userInfo.id)
         .order('last_commented_at', { ascending: false })

@@ -14,46 +14,32 @@ export type Database = {
   }
   public: {
     Tables: {
-      comment_books: {
+      book_stats: {
         Row: {
-          book_cover: string | null
-          book_title: string | null
-          comment_count: number
+          comment_count: number | null
           created_at: string
-          id: string
-          last_commented_at: string | null
+          like_count: number | null
           post_id: string
-          user_id: string
+          updated_at: string
+          view_count: number | null
         }
         Insert: {
-          book_cover?: string | null
-          book_title?: string | null
-          comment_count?: number
+          comment_count?: number | null
           created_at?: string
-          id?: string
-          last_commented_at?: string | null
+          like_count?: number | null
           post_id: string
-          user_id: string
+          updated_at?: string
+          view_count?: number | null
         }
         Update: {
-          book_cover?: string | null
-          book_title?: string | null
-          comment_count?: number
+          comment_count?: number | null
           created_at?: string
-          id?: string
-          last_commented_at?: string | null
+          like_count?: number | null
           post_id?: string
-          user_id?: string
+          updated_at?: string
+          view_count?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "comment_books_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       comments: {
         Row: {
@@ -102,32 +88,46 @@ export type Database = {
           },
         ]
       }
-      post_stats: {
+      user_book_comments: {
         Row: {
-          comment_count: number | null
+          book_cover: string | null
+          book_title: string | null
+          comment_count: number
           created_at: string
-          like_count: number | null
+          id: string
+          last_commented_at: string | null
           post_id: string
-          updated_at: string
-          view_count: number | null
+          user_id: string
         }
         Insert: {
-          comment_count?: number | null
+          book_cover?: string | null
+          book_title?: string | null
+          comment_count?: number
           created_at?: string
-          like_count?: number | null
+          id?: string
+          last_commented_at?: string | null
           post_id: string
-          updated_at?: string
-          view_count?: number | null
+          user_id: string
         }
         Update: {
-          comment_count?: number | null
+          book_cover?: string | null
+          book_title?: string | null
+          comment_count?: number
           created_at?: string
-          like_count?: number | null
+          id?: string
+          last_commented_at?: string | null
           post_id?: string
-          updated_at?: string
-          view_count?: number | null
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "comment_books_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {
