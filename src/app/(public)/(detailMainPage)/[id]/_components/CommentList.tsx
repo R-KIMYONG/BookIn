@@ -40,7 +40,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
             .eq('post_id', postId)
             .order('created_at', { ascending: false })
             .range(from, to),
-          supabase.from('post_stats').select('comment_count').eq('post_id', postId).maybeSingle(),
+          supabase.from('book_stats').select('comment_count').eq('post_id', postId).maybeSingle(),
         ]);
       if (commentDataError) {
         throw new Error(commentDataError.message ?? '댓글 조회 실패');
@@ -49,8 +49,6 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
       if (statsError) {
         throw new Error(statsError.message ?? '댓글 수 조회 실패');
       }
-      console.log(commentData);
-      console.log(statsData);
 
       return {
         data: commentData ?? [],
