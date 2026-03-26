@@ -1,68 +1,69 @@
 import { MypageUserInfo } from '@/types/userInfo.type';
-import ChangePassWord from './ChangePassWord';
-import ChangeUserId from './ChangeUserId';
-import ChangeUserNickName from './ChangeUserNickName';
-import AccountDeletion from './AccountDeletion';
 import { useMemo } from 'react';
+import dayjs from 'dayjs';
+import ButtonComponent from '@/components/common/ButtonComponent';
+import { useRouter } from 'next/navigation';
 
 const UserInfo = ({ userInfo }: { userInfo: MypageUserInfo }) => {
+  const router = useRouter();
+  const created = dayjs(userInfo.created_at).startOf('day');
+  const today = dayjs().startOf('day');
+  const diff = today.diff(created, 'day');
   const userInfoRows = useMemo(
     () => [
       {
-        label: '회원번호',
-        desc: '고유 식별자 (변경 불가)',
-        value: <span className="font-semibold">{userInfo?.id.split('-')[0].toUpperCase()}</span>,
+        label: '가입일',
+        desc: '계정을 처음 생성한 날짜입니다.',
+        value: `${created.format('YYYY.MM.DD')} (가입 ${diff}일째)`,
       },
       {
         label: '닉네임',
         desc: '게시글/댓글에 표시됩니다',
-        value: <ChangeUserNickName nickname={userInfo.nickname} userId={userInfo.id} />,
+        value: userInfo.nickname,
       },
       {
         label: '아이디',
         desc: '로그인에 사용됩니다',
-        value: <ChangeUserId email={userInfo.email} userId={userInfo.id} />,
-      },
-      {
-        label: '비밀번호',
-        desc: '보안을 위해 주기적으로 변경하세요',
-        value: <ChangePassWord userId={userInfo.id} />,
+        value: userInfo.email,
       },
     ],
-    [userInfo]
+    [created, diff, userInfo.nickname, userInfo.email]
   );
 
   return (
-    <div className="h-full rounded-2xl border border-default-200 bg-white overflow-hidden flex flex-col">
+    <section className="flex flex-col">
       {/* header */}
-      <div className="px-5 py-4 border-b border-default-200">
-        <h2 className="text-xs font-bold">계정 설정</h2>
-        <p className="text-[8px] text-default-500 mt-1">회원 정보와 보안 설정을 관리합니다.</p>
+      <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-5">
+        <div>
+          <h2 className="text-base font-extrabold text-gray-900 sm:text-lg">계정 정보</h2>
+          <p className="mt-1 text-sm text-gray-500">프로필과 계정 정보를 확인할 수 있습니다.</p>
+        </div>
+
+        <div className="shrink-0">
+          <ButtonComponent label="설정" size="sm" variant="outline" onClick={() => router.push('/settings')} />
+        </div>
       </div>
 
-      {/* main 기능들*/}
-      <div className="divide-y divide-default-200 border-b border-default-200">
+      {/* rows */}
+      <div className="divide-y divide-gray-100">
         {userInfoRows.map((row) => (
-          <div key={row.label} className="px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold">{row.label}</p>
-              <p className="text-[8px] text-default-500 mt-1">{row.desc}</p>
+          <div key={row.label} className="py-5">
+            <div className="flex flex-col gap-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{row.label}</p>
+                <p className="mt-1 text-sm text-gray-500">{row.desc}</p>
+              </div>
+
+              <div>
+                <p className="inline-flex max-w-full rounded-xl bg-gray-50 px-3 py-2 text-sm font-medium text-gray-900 break-all">
+                  {row.value}
+                </p>
+              </div>
             </div>
-            <div className="shrink-0 flex justify-start sm:justify-end">{row.value}</div>
           </div>
         ))}
       </div>
-
-      {/* 회원탈퇴 danger zone 카드 최하단으로 */}
-      <div className="mt-auto border-t border-default-200 bg-red-200 px-5 py-4 box-border flex justify-between items-center">
-        <div>
-          <p className="text-xs font-semibold text-danger">위험 영역</p>
-          <p className="text-[8px] text-default-500 mt-1">회원탈퇴는 되돌릴 수 없습니다.</p>
-          <span className="text-[8px] text-default-500">계정 및 관련 데이터가 삭제될 수 있어요.</span>
-        </div>
-        <AccountDeletion />
-      </div>
-    </div>
+    </section>
   );
 };
 

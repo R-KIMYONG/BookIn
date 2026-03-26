@@ -59,15 +59,15 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
         return (
           <li key={book.post_id}>
             <Link href={`/${book.post_id}`}>
-              <Card className="h-52 relative overflow-hidden">
+              <Card className="h-40 relative overflow-hidden">
                 <Image src={book.cover} alt={book.title} fill className="object-cover" />
 
                 <div className="absolute inset-0 bg-black/40" />
 
                 <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <p className="font-bold line-clamp-1">{book.title}</p>
+                  <p className="font-bold line-clamp-1 text-xs">{book.title}</p>
 
-                  <div className="flex justify-between text-xs mt-1">
+                  <div className="flex flex-col justify-between text-xs mt-1">
                     <span>댓글 {book.comment_count}개</span>
                     <span>{book.last_commented_at ? date : ''}</span>
                   </div>
