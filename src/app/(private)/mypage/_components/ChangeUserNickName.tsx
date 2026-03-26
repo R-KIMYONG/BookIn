@@ -103,8 +103,7 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
     );
   }
   return (
-    <div className="flex items-center justify-between gap-2">
-      <p className="text-xs">{nickname}</p>
+    <div className="flex items-center justify-between">
       <ButtonComponent type="button" label="변경" variant="outline" size="xs" onClick={handleOpenEdit} />
     </div>
   );
