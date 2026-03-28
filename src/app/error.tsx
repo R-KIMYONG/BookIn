@@ -4,12 +4,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import ButtonComponent from '@/components/common/ButtonComponent';
 
-type Props = {
+type GlobalProps = {
   error: Error & { digest?: string };
   reset: () => void;
 };
 
-export default function GlobalError({ error, reset }: Props) {
+const GlobalError = ({ error, reset }: GlobalProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -20,7 +20,6 @@ export default function GlobalError({ error, reset }: Props) {
   const isDev = process.env.NODE_ENV !== 'production';
 
   useEffect(() => {
-    // Sentry 같은 로깅 붙일 때 여기서 captureException(error) 하면 딱 좋아요
     console.error('[GlobalError]', error);
   }, [error]);
 
@@ -135,4 +134,6 @@ export default function GlobalError({ error, reset }: Props) {
       </div>
     </div>
   );
-}
+};
+
+export default GlobalError;

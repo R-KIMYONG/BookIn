@@ -7,32 +7,29 @@ import BookComments from './BookComments';
 import ButtonComponent from '@/components/common/ButtonComponent';
 import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 import { MypageSectionType } from '@/types/useMypageUrlState.type';
-import useUser from '@/hooks/useUser';
-import MypageSkeleton from './MypageSkeleton';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { RiSettings5Fill } from 'react-icons/ri';
 import Image from 'next/image';
-const Mypage = (): React.JSX.Element => {
+
+const Mypage = ({ userId }: { userId: string }): React.JSX.Element => {
   const supabase = createClient();
   const router = useRouter();
   const { mypageSection, setMypageUrl } = useMypageUrlState();
-  const { data: authUser, isPending: isUserPending } = useUser();
   const {
     data: userInfo,
-    isPending: isUserInfoPending,
     isError,
     error,
   } = useQuery<MypageUserInfo, Error>({
-    queryKey: ['userInfo', authUser?.id],
+    queryKey: ['userInfo', userId],
     queryFn: async () => {
-      if (!authUser?.id) {
+      if (!userId) {
         throw new Error('[Mypage] 로그인 사용자 정보가 없습니다.');
       }
       const { data: user, error: userError } = await supabase
         .from('users')
         .select('id,email,nickname,avatar,created_at')
-        .eq('id', authUser.id)
+        .eq('id', userId)
         .maybeSingle();
 
       if (userError) {
@@ -43,16 +40,10 @@ const Mypage = (): React.JSX.Element => {
         throw new Error('[Mypage] 사용자 프로필 정보를 찾을 수 없습니다.');
       }
 
-      return {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        avatar: user.avatar ?? '',
-        created_at: user.created_at,
-      };
+      return user;
     },
     throwOnError: true,
-    enabled: !!authUser?.id,
+    enabled: !!userId,
   });
   const created = dayjs(userInfo?.created_at);
 
@@ -60,13 +51,10 @@ const Mypage = (): React.JSX.Element => {
     { label: '회원정보', sectionType: 'userInfo' as MypageSectionType },
     { label: '댓글목록', sectionType: 'commentList' as MypageSectionType },
   ];
-  if (isUserPending || isUserInfoPending) {
-    return <MypageSkeleton />;
-  }
-  if (isError) {
-    console.error(error);
-    throw error;
-  }
+
+  if (isError) throw error;
+
+  if (!userInfo) throw new Error('마이페이지 정보를 불러오지 못했습니다.');
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">

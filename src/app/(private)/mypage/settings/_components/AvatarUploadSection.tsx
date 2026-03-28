@@ -4,6 +4,7 @@ import ButtonComponent from '@/components/common/ButtonComponent';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
+import { RiCameraLine } from 'react-icons/ri';
 import { toast } from 'react-toastify';
 
 const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userId: string }) => {
@@ -68,25 +69,28 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
   );
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="relative h-20 w-20 overflow-hidden rounded-full border-4 border-white/80 bg-white shadow-md sm:h-24 sm:w-24">
+      <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
         <Image src={userAvatar || '/images/noImg.png'} alt="avatarImg" className="object-cover" priority fill />
       </div>
 
-      {/* <ButtonComponent
+      <ButtonComponent
         type="button"
         label={updateAvatarImgMutation.isPending ? '업로드 중...' : '프로필 변경'}
         variant="outline"
         size="xs"
-        className="!rounded-full !border-white/60 !bg-white/10 !px-4 !text-white hover:!bg-white hover:!text-[#7f3f3f]"
+        className="!rounded-full  !px-4 !py-2  text-gray-700 transition hover:border-[#AF5858] hover:text-[#AF5858]"
         onClick={() => avatarImgRef.current?.click()}
         disabled={updateAvatarImgMutation.isPending}
-      /> */}
+        leftIcon={<RiCameraLine />}
+      >
+        프로필 이미지 변경
+      </ButtonComponent>
 
       <input
         ref={avatarImgRef}
         type="file"
         className="hidden"
-        accept=".jpg,.jpeg,.png,.gif"
+        accept=".jpg,.jpeg,.png,.gif,.webp"
         onChange={handleAvatarUpload}
       />
     </div>
