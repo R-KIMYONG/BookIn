@@ -1,46 +1,58 @@
-'use client';
-
+'user client';
 import { Skeleton } from '@nextui-org/react';
 
-const Loading = () => {
+const MypageLoading = () => {
   return (
-    <div className="flex justify-between gap-4 sm:w-full mx-auto items-stretch min-h-[calc(100vh-3rem)]">
-      {/* 좌측 사이드바 */}
-      <div className="bg-[#af5858] w-1/6 self-stretch flex flex-col items-center justify-center text-xs gap-5">
-        {/* 아바타 */}
-        <Skeleton className="rounded-full w-16 h-16 sm:w-20 sm:h-20 bg-white/30" />
+    <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+        {/* 좌측 프로필 카드 */}
+        <aside className="w-full lg:w-[280px] lg:shrink-0">
+          <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+            {/* 프로필 헤더 */}
+            <div className="bg-[#af5858] px-5 py-6">
+              <div className="flex items-center gap-4">
+                {/* 아바타 */}
+                <Skeleton className="h-20 w-20 rounded-full bg-white/30" />
 
-        {/* 업로드 버튼 */}
-        <Skeleton className="w-16 h-6 rounded-md bg-white/30" />
+                {/* 텍스트 */}
+                <div className="flex flex-col gap-2 flex-1">
+                  <Skeleton className="h-4 w-24 bg-white/30" />
+                  <Skeleton className="h-3 w-32 bg-white/30" />
+                  <Skeleton className="h-3 w-28 bg-white/30" />
+                </div>
+              </div>
+            </div>
 
-        {/* 환영 텍스트 */}
-        <div className="flex flex-col items-center gap-2">
-          <Skeleton className="w-20 h-3 bg-white/30" />
-          <Skeleton className="w-24 h-3 bg-white/30" />
-        </div>
+            {/* 탭 */}
+            <div className="px-3 py-3">
+              <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+                <Skeleton className="h-10 w-full rounded-xl" />
+                <Skeleton className="h-10 w-full rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </aside>
 
-        {/* 탭 버튼들 */}
-        <div className="w-full flex flex-col gap-2 px-4">
-          <Skeleton className="w-full h-10 rounded-md bg-white/30" />
-          <Skeleton className="w-full h-10 rounded-md bg-white/30" />
-        </div>
+        {/* 우측 콘텐츠 */}
+        <main className="min-w-0 flex-1">
+          <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+            {/* 헤더 */}
+            <div className="border-b border-gray-100 px-5 py-4">
+              <Skeleton className="h-5 w-32 rounded-md" />
+              <Skeleton className="mt-2 h-3 w-56 rounded-md" />
+            </div>
 
-        {/* 로그아웃 */}
-        <Skeleton className="w-16 h-6 rounded-md bg-white/30" />
-      </div>
-
-      {/* 우측 콘텐츠 영역 */}
-      <div className="w-5/6 self-stretch flex flex-col gap-4 p-6">
-        {/* 제목 */}
-        <Skeleton className="w-48 h-6 rounded-md" />
-
-        {/* 콘텐츠 블럭 */}
-        <Skeleton className="w-full h-32 rounded-lg" />
-        <Skeleton className="w-full h-32 rounded-lg" />
-        <Skeleton className="w-full h-32 rounded-lg" />
+            {/* 콘텐츠 영역 */}
+            <div className="px-4 py-5 space-y-4">
+              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-20 w-full rounded-xl" />
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
 };
 
-export default Loading;
+export default MypageLoading;

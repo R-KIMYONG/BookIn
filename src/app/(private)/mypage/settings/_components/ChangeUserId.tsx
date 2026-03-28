@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import PendingEmailCountdown from './PendingEmailCountdown';
 import { createClient } from '@/utils/supabase/client';
 import { isValidEmail } from '@/app/lib/validation/isEmail';
-import { ActionButtons, PendingEmailData } from '@/types/changeUserId.type';
+import { PendingEmailData } from '@/types/changeUserId.type';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
 const ChangeUserId = ({ email, userId }: { email: string; userId: string }): React.JSX.Element => {
@@ -16,14 +16,13 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
   const [hasExpired, setHasExpired] = useState<boolean>(false); //인증시간 만료여부 상태
 
-  const [isEditing, setIsEditing] = useState<boolean>(false); // 편집상태로 전환여부 상태
-
   const [draftEmail, setDraftEmail] = useState<string>(''); // input에 수정중인 상태
 
   const {
     data: pendingData,
     isError,
     error,
+    refetch,
   } = useQuery<PendingEmailData>({
     //조회이니까 컴포넌트에서 직접 supabase로 요청
     queryKey: ['pendingEmail', userId],
@@ -44,12 +43,11 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
   //인증 만료 상태
   const isExpired = !!pendingData?.pendingEmail && !!pendingData?.emailExpireAt && hasExpired;
 
-  const viewState: 'editing' | 'pending' | 'expired' | 'default' = useMemo(() => {
-    if (isEditing) return 'editing'; //지금 편집중임
+  const viewState: 'editable' | 'pending' | 'expired' = useMemo(() => {
     if (isPendingValid) return 'pending'; //지금 인증대기중임
     if (isExpired) return 'expired'; //지금 인증만료임
-    return 'default';
-  }, [isEditing, isPendingValid, isExpired]);
+    return 'editable';
+  }, [isPendingValid, isExpired]);
 
   const changeUserEmailMutation = useMutation({
     mutationFn: async (email: string) => {
@@ -69,11 +67,14 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
       return result;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+    onSuccess: (result) => {
+      if (result?.user) {
+        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['pendingEmail', userId] });
       setDraftEmail('');
-      setIsEditing(false);
     },
   });
   const isSaving = changeUserEmailMutation.isPending;
@@ -124,9 +125,13 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      if (result?.user) {
+        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['pendingEmail', userId] });
-      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
     },
   });
 
@@ -138,17 +143,6 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
       console.error(error);
     }
   };
-  //편집 취소
-  const handleCancelEdit = () => {
-    setDraftEmail('');
-    setIsEditing(false);
-  };
-
-  //편집 시작
-  const handleOpenEdit = () => {
-    setIsEditing(true);
-    setDraftEmail('');
-  };
 
   //인증 재요청
   const handleRetry = async () => {
@@ -159,133 +153,102 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
       console.error(error);
     }
   };
-
-  const getActionButtons = (): ActionButtons => {
-    switch (viewState) {
-      case 'pending':
-        return [
-          {
-            key: 'cancel-pending',
-            label: '인증 취소',
-            variant: 'secondary' as const,
-            type: 'button' as const,
-            disabled: false,
-            onClick: handleCancelPending,
-          },
-          {
-            key: 'pending-status',
-            label: '인증 대기중',
-            variant: 'outline' as const,
-            type: 'button' as const,
-            disabled: true,
-            onClick: handleOpenEdit,
-          },
-        ];
-
-      case 'expired':
-        return [
-          {
-            key: 'cancel-expired',
-            label: '취소',
-            variant: 'secondary' as const,
-            type: 'button' as const,
-            disabled: false,
-            onClick: handleCancelPending,
-          },
-          {
-            key: 'retry',
-            label: '재요청',
-            variant: 'primary' as const,
-            type: 'button' as const,
-            disabled: false,
-            onClick: handleRetry,
-          },
-        ];
-
-      default:
-        return [
-          {
-            key: 'edit',
-            label: '변경',
-            variant: 'outline' as const,
-            type: 'button' as const,
-            disabled: false,
-            onClick: handleOpenEdit,
-          },
-        ];
-    }
-  };
-  const actionButtons = getActionButtons();
-
-  useEffect(() => {
-    if (isError) {
-      console.error(error);
-    }
-  }, [isError, error]);
-
   //인증대기 시간 만료될경우 UI변경용 상태 업데이트
   useEffect(() => {
     setHasExpired(false);
   }, [pendingData?.pendingEmail, pendingData?.emailExpireAt]);
 
-  if (viewState === 'editing') {
+  if (isError) {
+    console.error(error);
     return (
-      <form
-        className="flex gap-2"
-        onSubmit={(e: FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          handleSave();
-        }}
-      >
-        <input
-          type="text"
-          value={draftEmail}
-          placeholder={email}
-          className="text-xs outline-dashed pl-2 py-1 rounded block box-border"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setDraftEmail(e.target.value);
-          }}
-          maxLength={25}
-          autoComplete="off"
-        />
-
-        <ButtonComponent type="button" label="취소" variant="secondary" size="xs" onClick={handleCancelEdit} />
-        <ButtonComponent
-          type="submit"
-          size="xs"
-          label={isSaving ? '요청중...' : '저장'}
-          variant="primary"
-          disabled={isSaving}
-        />
-      </form>
+      <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-4">
+        <p className="text-sm font-medium text-red-600">이메일 인증 상태를 불러오지 못했습니다.</p>
+        <p className="mt-1 text-xs text-gray-500">네트워크 상태를 확인한 뒤 다시 시도해주세요.</p>
+        <div className="mt-3 flex justify-end">
+          <ButtonComponent size="sm" variant="primary" label="다시 시도" onClick={() => refetch()} />
+        </div>
+      </div>
     );
   }
 
-  return (
-    <div className="flex items-center justify-between gap-4">
-        {(viewState === 'pending' || viewState === 'expired') && (
+  if (viewState === 'expired') {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-4">
           <PendingEmailCountdown
             email={pendingData?.pendingEmail}
             expireAt={pendingData?.emailExpireAt ?? null}
             onExpiredChange={setHasExpired}
           />
-        )}
-      <div className="flex shrink-0 gap-2 items-center">
-        {actionButtons.map((item) => {
-          return (
-            <ButtonComponent
-              key={item.key}
-              type={item.type}
-              size="xs"
-              label={item.label}
-              variant={item.variant}
-              disabled={item.disabled}
-              onClick={item.onClick}
-            />
-          );
-        })}
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <ButtonComponent type="button" size="sm" label="취소" variant="secondary" onClick={handleCancelPending} />
+          <ButtonComponent type="button" size="sm" label="재요청" variant="primary" onClick={handleRetry} />
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  if (viewState === 'pending') {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
+          <PendingEmailCountdown
+            email={pendingData?.pendingEmail}
+            expireAt={pendingData?.emailExpireAt ?? null}
+            onExpiredChange={setHasExpired}
+          />
+        </div>
+
+        <div className="flex justify-end">
+          <ButtonComponent
+            type="button"
+            size="sm"
+            label="인증 취소"
+            variant="secondary"
+            onClick={handleCancelPending}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={(e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleSave();
+      }}
+    >
+      <div>
+        <label htmlFor="email" className="mb-2 block text-sm font-semibold text-gray-900">
+          새 이메일
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={draftEmail}
+          placeholder={email}
+          className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#AF5858]"
+          onChange={(e) => setDraftEmail(e.target.value)}
+          maxLength={40}
+          autoComplete="off"
+        />
+        <p className="mt-2 text-xs text-gray-400">변경 요청 후 인증 메일을 통해 새 이메일을 확인해야 합니다.</p>
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <ButtonComponent
+          type="submit"
+          size="sm"
+          label={changeUserEmailMutation.isPending ? '요청중...' : '이메일 변경'}
+          variant="primary"
+          disabled={changeUserEmailMutation.isPending}
+        />
+      </div>
+    </form>
   );
 };
 

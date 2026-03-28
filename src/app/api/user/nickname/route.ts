@@ -1,3 +1,4 @@
+import { MAX_LENGTH_NICKNME } from '@/app/(private)/mypage/settings/_components/ChangeUserNickName';
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,8 +12,8 @@ export const PATCH = async (request: NextRequest) => {
       return NextResponse.json({ message: '닉네임을 입력해주세요.' }, { status: 400 });
     }
 
-    if (nickname.length > 8) {
-      return NextResponse.json({ message: '닉네임은 8자 이하만 가능합니다.' }, { status: 400 });
+    if (nickname.length > MAX_LENGTH_NICKNME) {
+      return NextResponse.json({ message: `닉네임은 ${MAX_LENGTH_NICKNME}자 이하만 가능합니다.` }, { status: 400 });
     }
     const {
       data: { user },

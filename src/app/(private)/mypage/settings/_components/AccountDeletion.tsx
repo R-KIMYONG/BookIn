@@ -18,7 +18,9 @@ const AccountDeletion = (): React.JSX.Element => {
         formAction={deleteAccount}
         onClose={onClose}
       />
-      <ButtonComponent type="button" label="탈퇴" variant="danger" size="xs" onClick={onOpen} />
+      <div className="mt-4 flex justify-end">
+        <ButtonComponent type="button" label="회원 탈퇴" variant="danger" size="sm" onClick={onOpen} />
+      </div>
     </>
   );
 };

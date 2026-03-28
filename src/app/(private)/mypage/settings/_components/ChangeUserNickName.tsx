@@ -6,8 +6,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { FormEvent, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 
+export const MAX_LENGTH_NICKNME = 10;
 const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): React.JSX.Element => {
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [draftNickname, setDraftNickname] = useState<string>(nickname);
   const queryClient = useQueryClient();
 
@@ -29,9 +29,12 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
 
       return result;
     },
-    onSuccess: () => {
-      setIsEditing(false);
-      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+    onSuccess: (result) => {
+      if (result?.user) {
+        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+      }
     },
   });
 
@@ -59,53 +62,41 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
     }
   }, [changeNickNameMutation, draftNickname, nickname]);
 
-  const handleOpenEdit = () => {
-    setDraftNickname(nickname);
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = () => {
-    setDraftNickname(nickname);
-    setIsEditing(false);
-  };
-
-  if (isEditing) {
-    return (
-      <form
-        className="flex items-center justify-between gap-2"
-        onSubmit={(e: FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          handleSaveNickname();
-        }}
-      >
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={(e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleSaveNickname();
+      }}
+    >
+      <div>
+        <label htmlFor="nickname" className="mb-2 block text-sm font-semibold text-gray-900">
+          새 닉네임
+        </label>
         <input
+          id="nickname"
           type="text"
           value={draftNickname}
-          className="text-xs outline-dashed pl-2 py-1 rounded block box-border"
+          className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#AF5858]"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setDraftNickname(e.target.value);
           }}
-          maxLength={8}
-          autoFocus
+          maxLength={MAX_LENGTH_NICKNME}
         />
+        <p className="mt-2 text-xs text-gray-400">최대 {MAX_LENGTH_NICKNME}자까지 입력할 수 있습니다.</p>
+      </div>
 
-        <div className="flex gap-2">
-          <ButtonComponent type="button" label="취소" variant="secondary" size="xs" onClick={handleCancelEdit} />
-          <ButtonComponent
-            type="submit"
-            label={changeNickNameMutation.isPending ? '저장중...' : '저장'}
-            variant="primary"
-            size="xs"
-            disabled={changeNickNameMutation.isPending}
-          />
-        </div>
-      </form>
-    );
-  }
-  return (
-    <div className="flex items-center justify-between">
-      <ButtonComponent type="button" label="변경" variant="outline" size="xs" onClick={handleOpenEdit} />
-    </div>
+      <div className="flex justify-end">
+        <ButtonComponent
+          type="submit"
+          label={changeNickNameMutation.isPending ? '저장중...' : '저장'}
+          variant="primary"
+          size="sm"
+          disabled={changeNickNameMutation.isPending}
+        />
+      </div>
+    </form>
   );
 };
 
