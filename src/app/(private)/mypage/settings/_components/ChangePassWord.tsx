@@ -66,8 +66,12 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
       if (!res.ok) throw new Error(result.message ?? '비밀번호 변경 실패');
       return result;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+    onSuccess: (result) => {
+      if (result?.user) {
+        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+      }
       handleClose();
     },
   });
@@ -150,6 +154,36 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
               {checkPrevPW === 'error' && (
                 <p className="text-xs text-red-500 text-center">현재 비밀번호가 올바르지 않습니다.</p>
               )}
+              {/* 진행단계안내 */}
+              <div className="my-3 flex justify-center py-3">
+                <div className="relative flex w-full max-w-xs rounded-full bg-gray-100 p-1">
+                  <div
+                    className={`absolute top-0 bottom-0 left-1 w-[calc(50%-4px)] rounded-full bg-[#af5858] transition-transform duration-300 ease-in-out h-full ${
+                      checkPrevPW === 'success' ? 'translate-x-full' : 'translate-x-0'
+                    }`}
+                  />
+
+                  <div className="relative z-10 flex w-1/2 items-center justify-center">
+                    <span
+                      className={`text-xs font-semibold transition-colors duration-300 ${
+                        checkPrevPW !== 'success' ? 'text-white' : 'text-gray-500'
+                      }`}
+                    >
+                      1. 현재 비밀번호
+                    </span>
+                  </div>
+
+                  <div className="relative z-10 flex w-1/2 items-center justify-center">
+                    <span
+                      className={`text-xs font-semibold transition-colors duration-300 ${
+                        checkPrevPW === 'success' ? 'text-white' : 'text-gray-500'
+                      }`}
+                    >
+                      2. 새 비밀번호
+                    </span>
+                  </div>
+                </div>
+              </div>
               <ModalBody>
                 {checkPrevPW !== 'success' ? (
                   <PasswordFields
@@ -205,7 +239,9 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
           )}
         </ModalContent>
       </Modal>
-      <ButtonComponent type="button" label="변경" variant="outline" size="xs" onClick={handleOpen} />
+      <div className="mt-4 flex justify-end">
+        <ButtonComponent type="button" label="비밀번호 변경" variant="primary" size="sm" onClick={handleOpen} />
+      </div>
     </>
   );
 };
