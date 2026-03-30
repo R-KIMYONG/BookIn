@@ -120,9 +120,9 @@ export default function Category() {
   const totalPages = getTotalPages(totalResults, perPage);
 
   return (
-    <section className="max-w-7xl mx-auto flex flex-col gap-2">
+    <section className="w-full max-w-7xl mx-auto flex flex-col gap-2 overflow-x-hidden">
       <div className="flex flex-col flex-wrap gap-2 md:flex-row md:items-start md:justify-between py-4 box-border">
-        <div className="md:flex-1 md:pr-3">
+        <div className="md:flex-1 md:pr-3 w-full ">
           <QueryTypeTabs
             value={queryType}
             onChange={(k) => setHomeUrl({ queryType: k, searchKeyWord: null })}
@@ -150,8 +150,7 @@ export default function Category() {
       {isPending ? (
         <SkeletonGrid count={20} />
       ) : (
-        // <div className="grid gap-y-6 gap-x-4 sm:gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-auto">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="w-full grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {list.map((item, index) => {
             const href = makeHref(item);
             const key = makeItemKey(item, index);

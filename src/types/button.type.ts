@@ -1,5 +1,5 @@
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'|'navbarLight'|'navbarDark';
- 
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'navbarLight' | 'navbarDark';
+
 //  primary   : 가장 중요한 주요 액션 (저장, 제출, 결제 등)
 //  secondary : 보조 액션 (취소, 뒤로가기 등)
 //  danger    : 위험 액션 (삭제, 탈퇴 등)
@@ -10,18 +10,16 @@ export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outl
 
 type ButtonSize = 'xs' | 'sm' | 'md';
 
-
 export type ButtonComponentProps = React.ComponentPropsWithoutRef<'button'> & {
-  label?: React.ReactNode; 
+  label?: React.ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
-  loadingText?: React.ReactNode 
+  loadingText?: React.ReactNode;
 };
-
 
 type SocialProvider = 'google' | 'github' | 'kakao';
 

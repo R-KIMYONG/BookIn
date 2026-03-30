@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import type { CookieOptions } from '@supabase/ssr';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -14,7 +15,13 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(
+          cookiesToSet: {
+            name: string;
+            value: string;
+            options?: CookieOptions;
+          }[]
+        ) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           // supabaseResponse = NextResponse.next({request,});
           cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
@@ -48,7 +55,7 @@ export async function updateSession(request: NextRequest) {
 
         const response = NextResponse.redirect(url);
         response.cookies.delete('bookin_session_mode');
-        response.cookies.delete('booin_sesson_expires_at');
+        response.cookies.delete('booin_session_expires_at');
         return response;
       }
       supabaseResponse.cookies.delete('bookin_session_mode');

@@ -19,8 +19,11 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
   //page=현재페이지를 나타남, totalPages=총페이지를 나타남, onChange=몇번페이지로 가라, disabled=비활성화 여부
   const [error, setError] = useState<boolean>(false);
   const safePage = clamp(page, 1, totalPages);
-  const blockStart = Math.max(1, Math.min(safePage - 2, totalPages - 4)); //시작점 계산
-  const blockEnd = Math.min(totalPages, blockStart + 4); //끝점 계산
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const visibleCount = isMobile ? 3 : 5;
+
+  const blockStart = Math.max(1, Math.min(safePage - Math.floor(visibleCount / 2), totalPages - (visibleCount - 1)));
+  const blockEnd = Math.min(totalPages, blockStart + (visibleCount - 1));
   const pages = range(blockStart, blockEnd);
 
   const go = (next: number) => {
