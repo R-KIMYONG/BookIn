@@ -10,7 +10,7 @@ const HeaderLogoutForm = () => {
   return (
     <form action={logout}>
       <input type="hidden" name="next" value={pathname} />
-      <ButtonComponent type="submit" variant="navbarDark" label="로그아웃" size="xs" />
+      <ButtonComponent type="submit" variant="navbarDark" label="로그아웃" size="xs" className="w-full" />
     </form>
   );
 };

@@ -3,13 +3,18 @@
 import Link from 'next/link';
 import ButtonComponent from '@/components/common/ButtonComponent';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
+import { ButtonVariant } from '@/types/button.type';
 
-const LoginLink = () => {
+type LoginLinkProps = {
+  btnVariant?: ButtonVariant;
+};
+
+const LoginLink = ({ btnVariant }: LoginLinkProps) => {
   const currentUrl = useCurrentUrl();
-
+  console.log(currentUrl)
   return (
     <Link href={`/login?redirectTo=${encodeURIComponent(currentUrl)}`}>
-      <ButtonComponent variant="navbarLight" label="로그인" size="xs" />
+      <ButtonComponent variant={btnVariant ?? 'navbarLight'} label="로그인" size="xs" className="w-full" />
     </Link>
   );
 };

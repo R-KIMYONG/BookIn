@@ -20,7 +20,7 @@ const HeaderCategories = ({ koGenres, foGenres, ebGenres }: HeaderCategoriesProp
   ];
 
   return (
-    <div className="flex items-center gap-4 font-bold">
+    <div className="flex items-center gap-8 md:gap-4 font-bold">
       {groups.map(({ key, label, items }) => (
         <Dropdown key={key}>
           <DropdownTrigger>

@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
-const HeaderLogo = ({ className }: { className: string }) => {
+const HeaderLogo = ({ className }: { className?: string }) => {
   return (
     <div className={className}>
-      <Link href="/" >
+      <Link href="/">
         <svg width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M32 16C35.1826 16 38.2348 17.2643 40.4853 19.5147C42.7357 21.7652 44 24.8174 44 28V42H36V28C36 26.9391 35.5786 25.9217 34.8284 25.1716C34.0783 24.4214 33.0609 24 32 24C30.9391 24 29.9217 24.4214 29.1716 25.1716C28.4214 25.9217 28 26.9391 28 28V42H20V28C20 24.8174 21.2643 21.7652 23.5147 19.5147C25.7652 17.2643 28.8174 16 32 16Z"

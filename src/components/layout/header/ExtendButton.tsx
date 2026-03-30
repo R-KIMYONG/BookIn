@@ -5,7 +5,7 @@ import { resetTempSession } from '@/app/actions/session.actions';
 const ExtendButton = React.memo(() => {
   return (
     <form action={resetTempSession}>
-      <ButtonComponent type="submit" size="xs" variant="secondary" label="연장" />
+      <ButtonComponent type="submit" size="xs" variant="ghost" label="연장" />
     </form>
   );
 });

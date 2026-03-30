@@ -34,7 +34,7 @@ const SearchBar = ({
     Publisher: '검색할 출판사를 입력하세요',
   };
   return (
-    <div className="flex justify-start items-center gap-2">
+    <div className="w-full flex justify-start items-center gap-2">
       <form
         onSubmit={(e: FormEvent<HTMLFormElement>) => {
           e.preventDefault();
@@ -48,7 +48,7 @@ const SearchBar = ({
           onSubmit(keyword);
         }}
         ref={formRef}
-        className="flex gap-2 rounded-2xl border border-gray-200 px-2 h-10 box-border"
+        className="flex w-full gap-1 rounded-2xl border border-gray-200 px-1 h-10"
       >
         <div className="relative shrink-0 flex items-center ">
           <select
@@ -76,7 +76,7 @@ const SearchBar = ({
             autoFocus
             maxLength={10}
             placeholder={searchQtOptionMap[searchQueryType]}
-            className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-48"
+            className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-0"
           />
           <ButtonComponent
             type="submit"

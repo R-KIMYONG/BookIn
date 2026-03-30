@@ -47,7 +47,8 @@ export const login = async (formData: FormData) => {
   }
   revalidatePath('/', 'layout');
 
-  const nextPath = redirectTo === '/' || redirectTo === '' ? '/mypage' : redirectTo;
+  const nextPath = redirectTo && redirectTo !== '' && redirectTo !== '/login' ? redirectTo : '/mypage';
+
   redirect(nextPath);
 };
 
