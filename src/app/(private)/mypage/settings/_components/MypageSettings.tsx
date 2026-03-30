@@ -57,14 +57,13 @@ const MypageSettings = ({ userId }: { userId: string }) => {
         <div className="border-b border-gray-100 px-5 py-5 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <button
+              <ButtonComponent
                 type="button"
                 onClick={() => router.push('/mypage')}
-                className="mb-3 inline-flex items-center gap-1 text-sm text-gray-500 transition hover:text-gray-800"
-              >
-                <RiArrowLeftLine className="text-base" />
-                마이페이지로 돌아가기
-              </button>
+                variant="ghost"
+                label="마이페이지"
+                leftIcon={<RiArrowLeftLine className="text-base" />}
+              />
 
               <div className="flex items-center gap-2">
                 <RiUserSettingsLine className="text-xl text-[#AF5858]" />
@@ -74,9 +73,11 @@ const MypageSettings = ({ userId }: { userId: string }) => {
               <p className="mt-2 text-sm text-gray-500">현재 정보를 확인하고 필요한 항목만 수정하세요.</p>
             </div>
 
-            <ButtonComponent size="sm" variant="outline" leftIcon={<RiHome3Line />} onClick={() => router.push('/')}>
-              홈으로
-            </ButtonComponent>
+            <div className='shrink-0'>
+              <ButtonComponent size="sm" variant="outline" leftIcon={<RiHome3Line />} onClick={() => router.push('/')}>
+                홈으로
+              </ButtonComponent>
+            </div>
           </div>
         </div>
 

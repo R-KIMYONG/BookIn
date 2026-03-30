@@ -79,6 +79,7 @@ const Mypage = ({ userId }: { userId: string }): React.JSX.Element => {
                     src={userInfo.avatar || '/images/noImg.png'}
                     alt="avatarImg"
                     className="object-cover"
+                    sizes="(max-width: 640px) 80px, 96px"
                     priority
                     fill
                   />

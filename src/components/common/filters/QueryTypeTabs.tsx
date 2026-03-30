@@ -20,7 +20,7 @@ const QueryTypeTabs = ({ value, onChange, disable, target }: QueryTypeTabsProps)
 
   return (
     <>
-      <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap py-1">
+<div className="flex flex-wrap gap-2 py-1">
         {tabs.map((t) => {
           const active = t.key === value;
           return (
@@ -32,6 +32,7 @@ const QueryTypeTabs = ({ value, onChange, disable, target }: QueryTypeTabsProps)
               onClick={() => onChange(t.key)}
               loadingText="요청중..."
               disabled={disable}
+              className="!px-2 !py-1 !text-xs !sm:px-3 !sm:text-sm !md:px-4 !md:text-base"
             />
           );
         })}
