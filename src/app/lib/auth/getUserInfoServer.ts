@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 
 export const getUserInfoServer = async (userId: string) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('users')

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ButtonComponent from './ButtonComponent';
+import ButtonComponent from './ui/ButtonComponent';
 
 type EmptyStateProps = {
   title?: string;
@@ -20,7 +20,7 @@ const EmptyState = ({
         <p className="font-semibold text-gray-900">{title}</p>
         {description ? <p className="mt-2 text-sm text-gray-500 whitespace-pre-line">{description}</p> : null}
         <Link href={href}>
-          <ButtonComponent label={buttonLabel} variant="primary" size="sm" type="button" className='!mt-4'/>
+          <ButtonComponent label={buttonLabel} variant="primary" size="sm" type="button" className="!mt-4" />
         </Link>
       </div>
     </div>

@@ -1,8 +1,8 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import PendingEmailCountdown from './PendingEmailCountdown';
 import { createClient } from '@/utils/supabase/client';
@@ -10,7 +10,7 @@ import { isValidEmail } from '@/app/lib/validation/isEmail';
 import { PendingEmailData } from '@/types/changeUserId.type';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
-const ChangeUserId = ({ email, userId }: { email: string; userId: string }): React.JSX.Element => {
+const ChangeUserId = ({ email, userId }: { email: string; userId: string }): ReactElement => {
   const queryClient = useQueryClient();
   const supabase = createClient();
 
@@ -217,7 +217,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
   return (
     <form
       className="space-y-4"
-      onSubmit={(e: FormEvent<HTMLFormElement>) => {
+      onSubmit={(e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         handleSave();
       }}

@@ -1,7 +1,7 @@
 import 'server-only';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@supabase/supabase-js';
 
-export const clearPendingEmail = async (supabase: ReturnType<typeof createClient>, userId: string) => {
+export const clearPendingEmail = async (supabase: SupabaseClient, userId: string) => {
   return await supabase
     .from('users')
     .update({

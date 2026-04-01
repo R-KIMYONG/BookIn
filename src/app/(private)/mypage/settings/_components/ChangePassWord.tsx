@@ -1,14 +1,13 @@
-import React, { useCallback, useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/react';
+import React, { ReactElement, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import PasswordFields from '@/components/form/PasswordFields';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isValidPassword } from '@/app/lib/validation/isPassword';
 import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 
-const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
+const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
   const { modalType, setMypageUrl } = useMypageUrlState();
   const isOpen = modalType === 'changePassword';
   const queryClient = useQueryClient();
@@ -135,110 +134,88 @@ const ChangePassWord = ({ userId }: { userId: string }): React.JSX.Element => {
   };
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={(open) => {
-          if (!open) handleClose();
-        }}
-        placement="center"
-        size="sm"
-        classNames={{ base: 'max-w-sm' }}
-      >
-        <ModalContent>
-          {() => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">비밀번호 변경</ModalHeader>
-              {passwordMissMatch ? (
-                <p className="text-xs text-red-500 text-center">비밀번호 일치하지 않습니다.</p>
-              ) : null}
-              {checkPrevPW === 'error' && (
-                <p className="text-xs text-red-500 text-center">현재 비밀번호가 올바르지 않습니다.</p>
-              )}
-              {/* 진행단계안내 */}
-              <div className="my-3 flex justify-center py-3">
-                <div className="relative flex w-full max-w-xs rounded-full bg-gray-100 p-1">
-                  <div
-                    className={`absolute top-0 bottom-0 left-1 w-[calc(50%-4px)] rounded-full bg-[#af5858] transition-transform duration-300 ease-in-out h-full ${
-                      checkPrevPW === 'success' ? 'translate-x-full' : 'translate-x-0'
-                    }`}
-                  />
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* backdrop */}
+          <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
-                  <div className="relative z-10 flex w-1/2 items-center justify-center">
-                    <span
-                      className={`text-xs font-semibold transition-colors duration-300 ${
-                        checkPrevPW !== 'success' ? 'text-white' : 'text-gray-500'
-                      }`}
-                    >
-                      1. 현재 비밀번호
-                    </span>
-                  </div>
+          {/* modal */}
+          <div className="relative z-10 w-full max-w-sm rounded-xl bg-white p-5 shadow-lg">
+            {/* header */}
+            <h2 className="text-lg font-semibold mb-2">비밀번호 변경</h2>
 
-                  <div className="relative z-10 flex w-1/2 items-center justify-center">
-                    <span
-                      className={`text-xs font-semibold transition-colors duration-300 ${
-                        checkPrevPW === 'success' ? 'text-white' : 'text-gray-500'
-                      }`}
-                    >
-                      2. 새 비밀번호
-                    </span>
-                  </div>
-                </div>
+            {/* 에러 메시지 */}
+            {passwordMissMatch && <p className="text-xs text-red-500 text-center">비밀번호 일치하지 않습니다.</p>}
+
+            {checkPrevPW === 'error' && (
+              <p className="text-xs text-red-500 text-center">현재 비밀번호가 올바르지 않습니다.</p>
+            )}
+
+            {/* 진행 단계 */}
+            <div className="my-3 flex justify-center py-3">
+              <div className="relative flex w-full max-w-xs rounded-full bg-gray-100 p-1">
+                <div
+                  className={`absolute top-0 bottom-0 left-1 w-[calc(50%-4px)] rounded-full bg-[#af5858] transition-transform ${
+                    checkPrevPW === 'success' ? 'translate-x-full' : ''
+                  }`}
+                />
+                <div className="relative z-10 flex w-1/2 justify-center text-xs font-semibold">1. 현재 비밀번호</div>
+                <div className="relative z-10 flex w-1/2 justify-center text-xs font-semibold">2. 새 비밀번호</div>
               </div>
-              <ModalBody>
-                {checkPrevPW !== 'success' ? (
-                  <PasswordFields
-                    passwordLabel="현재 비밀번호"
-                    passwordPlaceholder="현재 비밀번호를 입력하세요"
-                    passwordName="prevPassword"
-                    passwordValue={passwordForm.prevPassword}
-                    onChange={handleChange}
-                    showHint={false}
-                  />
-                ) : (
-                  <PasswordFields
-                    withConfirm
-                    passwordLabel="새 비밀번호"
-                    confirmLabel="새 비밀번호 확인"
-                    passwordPlaceholder="새 비밀번호를 입력하세요"
-                    confirmPlaceholder="새 비밀번호를 다시 입력하세요"
-                    passwordName="newPassword"
-                    confirmName="confirmPassword"
-                    passwordValue={passwordForm.newPassword}
-                    confirmValue={passwordForm.confirmPassword}
-                    onChange={handleChange}
-                    showHint
-                    className={passwordMissMatch ? 'border-red-600' : ''}
-                  />
-                )}
-              </ModalBody>
-              <ModalFooter>
-                <ButtonComponent type="button" variant="danger" size="xs" label="닫기" onClick={handleClose} />
-                {checkPrevPW !== 'success' ? (
-                  <ButtonComponent
-                    type="button"
-                    variant="primary"
-                    size="xs"
-                    label="현재 비밀번호 확인"
-                    onClick={handleCheckPrevPassWord}
-                    isLoading={checkPrevPassWordMutation.isPending}
-                    loadingText="확인중..."
-                  />
-                ) : (
-                  <ButtonComponent
-                    type="button"
-                    variant="primary"
-                    size="xs"
-                    label="재설정"
-                    onClick={handleSaveNewPassWord}
-                    isLoading={changePassWordMutation.isPending}
-                    loadingText="변경중..."
-                  />
-                )}
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+            </div>
+
+            {/* body */}
+            <div className="mb-4">
+              {checkPrevPW !== 'success' ? (
+                <PasswordFields
+                  passwordLabel="현재 비밀번호"
+                  passwordPlaceholder="현재 비밀번호 입력"
+                  passwordName="prevPassword"
+                  passwordValue={passwordForm.prevPassword}
+                  onChange={handleChange}
+                  showHint={false}
+                />
+              ) : (
+                <PasswordFields
+                  withConfirm
+                  passwordLabel="새 비밀번호"
+                  confirmLabel="비밀번호 확인"
+                  passwordName="newPassword"
+                  confirmName="confirmPassword"
+                  passwordValue={passwordForm.newPassword}
+                  confirmValue={passwordForm.confirmPassword}
+                  onChange={handleChange}
+                />
+              )}
+            </div>
+
+            {/* footer */}
+            <div className="flex justify-end gap-2">
+              <ButtonComponent type="button" variant="danger" size="xs" label="닫기" onClick={handleClose} />
+
+              {checkPrevPW !== 'success' ? (
+                <ButtonComponent
+                  type="button"
+                  variant="primary"
+                  size="xs"
+                  label="현재 비밀번호 확인"
+                  onClick={handleCheckPrevPassWord}
+                  isLoading={checkPrevPassWordMutation.isPending}
+                />
+              ) : (
+                <ButtonComponent
+                  type="button"
+                  variant="primary"
+                  size="xs"
+                  label="재설정"
+                  onClick={handleSaveNewPassWord}
+                  isLoading={changePassWordMutation.isPending}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mt-4 flex justify-end">
         <ButtonComponent type="button" label="비밀번호 변경" variant="primary" size="sm" onClick={handleOpen} />
       </div>

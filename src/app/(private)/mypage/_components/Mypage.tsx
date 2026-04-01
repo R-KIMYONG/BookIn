@@ -4,15 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { MypageUserInfo } from '@/types/userInfo.type';
 import UserInfo from './UserInfo';
 import BookComments from './BookComments';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 import { MypageSectionType } from '@/types/useMypageUrlState.type';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { RiSettings5Fill } from 'react-icons/ri';
 import Image from 'next/image';
+import { ReactElement } from 'react';
 
-const Mypage = ({ userId }: { userId: string }): React.JSX.Element => {
+const Mypage = ({ userId }: { userId: string }): ReactElement=> {
   const supabase = createClient();
   const router = useRouter();
   const { mypageSection, setMypageUrl } = useMypageUrlState();

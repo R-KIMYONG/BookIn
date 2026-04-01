@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-const AuthCodeErrorPage = ({ searchParams }: { searchParams: { reason?: string } }) => {
-  const reason = searchParams.reason ?? 'error';
+const AuthCodeErrorPage = async ({ searchParams }: { searchParams: Promise<{ reason?: string }> }) => {
+  const { reason = 'error' } = await searchParams;
 
   const messages = {
     cancelled: {

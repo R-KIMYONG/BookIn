@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { createRedirectUrl } from '../lib/navigation/createRedirectUrl';
 
 export const resetTempSession = async () => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const mode = cookieStore.get('bookin_session_mode')?.value;
   if (mode !== 'temp') return;
@@ -36,7 +36,7 @@ export const logoutExpiredSession = async ({
   redirectTo?: string;
   shouldRedirectToLogin: boolean;
 }) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   clearTempSessionCookies();
   revalidatePath('/', 'layout');

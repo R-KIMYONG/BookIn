@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const PATCH = async (req: NextRequest) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const maxFileSize = 5 * 1024 * 1024;
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
   const {

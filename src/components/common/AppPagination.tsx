@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import cn from '@/utils/cn';
-import ButtonComponent from './ButtonComponent';
+import ButtonComponent from './ui/ButtonComponent';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { AppPaginationProps } from '@/types/apppagenation.type';
@@ -82,7 +82,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
         </div>
         <form
           className="flex items-center gap-2"
-          onSubmit={(e) => {
+          onSubmit={(e: React.SubmitEvent<HTMLFormElement>) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
             const pageInputValue = formData.get('pageInput');

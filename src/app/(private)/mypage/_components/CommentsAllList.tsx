@@ -1,6 +1,5 @@
 import { Mycommentlist } from '@/types/mypageCommentslist.type';
 import { createClient } from '@/utils/supabase/client';
-import { Card, CardFooter, CardHeader } from '@nextui-org/react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -57,28 +56,29 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
     <ul className="grid w-full content-start gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {myCommentslist.data.map((item) => (
         <li key={item.id}>
-          {
-            <Link href={`/${item.post_id}`}>
-              <Card isFooterBlurred className="h-52">
-                <CardHeader className="absolute z-10 top-1 flex-col items-start">
-                  <h5 className="text-white font-medium text-xl mb-1 h-[30px] truncate w-full">{item.title}</h5>
-                  <p
-                    dangerouslySetInnerHTML={{ __html: item.content || '' }}
-                    className="text-tiny text-white/60 uppercase font-bold w-full text-ellipsis overflow-hidden line-clamp-6"
-                  />
-                </CardHeader>
-                <div className="relative w-full h-full">
-                  <Image alt={item.title} className="object-cover" src={item.cover || '/noImg.png'} fill priority />
-                  <div className="bg-black/50 w-full h-full absolute top-0 left-0"></div>
-                </div>
-                <CardFooter className="absolute bg-white/20 bottom-0 border-t-1 border-zinc-100/80 z-10 justify-between">
-                  <div>
-                    <p className="text-black text-tiny font-bold">{userInfo.nickname}</p>
-                  </div>
-                </CardFooter>
-              </Card>
-            </Link>
-          }
+          <Link href={`/${item.post_id}`}>
+            <div className="relative h-52 overflow-hidden rounded-xl">
+              {/* 이미지 */}
+              <Image alt={item.title} className="object-cover" src={item.cover || '/noImg.png'} fill priority />
+
+              {/* 오버레이 */}
+              <div className="absolute inset-0 bg-black/50" />
+
+              {/* 상단 텍스트 */}
+              <div className="absolute top-0 z-10 p-3 w-full">
+                <h5 className="text-white font-medium text-sm mb-1 truncate">{item.title}</h5>
+                <p
+                  dangerouslySetInnerHTML={{ __html: item.content || '' }}
+                  className="text-[10px] text-white/70 line-clamp-4"
+                />
+              </div>
+
+              {/* 하단 */}
+              <div className="absolute bottom-0 z-10 w-full bg-white/20 p-2">
+                <p className="text-black text-[10px] font-bold">{userInfo.nickname}</p>
+              </div>
+            </div>
+          </Link>
         </li>
       ))}
     </ul>

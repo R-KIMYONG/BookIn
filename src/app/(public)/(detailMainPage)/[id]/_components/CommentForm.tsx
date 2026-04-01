@@ -1,24 +1,19 @@
 'use client';
 
-import { Tables } from '@/types/supabase';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import DOMPurify from 'dompurify';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
-import ButtonComponent from '../../../../../components/common/ButtonComponent';
 import { CommentFormProps } from '@/types/commentList.type';
 import useCurrentUrl from '@/hooks/useCurrentUrl';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
+import dynamic from 'next/dynamic';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import { SubmitItem, useCommentMutation } from '@/hooks/useCommentMutation';
+import { sanitizeHtmlClient } from '@/app/lib/security/sanitizeHtml.client';
 
-type SubmitItem = Pick<
-  Tables<'comments'>,
-  'user_id' | 'title' | 'content' | 'post_id' | 'writer' | 'cover' | 'updated_at'
-> & { book_title: string };
-type UpdateSubmitItem = SubmitItem & Pick<Tables<'comments'>, 'id'>;
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
+  ssr: false,
+  loading: () => <div>Loading editor...</div>,
+});
 
 const CommentForm = ({
   isEdit, //편집 상태
@@ -32,8 +27,8 @@ const CommentForm = ({
   postId,
 }: CommentFormProps) => {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const currentUrl = useCurrentUrl();
+  const { add, update } = useCommentMutation(postId, userId);
 
   const handleContentChange = (value: string) => {
     if (value.length <= 200) {
@@ -47,53 +42,9 @@ const CommentForm = ({
     setTargetValue((prev) => ({ ...prev, title: e.target.value }));
   };
 
-  const addCommentMutation = useMutation({
-    mutationFn: async (newComment: SubmitItem) => {
-      const res = await fetch('/api/comment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newComment),
-      });
-
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message ?? '댓글 작성 실패하였습니다.');
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
-      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
-      handleCancelEdit();
-    },
-  });
-
-  const updateCommentMutation = useMutation({
-    mutationFn: async (updatedComment: UpdateSubmitItem) => {
-      const res = await fetch(`/api/comment`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedComment),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message ?? '댓글수정 싶패');
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
-      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
-      handleCancelEdit();
-    },
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const cleanContent: string = DOMPurify.sanitize(targetValue.content || '');
+    const cleanContent: string = sanitizeHtmlClient(targetValue.content || '');
 
     if (!userId) {
       toast.error('로그인 후 댓글을 작성할 수 있습니다.');
@@ -113,13 +64,14 @@ const CommentForm = ({
 
     const requestPromise =
       isEdit && targetValue.id
-        ? updateCommentMutation.mutateAsync({ ...newComment, id: targetValue.id })
-        : addCommentMutation.mutateAsync(newComment);
+        ? update.mutateAsync({ ...newComment, id: targetValue.id })
+        : add.mutateAsync(newComment);
 
     const pendingMessage = isEdit ? '댓글 수정중...' : '댓글 업로드중...';
 
     try {
       await toastMutationPromise(requestPromise, pendingMessage);
+      handleCancelEdit();
     } catch (error) {
       console.error(error);
     }
@@ -137,12 +89,7 @@ const CommentForm = ({
             maxLength={20}
             className="w-[100%] h-[40px] p-2 text-lg"
           />
-          <ReactQuill
-            className="bg-white h-[150px] overflow-hidden"
-            theme="snow"
-            value={targetValue.content}
-            onChange={handleContentChange}
-          />
+          <TiptapEditor value={targetValue.content ?? ''} onChange={handleContentChange} />
           <div className="flex gap-2 justify-end mt-6">
             <ButtonComponent variant="danger" size="xs" type="submit" label={isEdit ? '완료' : '업로드'} />
             {isEdit && (

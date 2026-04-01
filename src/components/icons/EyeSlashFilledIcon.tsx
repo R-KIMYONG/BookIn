@@ -1,6 +1,7 @@
 import { IconProps } from '@/types/icons.type';
+import { ReactElement } from 'react';
 
-export const EyeSlashFilledIcon = ({ size = 20, className }: IconProps): JSX.Element => (
+export const EyeSlashFilledIcon = ({ size = 20, className }: IconProps): ReactElement => (
   <svg
     aria-hidden="true"
     fill="none"

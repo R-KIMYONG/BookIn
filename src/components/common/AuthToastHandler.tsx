@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { AUTH_CODE, AUTH_FEEDBACK_TEXT } from '@/app/lib/auth/authActionFeedback';
 import { useQueryClient } from '@tanstack/react-query';
-import useUser from '@/hooks/useUser';
 
 const AuthToastHandler = () => {
   const searchParams = useSearchParams();

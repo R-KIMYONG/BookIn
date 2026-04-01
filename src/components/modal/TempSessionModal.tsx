@@ -1,5 +1,7 @@
+'use client';
+
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { TempSessionModalProps } from '@/types/useCountDownOptions.type';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 
 const TempSessionModal = ({
   isOpen,
@@ -13,62 +15,71 @@ const TempSessionModal = ({
 }: TempSessionModalProps) => {
   const isReallyExpired = isExpired || remainingSec <= 0;
 
+  if (!isOpen) return null;
+
   return (
-    <Modal isOpen={isOpen} placement="center" size="sm" classNames={{ base: 'max-w-sm' }}>
-      <ModalContent>
-        {() => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              {isReallyExpired ? '로그인이 만료되었습니다' : '로그인 연장하시겠습니까?'}
-            </ModalHeader>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-            <ModalBody>
-              {isReallyExpired ? (
-                <>
-                  <p className="text-sm text-gray-700">장시간 활동이 없어 자동 로그아웃되었습니다.</p>
-                  <p className="text-sm text-gray-700">계속 이용하려면 다시 로그인해주세요.</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-gray-700">로그인 세션이 곧 만료됩니다.</p>
-                  <p className="text-sm text-gray-700">계속 이용하시려면 지금 연장해주세요.</p>
-                  <p className="mt-2 text-xs text-gray-400">연장 시 로그인 시간이 2시간으로 초기화됩니다.</p>
-                  {countDownText ? (
-                    <p className="mt-2 text-xs text-gray-500">
-                      남은 시간: <b>{countDownText}</b>
-                    </p>
-                  ) : null}
-                </>
-              )}
-            </ModalBody>
+      {/* modal */}
+      <div
+        className="relative z-10 w-full max-w-sm rounded-xl bg-white p-5 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* header */}
+        <h2 className="text-lg font-semibold mb-3">
+          {isReallyExpired ? '로그인이 만료되었습니다' : '로그인 연장하시겠습니까?'}
+        </h2>
 
-            <ModalFooter>
-              {isReallyExpired ? (
-                <>
-                  <Button color="default" variant="flat" size="sm" onPress={onClose}>
-                    닫기
-                  </Button>
-                  {showGoLoginButton ? (
-                    <Button color="primary" size="sm" onPress={onGoLogin}>
-                      로그인 하러가기
-                    </Button>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <Button color="default" variant="flat" size="sm" onPress={onClose}>
-                    나중에
-                  </Button>
-                  <Button color="primary" size="sm" onPress={onExtend}>
-                    연장하기
-                  </Button>
-                </>
+        {/* body */}
+        <div className="space-y-2 text-sm text-gray-700">
+          {isReallyExpired ? (
+            <>
+              <p>장시간 활동이 없어 자동 로그아웃되었습니다.</p>
+              <p>계속 이용하려면 다시 로그인해주세요.</p>
+            </>
+          ) : (
+            <>
+              <p>로그인 세션이 곧 만료됩니다.</p>
+              <p>계속 이용하시려면 지금 연장해주세요.</p>
+              <p className="text-xs text-gray-400">연장 시 로그인 시간이 2시간으로 초기화됩니다.</p>
+
+              {countDownText && (
+                <p className="text-xs text-gray-500">
+                  남은 시간: <b>{countDownText}</b>
+                </p>
               )}
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+            </>
+          )}
+        </div>
+
+        {/* footer */}
+        <div className="mt-5 flex justify-end gap-2">
+          {isReallyExpired ? (
+            <>
+              <ButtonComponent type="button" label="닫기" variant="secondary" size="sm" onClick={onClose} />
+
+              {showGoLoginButton && (
+                <ButtonComponent
+                  type="button"
+                  label="로그인 하러가기"
+                  variant="primary"
+                  size="sm"
+                  onClick={onGoLogin}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <ButtonComponent type="button" label="나중에" variant="secondary" size="sm" onClick={onClose} />
+
+              <ButtonComponent type="button" label="연장하기" variant="primary" size="sm" onClick={onExtend} />
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

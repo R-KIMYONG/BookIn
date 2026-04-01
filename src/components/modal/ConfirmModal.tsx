@@ -1,4 +1,4 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import ButtonComponent from '../common/ui/ButtonComponent';
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -24,47 +24,48 @@ const ConfirmModal = ({
   isLoading = false,
   formAction,
 }: ConfirmModalProps) => {
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      placement="center"
-      size="sm"
-      classNames={{ base: 'max-w-sm' }}
-      isDismissable={!isLoading}
-      shouldBlockScroll={true}
-    >
-      <ModalContent>
-        {() => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={!isLoading ? onClose : undefined} />
 
-            <ModalBody>
-              <p className="text-sm text-gray-700 whitespace-pre-line">{message}</p>
-            </ModalBody>
+      {/* modal */}
+      <div className="relative z-10 w-full max-w-sm rounded-xl bg-white p-5 shadow-lg">
+        {/* header */}
+        <h2 className="text-lg font-semibold mb-2">{title}</h2>
 
-            <ModalFooter>
-              <Button color="default" variant="flat" size="sm" onPress={onClose} isDisabled={isLoading}>
-                {cancelLabel}
-              </Button>
-              {formAction ? (
-                //  server action용
-                <form action={formAction} className="contents">
-                  <Button type="submit" color={confirmColor} size="sm" isLoading={isLoading}>
-                    {confirmLabel}
-                  </Button>
-                </form>
-              ) : (
-                // 기존 방식 유지
-                <Button color={confirmColor} size="sm" onPress={onConfirm} isLoading={isLoading}>
-                  {confirmLabel}
-                </Button>
-              )}
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+        {/* body */}
+        <p className="text-sm text-gray-700 whitespace-pre-line mb-4">{message}</p>
+
+        {/* footer */}
+        <div className="flex justify-end gap-2">
+          <ButtonComponent type="button" label={cancelLabel} variant="secondary" size="sm" onClick={onClose} />
+
+          {formAction ? (
+            <form action={formAction}>
+              <ButtonComponent
+                type="submit"
+                label={confirmLabel}
+                variant={confirmColor === 'danger' ? 'danger' : 'primary'}
+                size="sm"
+                disabled={isLoading}
+              />
+            </form>
+          ) : (
+            <ButtonComponent
+              type="button"
+              label={confirmLabel}
+              variant={confirmColor === 'danger' ? 'danger' : 'primary'}
+              size="sm"
+              onClick={onConfirm}
+              disabled={isLoading}
+            />
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -13,7 +13,7 @@ export const PATCH = async (request: NextRequest) => {
   //2. 확보된 변경할 이메일을 검증
   //3. public.users테이블에 pending정보를 업데이트
   //4. 이후 인증메일을 발송(변경할 이메일 + redirectURL껴서 보내면됨)
-  const supabase = createClient();
+  const supabase = await createClient();
   const body = await request.json();
   const newEmail = String(body?.email ?? '')
     .trim()
@@ -101,7 +101,7 @@ export const PATCH = async (request: NextRequest) => {
 export const DELETE = async () => {
   //1. 현재로그인세션을 확인
   //2. public.users테입르의 pending정보를 reset
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

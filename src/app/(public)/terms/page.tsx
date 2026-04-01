@@ -1,72 +1,63 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
-import { Switch } from '@headlessui/react';
 import { TermsConsentItem, TermsState } from '@/types/terms.type';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 
-
-export default function TermsPage() {
+const TermsPage = () => {
   const router = useRouter();
 
   const [terms, setTerms] = useState<Record<TermsState, boolean>>({
-    all: false,
     isOver14: false,
     agreedToTerms: false,
     agreedToMarketing: false,
   });
-  const requiredAgreed = terms.isOver14 && terms.agreedToTerms;
-  const isNextButton = requiredAgreed;
+  const canProceed = terms.isOver14 && terms.agreedToTerms;
 
-  const handleSingleChange = (key: Exclude<TermsState, 'all'>, value: boolean) => {
-    setTerms((prev) => {
-      const updated = { ...prev, [key]: value };
+  const isAllChecked = terms.isOver14 && terms.agreedToTerms && terms.agreedToMarketing;
 
-      const allRequired = updated.isOver14 && updated.agreedToTerms;
-      updated.all = allRequired;
-
-      return updated;
-    });
+  const handleSingleChange = (key: TermsState, value: boolean) => {
+    setTerms((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
-  const termsConsentItems = useMemo<TermsConsentItem[]>(
-    () => [
-      {
-        id: 'isOver14',
-        title: '만 14세 이상입니다.',
-        required: true,
-        href: null,
-      },
-      {
-        id: 'agreedToTerms',
-        title: '서비스 이용약관',
-        required: true,
-        href: '/terms_of_use',
-      },
-      {
-        id: 'agreedToMarketing',
-        title: '마케팅 수신 동의',
-        required: false,
-        href: '/marketing',
-      },
-    ],
-    []
-  );
+  const TERMS_ITEMS: TermsConsentItem[] = [
+    {
+      id: 'isOver14',
+      title: '만 14세 이상입니다.',
+      required: true,
+      href: null,
+    },
+    {
+      id: 'agreedToTerms',
+      title: '서비스 이용약관',
+      required: true,
+      href: '/terms_of_use',
+    },
+    {
+      id: 'agreedToMarketing',
+      title: '마케팅 수신 동의',
+      required: false,
+      href: '/marketing',
+    },
+  ];
 
   const handleAllChange = (checked: boolean) => {
-    setTerms({
+    setTerms((prev) => ({
+      ...prev,
       isOver14: checked,
       agreedToTerms: checked,
       agreedToMarketing: checked,
-      all: checked,
-    });
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!terms.isOver14 || !terms.agreedToTerms) {
@@ -95,26 +86,27 @@ export default function TermsPage() {
                   <p className="text-sm font-semibold text-gray-900">모두 동의</p>
                   <p className="mt-0.5 text-[11px] text-gray-500">필수 및 선택 항목을 한 번에 설정합니다.</p>
                 </div>
-
-                <Switch
-                  checked={terms.all}
-                  onChange={handleAllChange}
-                  className={`${
-                    terms.all ? 'bg-[#af5858]' : 'bg-gray-300'
-                  } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors focus:outline-none items-center`}
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isAllChecked}
+                  onClick={() => handleAllChange(!isAllChecked)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                    isAllChecked ? 'bg-[#af5858]' : 'bg-gray-300'
+                  }`}
                 >
                   <span
-                    className={`${
-                      terms.all ? 'translate-x-5' : 'translate-x-0'
-                    } inline-block h-5 w-5 transform rounded-full bg-white shadow transition`}
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
+                      isAllChecked ? 'translate-x-5' : 'translate-x-0'
+                    }`}
                   />
-                </Switch>
+                </button>
               </div>
             </div>
 
             {/* 항목 리스트 */}
             <div className="divide-y divide-gray-100 rounded-2xl border border-gray-200 overflow-hidden">
-              {termsConsentItems.map((item) => {
+              {TERMS_ITEMS.map((item) => {
                 const checked = terms[item.id];
 
                 return (
@@ -144,20 +136,19 @@ export default function TermsPage() {
                         <p className="mt-1 text-[11px] text-gray-500">가입 연령 요건을 확인합니다.</p>
                       )}
                     </div>
-
-                    <Switch
-                      checked={checked}
-                      onChange={(v) => handleSingleChange(item.id, v)}
-                      className={`${
+                    <button
+                      type="button"
+                      onClick={() => handleSingleChange(item.id, !checked)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
                         checked ? 'bg-[#af5858]' : 'bg-gray-300'
-                      } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors focus:outline-none items-center`}
+                      }`}
                     >
                       <span
-                        className={`${
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
                           checked ? 'translate-x-5' : 'translate-x-0'
-                        } inline-block h-5 w-5 transform rounded-full bg-white shadow transition`}
+                        }`}
                       />
-                    </Switch>
+                    </button>
                   </div>
                 );
               })}
@@ -182,7 +173,7 @@ export default function TermsPage() {
                 variant="primary"
                 size="md"
                 className="flex-1 rounded-xl"
-                disabled={!isNextButton}
+                disabled={!canProceed}
                 isLoading={false}
                 label="다음"
               />
@@ -196,4 +187,5 @@ export default function TermsPage() {
       </div>
     </div>
   );
-}
+};
+export default TermsPage;

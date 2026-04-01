@@ -4,7 +4,7 @@ import { Book } from '@/types/book.type';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import InvalidCategory from './InvalidCategory';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import AppPagination from '@/components/common/AppPagination';
 import CategoryItem from '@/components/home/CategoryItem';
 import Link from 'next/link';

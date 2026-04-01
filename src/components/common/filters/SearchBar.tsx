@@ -1,7 +1,7 @@
-import { FormEvent, useEffect, useRef } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { FiChevronDown, FiSearch, FiX } from 'react-icons/fi';
-import ButtonComponent from '../ButtonComponent';
+import ButtonComponent from '../ui/ButtonComponent';
 import { SearchQueryType } from '@/types/searchBar.type';
 
 type SearchBarProps = {
@@ -22,9 +22,13 @@ const SearchBar = ({
   onChangeSearchQueryType,
 }: SearchBarProps) => {
   const formRef = useRef<HTMLFormElement>(null);
+  const [keyword, setKeyword] = useState(value);
   useEffect(() => {
     const input = formRef.current?.elements.namedItem('keyword') as HTMLInputElement | null;
     if (input) input.value = value ?? '';
+  }, [value]);
+  useEffect(() => {
+    setKeyword(value);
   }, [value]);
 
   const searchQtOptionMap: Record<SearchQueryType, string> = {
@@ -36,7 +40,7 @@ const SearchBar = ({
   return (
     <div className="w-full flex justify-start items-center gap-2">
       <form
-        onSubmit={(e: FormEvent<HTMLFormElement>) => {
+        onSubmit={(e:React.SubmitEvent<HTMLFormElement>) => {
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
 
@@ -72,10 +76,10 @@ const SearchBar = ({
             type="search"
             name="keyword"
             autoComplete="off"
-            defaultValue={value}
-            autoFocus
+            value={keyword}
             maxLength={10}
             placeholder={searchQtOptionMap[searchQueryType]}
+            onChange={(e) => setKeyword(e.target.value)}
             className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-0"
           />
           <ButtonComponent
