@@ -1,7 +1,7 @@
 import { MypageUserInfo } from '@/types/userInfo.type';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useRouter } from 'next/navigation';
 
 const UserInfo = ({ userInfo }: { userInfo: MypageUserInfo }) => {

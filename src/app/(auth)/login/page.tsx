@@ -4,8 +4,8 @@ import SocialLoginButtons from './_components/SocialLoginButtons';
 import PasswordFields from '@/components/form/PasswordFields';
 import { login } from '@/app/actions/auth.actions';
 
-const LoginPage = ({ searchParams }: { searchParams: { error?: string; redirectTo?: string } }) => {
-  const redirectTo = searchParams.redirectTo ?? '/';
+const LoginPage = async ({ searchParams }: { searchParams: Promise<{ error?: string; redirectTo?: string }> }) => {
+  const { redirectTo = '/' } = await searchParams;
 
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">

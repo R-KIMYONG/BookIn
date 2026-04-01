@@ -1,23 +1,27 @@
 'use client';
 
-import { Spinner, useDisclosure } from '@nextui-org/react';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
 import { CommentListProps, CommentListResult } from '@/types/commentList.type';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 import { createClient } from '@/utils/supabase/client';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import AppPagination from '@/components/common/AppPagination';
 import ConfirmModal from '@/components/modal/ConfirmModal';
+import { useCommentMutation } from '@/hooks/useCommentMutation';
+import { sanitizeHtmlClient } from '@/app/lib/security/sanitizeHtml.client';
 
 const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, postId }: CommentListProps) => {
   const pageSize = 10;
   const supabase = createClient();
-  const queryClient = useQueryClient();
+  const { remove } = useCommentMutation(postId, userId);
   const { page, setCommentsUrl } = useCommentsUrlState();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
   const [targetDeleteId, setTargetDeleteId] = useState<string | null>(null);
 
   const {
@@ -61,28 +65,9 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
     refetchOnWindowFocus: false,
   });
 
-  const deleteCommentMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await fetch(`/api/comment/?id=${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message ?? '댓글 삭제에 실패했습니다.');
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
-      queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
-      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
-    },
-  });
-
   const handleDelete = async (id: string) => {
     try {
-      await toastMutationPromise(deleteCommentMutation.mutateAsync(id), '댓글 삭제중...');
+      await toastMutationPromise(remove.mutateAsync(id), '댓글 삭제중...');
       onClose();
       setTargetDeleteId(null);
     } catch (error) {
@@ -98,7 +83,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
   if (isPending)
     return (
       <div className="w-[100%] flex justify-center">
-        <Spinner />
+        <div className="h-6 w-6 border-2 border-gray-300 border-t-[#AF5858] rounded-full animate-spin" />
       </div>
     );
 
@@ -178,7 +163,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
                   {/* 본문: 내용 */}
                   <div className="mt-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-sm leading-6 text-gray-700">
                     <div
-                      dangerouslySetInnerHTML={{ __html: content || '' }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtmlClient(content || '') }}
                       className="prose prose-sm max-w-none break-words"
                     />
                   </div>

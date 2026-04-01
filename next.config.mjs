@@ -1,16 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['image.aladin.co.kr', 'vshtzcektgnzzfgtstdy.supabase.co'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'image.aladin.co.kr',
         pathname: '/product/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'vshtzcektgnzzfgtstdy.supabase.co',
+      },
     ],
   },
-  transpilePackages: ['@nextui-org/react', 'framer-motion'],
+  transpilePackages: ['framer-motion'],
   reactStrictMode: false,
 };
 

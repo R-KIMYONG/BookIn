@@ -1,25 +1,19 @@
-import { Card, Skeleton } from '@nextui-org/react';
 
 const SkeletonGrid = ({ count = 20 }: { count?: number }) => {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <Card className="space-y-5 p-4" radius="lg" key={i}>
-          <Skeleton className="rounded-lg">
-            <div className="h-24 rounded-lg bg-default-300"></div>
-          </Skeleton>
+        <div key={i} className="space-y-5 p-4 rounded-xl border animate-pulse">
+          {/* 이미지 */}
+          <div className="h-24 rounded-lg bg-gray-200" />
+
+          {/* 텍스트 */}
           <div className="space-y-3">
-            <Skeleton className="w-3/5 rounded-lg">
-              <div className="h-3 w-3/5 rounded-lg bg-default-200"></div>
-            </Skeleton>
-            <Skeleton className="w-4/5 rounded-lg">
-              <div className="h-3 w-4/5 rounded-lg bg-default-200"></div>
-            </Skeleton>
-            <Skeleton className="w-2/5 rounded-lg">
-              <div className="h-3 w-2/5 rounded-lg bg-default-300"></div>
-            </Skeleton>
+            <div className="h-3 w-3/5 rounded bg-gray-200" />
+            <div className="h-3 w-4/5 rounded bg-gray-200" />
+            <div className="h-3 w-2/5 rounded bg-gray-200" />
           </div>
-        </Card>
+        </div>
       ))}
     </div>
   );

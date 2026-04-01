@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { MypageUserInfo } from '@/types/userInfo.type';
 import CommentTabs from './CommentTabs';
 import CommentsAllList from './CommentsAllList';
@@ -7,7 +7,7 @@ import CommentsByBook from './CommentsByBook';
 import AppPagination from '@/components/common/AppPagination';
 import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 export const pageSize = 10; //한페이지에 패칭할 카드수량
-const BookComments = ({ userInfo }: { userInfo: MypageUserInfo }): React.JSX.Element => {
+const BookComments = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement=> {
   const [totalPages, setTotalPages] = useState<number>(1);
   const { commentTab, page, setMypageUrl } = useMypageUrlState();
 

@@ -4,7 +4,7 @@ import { EyeFilledIcon } from '@/components/icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '@/components/icons/EyeSlashFilledIcon';
 import { PasswordFieldsProps } from '@/types/passwordField.type';
 import { useState } from 'react';
-import ButtonComponent from '../common/ButtonComponent';
+import ButtonComponent from '../common/ui/ButtonComponent';
 import cn from '@/utils/cn';
 
 const PasswordFields = ({

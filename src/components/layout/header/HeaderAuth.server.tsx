@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import LoginLink from './LoginLink';
 import HeaderLogoutForm from './HeaderLogoutForm';
 import UserMenu from './UserMenu';

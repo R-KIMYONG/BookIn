@@ -1,6 +1,6 @@
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 import { isImageExtension } from '@/app/lib/validation/isImageExtension';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';

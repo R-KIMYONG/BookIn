@@ -6,7 +6,7 @@ import { getUserInfoServer } from '@/app/lib/auth/getUserInfoServer';
 
 const UserInfoSection = async () => {
   const queryClient = new QueryClient();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

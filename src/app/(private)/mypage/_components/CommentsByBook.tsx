@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { Card } from '@nextui-org/react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import dayjs from 'dayjs';
@@ -59,7 +59,7 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
         return (
           <li key={book.post_id}>
             <Link href={`/${book.post_id}`}>
-              <Card className="h-40 relative overflow-hidden">
+              <div className="h-40 relative overflow-hidden">
                 <Image src={book.cover} alt={book.title} fill className="object-cover" />
 
                 <div className="absolute inset-0 bg-black/40" />
@@ -72,7 +72,7 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
                     <span>{book.last_commented_at ? date : ''}</span>
                   </div>
                 </div>
-              </Card>
+              </div>
             </Link>
           </li>
         );

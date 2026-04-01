@@ -1,6 +1,6 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useRouter } from 'next/navigation';
 
 type SettingsErrorPageProps = {

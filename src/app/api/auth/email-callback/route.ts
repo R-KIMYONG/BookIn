@@ -21,7 +21,7 @@ export const GET = async (request: Request) => {
     return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: pendingData, error: pendingDataError } = await supabase
     .from('users')

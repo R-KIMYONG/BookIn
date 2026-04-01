@@ -5,7 +5,7 @@ import MypageSettings from './MypageSettings';
 
 const MypageSettingsSection = async () => {
   const queryClient = new QueryClient();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

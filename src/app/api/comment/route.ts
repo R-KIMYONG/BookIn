@@ -1,12 +1,13 @@
+import { sanitizeHtmlServer } from '@/app/lib/security/sanitizeHtml.server';
 import { Tables } from '@/types/supabase';
 import { createClient } from '@/utils/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const now = new Date().toISOString();
-  let body: Tables<'comments'>
+  let body: Tables<'comments'>;
 
   try {
     body = await request.json();
@@ -14,13 +15,14 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json({ message: '요청 데이터를 읽을 수 없습니다.' }, { status: 400 });
   }
   const { title, content, post_id, writer, user_id, cover, book_title } = body;
+  const cleanContent = sanitizeHtmlServer(content || '');
 
   if (!user_id || !post_id)
     return NextResponse.json({ message: '댓글 작성에 필요한 정보가 누락되었습니다.' }, { status: 400 });
 
   const { error: commentInsertError } = await supabase
     .from('comments')
-    .insert({ title, content, post_id, writer, user_id, updated_at: now, cover, book_title });
+    .insert({ title, content: cleanContent, post_id, writer, user_id, updated_at: now, cover, book_title });
 
   if (commentInsertError) {
     console.log(commentInsertError);
@@ -30,12 +32,12 @@ export const POST = async (request: NextRequest) => {
   return NextResponse.json({ message: '댓글이 등록되었습니다.' }, { status: 201 });
 };
 export const PUT = async (request: NextRequest) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const now = new Date().toISOString();
   try {
     const updateComment = await request.json();
     const { id, book_title, ...commentFields } = updateComment;
-
+    const cleanContent = sanitizeHtmlServer(commentFields.content || '');
     if (!id) return NextResponse.json({ message: '수정할 댓글 정보를 찾을 수 없습니다.' }, { status: 400 });
 
     if (!commentFields.user_id || !commentFields.post_id)
@@ -43,7 +45,7 @@ export const PUT = async (request: NextRequest) => {
 
     const { error: commentUpdateError } = await supabase
       .from('comments')
-      .update({ ...commentFields, updated_at: now, book_title })
+      .update({ ...commentFields, updated_at: now, book_title, content: cleanContent })
       .eq('id', id);
 
     if (commentUpdateError) {
@@ -60,7 +62,7 @@ export const PUT = async (request: NextRequest) => {
   }
 };
 export const DELETE = async (request: NextRequest) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   try {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');

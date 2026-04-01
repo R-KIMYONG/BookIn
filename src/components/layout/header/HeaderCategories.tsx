@@ -1,6 +1,6 @@
 'use client';
 
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
+import Dropdown from '@/components/common/ui/Dropdown';
 import { Genre } from '@/types/genre.type';
 import { useRouter } from 'next/navigation';
 
@@ -9,7 +9,6 @@ type HeaderCategoriesProps = {
   foGenres: Genre[];
   ebGenres: Genre[];
 };
-
 const HeaderCategories = ({ koGenres, foGenres, ebGenres }: HeaderCategoriesProps) => {
   const router = useRouter();
 
@@ -20,29 +19,21 @@ const HeaderCategories = ({ koGenres, foGenres, ebGenres }: HeaderCategoriesProp
   ];
 
   return (
-    <div className="flex items-center gap-8 md:gap-4 font-bold">
+    <div className="flex gap-6 text-white text-xs">
       {groups.map(({ key, label, items }) => (
-        <Dropdown key={key}>
-          <DropdownTrigger>
-            <p className="text-white text-xs cursor-pointer">{label}</p>
-          </DropdownTrigger>
-
-          <DropdownMenu
-            aria-label={`${label} 메뉴`}
-            items={items}
-            className="max-h-[200px] overflow-y-auto w-[200px]"
-            onAction={(genreId) => {
-              const target = key === 'kr' ? 'Book' : key === 'fr' ? 'Foreign' : 'eBook';
-              router.push(`/category/${genreId}?target=${target}&page=1`);
-            }}
-          >
-            {(genre: Genre) => (
-              <DropdownItem key={genre.id} className="!text-[10px]">
-                {genre.label}
-              </DropdownItem>
-            )}
-          </DropdownMenu>
-        </Dropdown>
+        <Dropdown
+          key={key}
+          trigger={<p className="cursor-pointer font-bold">{label}</p>}
+          items={items.map((g) => ({
+            type: 'action',
+            label: g.label,
+            value: g.id,
+          }))}
+          onSelect={(genreId) => {
+            const target = key === 'kr' ? 'Book' : key === 'fr' ? 'Foreign' : 'eBook';
+            router.push(`/category/${genreId}?target=${target}&page=1`);
+          }}
+        />
       ))}
     </div>
   );
