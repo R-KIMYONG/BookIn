@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { logout } from '@/app/actions/auth.actions';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 
 const HeaderLogoutForm = () => {
   const pathname = usePathname();

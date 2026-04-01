@@ -3,9 +3,9 @@ import EmptyState from '@/components/common/EmptyState';
 import Image from 'next/image';
 import CommentSection from './_components/CommentSection';
 
-const MainDetail = async ({ params }: { params: { id: string } }) => {
-  const data = await getAladinDetail(params.id);
-
+const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
+  const data = await getAladinDetail(id);
   const item = data?.item?.[0];
 
   if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
@@ -110,7 +110,7 @@ const MainDetail = async ({ params }: { params: { id: string } }) => {
 
         {/* 댓글부분 */}
         <div className="mt-8">
-          <CommentSection postId={params.id} cover={item.cover} book_title={item.title} />
+          <CommentSection postId={id} cover={item.cover} book_title={item.title} />
         </div>
       </div>
     </>

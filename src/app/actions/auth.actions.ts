@@ -10,7 +10,7 @@ import { AUTH_CODE } from '../lib/auth/authActionFeedback';
 import { createRedirectUrl } from '../lib/navigation/createRedirectUrl';
 
 export const logout = async (formData: FormData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const next = String(formData.get('next') ?? '/');
   const { error } = await supabase.auth.signOut();
 
@@ -24,7 +24,7 @@ export const logout = async (formData: FormData) => {
 };
 
 export const login = async (formData: FormData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const remember = formData.get('remember') === 'on';
   const email = String(formData.get('email') ?? '');
   const password = String(formData.get('password') ?? '');
@@ -53,7 +53,7 @@ export const login = async (formData: FormData) => {
 };
 
 export const signup = async (formData: FormData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
@@ -128,7 +128,7 @@ export const signup = async (formData: FormData) => {
 };
 
 export const deleteAccount = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

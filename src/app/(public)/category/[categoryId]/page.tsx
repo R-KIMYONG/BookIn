@@ -1,12 +1,11 @@
 import { getGenres } from '@/app/lib/category/getGenres';
-import { CategoryPageProps } from '@/types/categoryPage.type';
 import CategoryClient from './_components/CategoryClient';
-const CategoryPage = ({ params }: Pick<CategoryPageProps, 'params'>) => {
+const CategoryPage = async ({ params }: { params: Promise<{ categoryId: string }> }) => {
+  const resolvedParams = await params;
   const genres = getGenres();
-
   return (
     <CategoryClient
-      params={params}
+      params={resolvedParams}
       koreanGenres={genres.koGenres}
       foreignGenres={genres.foGenres}
       ebookGenres={genres.ebGenres}

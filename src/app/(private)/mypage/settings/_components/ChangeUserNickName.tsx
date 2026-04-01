@@ -1,13 +1,13 @@
 'use client';
 
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { FormEvent, useCallback, useState } from 'react';
+import React, { ReactElement, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 
 export const MAX_LENGTH_NICKNME = 10;
-const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): React.JSX.Element => {
+const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): ReactElement => {
   const [draftNickname, setDraftNickname] = useState<string>(nickname);
   const queryClient = useQueryClient();
 
@@ -65,7 +65,7 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
   return (
     <form
       className="space-y-4"
-      onSubmit={(e: FormEvent<HTMLFormElement>) => {
+      onSubmit={(e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         handleSaveNickname();
       }}

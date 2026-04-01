@@ -10,7 +10,7 @@ export const getCommentsServer = async ({
   page: number;
   pageSize?: number;
 }): Promise<CommentListResult> => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;

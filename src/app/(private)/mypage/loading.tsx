@@ -1,5 +1,5 @@
 'user client';
-import { Skeleton } from '@nextui-org/react';
+
 
 const MypageLoading = () => {
   return (
@@ -12,13 +12,13 @@ const MypageLoading = () => {
             <div className="bg-[#af5858] px-5 py-6">
               <div className="flex items-center gap-4">
                 {/* 아바타 */}
-                <Skeleton className="h-20 w-20 rounded-full bg-white/30" />
+                <div className="h-20 w-20 rounded-full bg-white/30" />
 
                 {/* 텍스트 */}
                 <div className="flex flex-col gap-2 flex-1">
-                  <Skeleton className="h-4 w-24 bg-white/30" />
-                  <Skeleton className="h-3 w-32 bg-white/30" />
-                  <Skeleton className="h-3 w-28 bg-white/30" />
+                  <div className="h-4 w-24 bg-white/30" />
+                  <div className="h-3 w-32 bg-white/30" />
+                  <div className="h-3 w-28 bg-white/30" />
                 </div>
               </div>
             </div>
@@ -26,8 +26,8 @@ const MypageLoading = () => {
             {/* 탭 */}
             <div className="px-3 py-3">
               <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-                <Skeleton className="h-10 w-full rounded-xl" />
-                <Skeleton className="h-10 w-full rounded-xl" />
+                <div className="h-10 w-full rounded-xl" />
+                <div className="h-10 w-full rounded-xl" />
               </div>
             </div>
           </div>
@@ -38,15 +38,15 @@ const MypageLoading = () => {
           <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
             {/* 헤더 */}
             <div className="border-b border-gray-100 px-5 py-4">
-              <Skeleton className="h-5 w-32 rounded-md" />
-              <Skeleton className="mt-2 h-3 w-56 rounded-md" />
+              <div className="h-5 w-32 rounded-md" />
+              <div className="mt-2 h-3 w-56 rounded-md" />
             </div>
 
             {/* 콘텐츠 영역 */}
             <div className="px-4 py-5 space-y-4">
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-20 w-full rounded-xl" />
+              <div className="h-20 w-full rounded-xl" />
+              <div className="h-20 w-full rounded-xl" />
+              <div className="h-20 w-full rounded-xl" />
             </div>
           </div>
         </main>

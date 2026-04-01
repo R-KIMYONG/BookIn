@@ -1,5 +1,5 @@
 import { QueryType } from '@/types/useListUrlState.type';
-import ButtonComponent from '../ButtonComponent';
+import ButtonComponent from '../ui/ButtonComponent';
 
 type QueryTypeTabsProps = {
   value: QueryType;
@@ -20,7 +20,7 @@ const QueryTypeTabs = ({ value, onChange, disable, target }: QueryTypeTabsProps)
 
   return (
     <>
-<div className="flex flex-wrap gap-2 py-1">
+      <div className="flex flex-wrap gap-2 py-1">
         {tabs.map((t) => {
           const active = t.key === value;
           return (

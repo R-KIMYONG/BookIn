@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/client';
 import { MypageUserInfo } from '@/types/userInfo.type';
-import ButtonComponent from '@/components/common/ButtonComponent';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -73,7 +73,7 @@ const MypageSettings = ({ userId }: { userId: string }) => {
               <p className="mt-2 text-sm text-gray-500">현재 정보를 확인하고 필요한 항목만 수정하세요.</p>
             </div>
 
-            <div className='shrink-0'>
+            <div className="shrink-0">
               <ButtonComponent size="sm" variant="outline" leftIcon={<RiHome3Line />} onClick={() => router.push('/')}>
                 홈으로
               </ButtonComponent>

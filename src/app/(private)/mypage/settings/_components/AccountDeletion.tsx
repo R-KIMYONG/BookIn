@@ -1,10 +1,15 @@
-import { useDisclosure } from '@nextui-org/react';
-import ButtonComponent from '@/components/common/ButtonComponent';
+'use client';
+
+import { ReactElement, useState } from 'react';
+import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import { deleteAccount } from '@/app/actions/auth.actions';
 
-const AccountDeletion = (): React.JSX.Element => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const AccountDeletion = (): ReactElement => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
 
   return (
     <>
@@ -18,6 +23,7 @@ const AccountDeletion = (): React.JSX.Element => {
         formAction={deleteAccount}
         onClose={onClose}
       />
+
       <div className="mt-4 flex justify-end">
         <ButtonComponent type="button" label="회원 탈퇴" variant="danger" size="sm" onClick={onOpen} />
       </div>

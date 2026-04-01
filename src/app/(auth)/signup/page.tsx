@@ -3,8 +3,8 @@ import SubmitButton from '../login/_components/SubmitButton';
 import { signup } from '@/app/actions/auth.actions';
 import PasswordFields from '@/components/form/PasswordFields';
 
-export default function SignupPage({ searchParams }: { searchParams: { error?: string; redirectTo?: string } }) {
-  const redirectTo = searchParams.redirectTo ?? '/';
+const SignupPage = async ({ searchParams }: { searchParams: Promise<{ error?: string; redirectTo?: string }> }) => {
+  const { redirectTo = '/' } = await searchParams;
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] flex items-center justify-center px-4 overflow-hidden">
       <div className="w-full max-w-[460px]">
@@ -66,4 +66,6 @@ export default function SignupPage({ searchParams }: { searchParams: { error?: s
       </div>
     </div>
   );
-}
+};
+
+export default SignupPage;

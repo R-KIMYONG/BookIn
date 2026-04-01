@@ -19,7 +19,7 @@ export const PATCH = async (req: NextRequest) => {
   if (!isValidPassword(password))
     return NextResponse.json({ message: '비밀번호 형식이 맞지않습니다.' }, { status: 400 });
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -56,7 +56,7 @@ export const POST = async (req: NextRequest) => {
   if (typeof password !== 'string' || !password.trim())
     return NextResponse.json({ message: '현재 비밀번호를 입력해주세요.' }, { status: 400 });
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

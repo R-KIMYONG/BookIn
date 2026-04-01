@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const PATCH = async (request: NextRequest) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   try {
     const body = await request.json();
     const nickname = String(body?.nickname ?? '').trim();

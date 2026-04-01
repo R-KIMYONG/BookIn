@@ -1,8 +1,8 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 
-export const setTempSessionCookies = () => {
-  const cookieStore = cookies();
+export const setTempSessionCookies =async () => {
+  const cookieStore =await cookies();
   const maxAge = 2 * 60 * 60;
   const expiresAt = Date.now() + maxAge * 1000;
 
@@ -21,8 +21,8 @@ export const setTempSessionCookies = () => {
   });
 };
 
-export const clearTempSessionCookies = () => {
-  const cookieStore = cookies();
+export const clearTempSessionCookies =async () => {
+  const cookieStore = await cookies();
   cookieStore.delete('bookin_session_mode');
   cookieStore.delete('bookin_session_expires_at');
 };

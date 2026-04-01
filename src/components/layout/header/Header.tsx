@@ -1,12 +1,12 @@
 import HeaderLogo from './HeaderLogo';
 import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
-import HeaderCategoriesServer from './HeaderCategoriesSever';
 import { createClient } from '@/utils/supabase/server';
+import HeaderCategoriesServer from './HeaderCategoriesSever';
 
 const Header = async () => {
-  const cookieStore = cookies();
-  const supabase = createClient();
+  const cookieStore = await cookies();
+  const supabase = await createClient();
 
   const {
     data: { user },

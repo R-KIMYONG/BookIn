@@ -1,6 +1,6 @@
 export default function termsOfUsePage() {
   return (
-    <div className="w-full max-w-[1192px] my-0 mx-auto py-[50px] px-0 ">
+    <div className="w-[80%] my-0 mx-auto py-[50px] px-0 ">
       <h2 className="text-[32px] font-[700] mb-[24px] pb-[20px] text-center">이용약관</h2>
       <div className="text-[14px]">
         <p className="text-[20px] font-[700] text-[#007194] mb-10">제1장 총칙</p>
