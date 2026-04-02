@@ -4,7 +4,6 @@ export type Mycommentlist = {
     created_at: string;
     id: string;
     post_id: string;
-    title: string;
     user_id: string;
     writer: string;
     cover: string;

@@ -59,14 +59,13 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
           <Link href={`/${item.post_id}`}>
             <div className="relative h-52 overflow-hidden rounded-xl">
               {/* 이미지 */}
-              <Image alt={item.title} className="object-cover" src={item.cover || '/noImg.png'} fill priority />
+              <Image alt={item.post_id} className="object-cover" src={item.cover || '/noImg.png'} fill priority />
 
               {/* 오버레이 */}
               <div className="absolute inset-0 bg-black/50" />
 
               {/* 상단 텍스트 */}
               <div className="absolute top-0 z-10 p-3 w-full">
-                <h5 className="text-white font-medium text-sm mb-1 truncate">{item.title}</h5>
                 <p
                   dangerouslySetInnerHTML={{ __html: item.content || '' }}
                   className="text-[10px] text-white/70 line-clamp-4"
