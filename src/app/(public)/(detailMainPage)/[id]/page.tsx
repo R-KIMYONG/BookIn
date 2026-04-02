@@ -2,106 +2,165 @@ import { getAladinDetail } from '@/app/lib/aladin/getAladinDetail';
 import EmptyState from '@/components/common/EmptyState';
 import Image from 'next/image';
 import CommentSection from './_components/CommentSection';
+import { AladinItem } from '@/types/MainDetail.type';
+const getCheapest = (items: { price: number; link: string }[]) => {
+  if (items.length === 0) return null;
+  return items.sort((a, b) => a.price - b.price)[0];
+};
+
+const getDiscountRate = (base: number, target: number) => {
+  if (!base || !target) return 0;
+  return Math.round(((base - target) / base) * 100);
+};
 
 const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   const data = await getAladinDetail(id);
-  const item = data?.item?.[0];
-
+  const item: AladinItem = data?.item?.[0];
   if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
 
+  //가격
   const standard = Number(item.priceStandard ?? 0);
   const sales = Number(item.priceSales ?? 0);
   const hasSale = standard > 0 && sales > 0 && sales < standard;
-  const discountRate = hasSale ? Math.round(((standard - sales) / standard) * 100) : 0;
+
+  const newDiscount = hasSale ? Math.round(((standard - sales) / standard) * 100) : 0;
+
+  //신뢰 지표
+  const rating = item.customerReviewRank ?? 0;
+  const salesPoint = item.salesPoint ?? 0;
+
+  //ebook
+  const ebookList = item.subInfo?.ebookList;
+
+  const ebookSources =
+    ebookList?.map((e) => ({
+      price: e.priceSales,
+      link: e.link,
+    })) ?? [];
+
+  const cheapestEbook = getCheapest(ebookSources);
+
+  //중고
+  const usedList = item.subInfo?.usedList;
+
+  const usedSources = [usedList?.aladinUsed, usedList?.spaceUsed, usedList?.userUsed]
+    .filter((u) => (u?.itemCount ?? 0) > 0)
+    .map((u) => ({
+      price: u!.minPrice,
+      link: u!.link,
+      count: u!.itemCount,
+    }));
+
+  const cheapestUsed = getCheapest(usedSources);
+
+  const totalUsedCount = usedSources.reduce((acc, cur) => acc + cur.count, 0);
+
+  const minUsedPrice = usedSources.length > 0 ? Math.min(...usedSources.map((u) => u.price)) : null;
+
+  //할인율
+  const usedDiscount = cheapestUsed && standard ? getDiscountRate(standard, cheapestUsed.price) : 0;
+
+  const ebookDiscount = cheapestEbook && standard ? getDiscountRate(standard, cheapestEbook.price) : 0;
+
+  const category = item.categoryName?.split('>')?.pop() ?? '';
 
   return (
     <>
       <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
-        <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
-          <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[360px_1fr]">
+        <div className="rounded-2xl bg-white shadow">
+          <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[260px_1fr]">
+            {/* 이미지 */}
             <div className="flex justify-center lg:justify-start">
-              <div className="w-full max-w-[320px]">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl ring-1 ring-black/10">
+              <div className="w-full max-w-[220px]">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
                   <Image
                     src={item.cover}
                     alt={item.title}
                     fill
                     priority
+                    sizes="(max-width: 768px) 80vw, 220px"
                     className="object-cover"
-                    sizes="(max-width: 640px) 90vw, (max-width: 1024px) 400px, 720px"
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-700">
-                    {item.publisher ?? '출판사 정보 없음'}
-                  </span>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                      item.adult
-                        ? 'bg-red-50 text-red-700 ring-1 ring-red-200'
-                        : 'bg-blue-50 text-blue-700 ring-1 ring-blue-200'
-                    }`}
-                  >
-                    {item.adult ? '성인' : '일반'}
-                  </span>
                 </div>
               </div>
             </div>
-            <div className="min-w-0">
-              <div className="flex flex-col gap-4">
-                <div className="min-w-0">
-                  <h1 className="text-xl font-extrabold leading-snug text-gray-900 sm:text-2xl lg:text-3xl">
-                    {item.title}
-                  </h1>
-                  <p className="mt-2 text-sm text-gray-700 sm:text-base">{item.author ?? '저자 정보 없음'}</p>
 
-                  <p className="mt-2 text-xs text-gray-500 sm:text-sm">{item.categoryName ?? ''}</p>
+            {/* 정보 */}
+            <div className="flex flex-col gap-4">
+              {/* 제목 */}
+              <div>
+                <h1 className="text-xl font-bold sm:text-2xl">{item.title}</h1>
+                <p className="text-sm text-gray-700">{item.author}</p>
+                <p className="text-xs text-gray-400">{category}</p>
+              </div>
+
+              {/* 설명 */}
+              {item.description && (
+                <div className="bg-gray-50 px-4 py-4 rounded-xl">
+                  <p className="text-sm text-gray-700 line-clamp-5">{item.description}</p>
+                </div>
+              )}
+
+              {/* 신뢰 */}
+              <div className="flex gap-4 text-xs text-gray-500">
+                {rating > 0 && <span>평점 {rating}</span>}
+                {salesPoint > 0 && <span>판매량 {salesPoint.toLocaleString()}</span>}
+              </div>
+
+              <div className="rounded-xl border px-4 py-4 space-y-3">
+                {/* 정가 */}
+                {hasSale && (
+                  <div className="text-sm text-gray-400 line-through">정가 {standard.toLocaleString()}원</div>
+                )}
+
+                {/* 새책 */}
+                <div className="flex items-end gap-2">
+                  <span className="text-2xl font-bold text-gray-900">{sales.toLocaleString()}원</span>
+                  {hasSale && <span className="text-sm font-semibold text-red-500">↓{newDiscount}%</span>}
                 </div>
 
-                {item.description ? (
-                  <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
-                    <p className="text-sm leading-6 text-gray-700 line-clamp-6">{item.description}</p>
+                {/* 적립 */}
+                {item.mileage && (
+                  <p className="text-xs text-gray-400">구매 시 {item.mileage.toLocaleString()}원 적립</p>
+                )}
+
+                {/* ebook 비교 */}
+                {cheapestEbook && (
+                  <div className="text-sm text-blue-600">
+                    eBook {cheapestEbook.price.toLocaleString()}원
+                    <span className="text-xs text-blue-400 ml-1">(정가 대비 ↓{ebookDiscount}%)</span>
                   </div>
-                ) : null}
-                {/* 가격 */}
-                <div className="rounded-2xl border border-gray-200 px-4 py-4">
-                  {hasSale ? (
-                    <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
-                      <p className="text-sm text-gray-400 line-through">{standard.toLocaleString()}원</p>
-                      <p className="text-2xl font-extrabold text-gray-900">{sales.toLocaleString()}원</p>
-                      <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-700 ring-1 ring-red-200">
-                        {discountRate}% 할인
-                      </span>
-                    </div>
-                  ) : (
-                    <p className="text-2xl font-extrabold text-gray-900">{standard.toLocaleString()}원</p>
-                  )}
+                )}
 
-                  <p className="mt-2 text-[11px] text-gray-400">
-                    가격 정보는 제공처 기준이며, 실제 판매가와 다를 수 있어요.
-                  </p>
-                </div>
+                {/* 중고 요약 */}
+                {totalUsedCount > 0 && minUsedPrice && (
+                  <div className="text-sm text-gray-600">
+                    중고 {totalUsedCount}개 · {minUsedPrice.toLocaleString()}원~
+                    <span className="text-xs text-red-500 ml-1">(정가 대비 ↓{usedDiscount}%)</span>
+                  </div>
+                )}
 
-                {/* 버튼 */}
-                <div className="flex flex-col gap-3 sm:flex-row">
+                {/* CTA */}
+                <div className="flex items-center gap-3 pt-2">
                   <a
                     href={item.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex w-full items-center justify-center rounded-xl bg-[#af5858] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#8f4646] sm:w-auto"
+                    className="px-3 py-1.5 rounded-md bg-[#af5858] text-white text-[11px] font-medium"
                   >
-                    구매 바로가기
+                    새책 구매
                   </a>
 
-                  <a
-                    href="/"
-                    className="inline-flex w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-700 shadow-sm transition hover:bg-gray-50 sm:w-auto"
-                  >
-                    목록으로
-                  </a>
+                  {cheapestEbook && (
+                    <a href={cheapestEbook.link} className="text-[11px] text-blue-600 hover:underline">
+                      eBook 보기
+                    </a>
+                  )}
+
+                  {cheapestUsed && (
+                    <a href={cheapestUsed.link} className="text-[11px] text-gray-600 hover:underline">
+                      중고 보기
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

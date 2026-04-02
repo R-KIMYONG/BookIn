@@ -18,3 +18,31 @@ header > nav > header {
 .searchInput > header {
   padding: 0px !important;
 }
+
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+.tiptap-editor {
+  position: relative;
+  cursor: text;
+  white-space: pre-wrap;
+}
+.tiptap-editor .ProseMirror {
+  outline: none;
+}
+.tiptap-editor p {
+  margin: 0;
+}
+
+.tiptap-editor p + p {
+  margin-top: 6px;
+}
+
+.tiptap-editor p:first-child {
+  min-height: 1.5em;
+}

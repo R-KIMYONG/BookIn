@@ -5,7 +5,6 @@ import TempSessionBadge, { TEMP_SESSION_SOON_TOAST_ID } from './TempSessionBadge
 import TempSessionModal from '../../modal/TempSessionModal';
 import { TempSessionState } from '@/types/useCountDownOptions.type';
 import { useEffect, useState } from 'react';
-
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { logoutExpiredSession, resetTempSession } from '@/app/actions/session.actions';

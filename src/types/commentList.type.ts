@@ -17,8 +17,7 @@ export type CommentListResult = {
 
 export type TargetValue = {
   id?: string;
-  title: string | undefined;
-  content: string | undefined;
+  content: string;
   created_at?: string;
 };
 

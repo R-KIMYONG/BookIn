@@ -14,7 +14,7 @@ export const POST = async (request: NextRequest) => {
   } catch {
     return NextResponse.json({ message: '요청 데이터를 읽을 수 없습니다.' }, { status: 400 });
   }
-  const { title, content, post_id, writer, user_id, cover, book_title } = body;
+  const { content, post_id, writer, user_id, cover, book_title } = body;
   const cleanContent = sanitizeHtmlServer(content || '');
 
   if (!user_id || !post_id)
@@ -22,7 +22,7 @@ export const POST = async (request: NextRequest) => {
 
   const { error: commentInsertError } = await supabase
     .from('comments')
-    .insert({ title, content: cleanContent, post_id, writer, user_id, updated_at: now, cover, book_title });
+    .insert({ content: cleanContent, post_id, writer, user_id, updated_at: now, cover, book_title });
 
   if (commentInsertError) {
     console.log(commentInsertError);
