@@ -11,7 +11,6 @@ import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import AppPagination from '@/components/common/AppPagination';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import { useCommentMutation } from '@/hooks/useCommentMutation';
-import { sanitizeHtmlClient } from '@/app/lib/security/sanitizeHtml.client';
 
 const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, postId }: CommentListProps) => {
   const pageSize = 10;
@@ -115,37 +114,29 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
             <p className="mt-1 text-xs text-gray-500">첫 댓글을 남겨보세요.</p>
           </div>
         ) : (
-          <ul className="space-y-3 py-6">
+          <ul className="divide-y divide-gray-200">
             {comments.data.map((comment) => {
-              const { id, title, content, writer, created_at, user_id } = comment;
+              const { id, content, writer, created_at, user_id } = comment;
               const date = dayjs(created_at).locale('ko').format('YYYY-MM-DD HH:mm');
               const isMine = userId === user_id;
 
               return (
-                <li
-                  key={id}
-                  className="rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm transition hover:shadow-md"
-                >
+                <li key={id} className="py-5">
                   {/* 헤더: 제목 + 날짜 */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-extrabold text-gray-900 sm:text-base">{title}</h3>
-                      <p className="mt-1 text-[11px] text-gray-500">{date}</p>
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900">{writer}</span>
+                      <span>·</span>
+                      <span>{date}</span>
                     </div>
 
                     {isMine ? (
-                      <div className="flex shrink-0 gap-2">
+                      <div className="flex gap-2">
                         <ButtonComponent
                           variant="outline"
                           size="xs"
                           label={isEdit && id === editingId ? '취소' : '수정'}
-                          onClick={() => {
-                            if (isEdit && editingId === id) {
-                              handleCancelEdit();
-                            } else {
-                              handleStartEdit(comment);
-                            }
-                          }}
+                          onClick={() => (isEdit && editingId === id ? handleCancelEdit() : handleStartEdit(comment))}
                         />
                         <ButtonComponent
                           variant="danger"
@@ -160,22 +151,15 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
                     ) : null}
                   </div>
 
-                  {/* 본문: 내용 */}
-                  <div className="mt-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-sm leading-6 text-gray-700">
-                    <div
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtmlClient(content || '') }}
-                      className="prose prose-sm max-w-none break-words"
-                    />
-                  </div>
+                  {/* 내용 - Velog 스타일 */}
+                  <div
+                    className="mt-2 text-sm leading-7 text-gray-800 break-words
+                     prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: content || '' }}
+                  />
 
-                  {/* 푸터: 작성자 */}
-                  <div className="mt-3 flex items-center justify-between">
-                    <p className="text-xs font-semibold text-gray-600">작성자: {writer}</p>
-
-                    {isEdit && id === editingId ? (
-                      <span className="text-[11px] font-semibold text-[#AF5858]">수정 중…</span>
-                    ) : null}
-                  </div>
+                  {/* 상태 표시 */}
+                  {isEdit && editingId === id && <p className="mt-2 text-xs text-[#AF5858] font-semibold">수정 중…</p>}
                 </li>
               );
             })}

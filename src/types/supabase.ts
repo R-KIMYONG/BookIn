@@ -49,7 +49,6 @@ export type Database = {
           created_at: string
           id: string
           post_id: string | null
-          title: string | null
           updated_at: string | null
           user_id: string | null
           writer: string | null
@@ -61,7 +60,6 @@ export type Database = {
           created_at?: string
           id?: string
           post_id?: string | null
-          title?: string | null
           updated_at?: string | null
           user_id?: string | null
           writer?: string | null
@@ -73,7 +71,6 @@ export type Database = {
           created_at?: string
           id?: string
           post_id?: string | null
-          title?: string | null
           updated_at?: string | null
           user_id?: string | null
           writer?: string | null
