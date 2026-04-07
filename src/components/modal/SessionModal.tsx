@@ -1,32 +1,34 @@
 'use client';
 
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { TempSessionModalProps } from '@/types/useCountDownOptions.type';
+import useCountdown from '@/hooks/useCountdown';
+import { SessionModalProps } from '@/types/useCountDownOptions.type';
+import { getCookie } from '@/utils/cookie';
 import { useEffect } from 'react';
 
-const TempSessionModal = ({
-  isOpen,
-  remainingSec,
-  countDownText,
-  isExpired,
-  onClose,
-  onExtend,
-  onGoLogin,
-  showGoLoginButton,
-}: TempSessionModalProps) => {
-  const isReallyExpired = isExpired || remainingSec <= 0;
+const SessionModal = ({ isOpen, isExpired, onClose, onExtend, onGoLogin, showGoLoginButton }: SessionModalProps) => {
+  const expiresAt = Number(getCookie('bookin_session_expires_at'));
+
+  const { remainingSec, countDownText } = useCountdown(expiresAt, {
+    enabled: !isExpired && expiresAt > Date.now(),
+  });
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isOpen) return;
+
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
     };
   }, [isOpen]);
+
+  const isReallyExpired = isExpired || (remainingSec ?? 0) <= 0;
 
   if (!isOpen) return null;
 
@@ -93,4 +95,4 @@ const TempSessionModal = ({
   );
 };
 
-export default TempSessionModal;
+export default SessionModal;

@@ -10,8 +10,9 @@ export type TempSessionState = {
   isExpired: boolean;
 };
 
-export type TempSessionModalProps = TempSessionState & {
+export type SessionModalProps = {
   isOpen: boolean;
+  isExpired: boolean;
   onClose: () => void;
   onExtend?: () => void;
   onGoLogin?: () => void;

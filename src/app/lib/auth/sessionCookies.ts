@@ -17,7 +17,7 @@ export const setTempSessionCookies =async () => {
     path: '/',
     maxAge,
     sameSite: 'lax',
-    httpOnly: true,
+    httpOnly: false,
   });
 };
 

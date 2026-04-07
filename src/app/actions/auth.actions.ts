@@ -35,6 +35,7 @@ export const login = async (formData: FormData) => {
     redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.EMPTY }));
   }
   const { error } = await supabase.auth.signInWithPassword({ email, password });
+  
 
   if (error) {
     redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.INVALID, redirectTo }));
