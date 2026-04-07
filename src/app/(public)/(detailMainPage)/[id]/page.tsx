@@ -145,19 +145,20 @@ const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
                 <div className="flex items-center gap-3 pt-2">
                   <a
                     href={item.link}
+                    target="_blank"
                     className="px-3 py-1.5 rounded-md bg-[#af5858] text-white text-[11px] font-medium"
                   >
                     새책 구매
                   </a>
 
                   {cheapestEbook && (
-                    <a href={cheapestEbook.link} className="text-[11px] text-blue-600 hover:underline">
+                    <a href={cheapestEbook.link} target="_blank" className="text-[11px] text-blue-600 hover:underline">
                       eBook 보기
                     </a>
                   )}
 
                   {cheapestUsed && (
-                    <a href={cheapestUsed.link} className="text-[11px] text-gray-600 hover:underline">
+                    <a href={cheapestUsed.link} target="_blank" className="text-[11px] text-gray-600 hover:underline">
                       중고 보기
                     </a>
                   )}
