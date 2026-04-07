@@ -3,13 +3,13 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layout/header/Header';
 import Footer from '@/components/layout/Footer';
-import TopButton from '@/components/TopButton';
+import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from './provider';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import AuthToastHandler from '@/components/common/AuthToastHandler';
 import { Suspense } from 'react';
-import SessionExpiredModalHandler from '@/components/common/SessionExpiredModalHandler';
+import SessionModalContainer from '@/components/session/SessionModalContainer';
+import ClientProviders from './client-providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,11 +31,9 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ToastContainer autoClose={1000} stacked draggable />
         <QueryProvider>
+          <SessionModalContainer />
           <Suspense fallback={null}>
-            <AuthToastHandler />
-          </Suspense>
-          <Suspense fallback={null}>
-            <SessionExpiredModalHandler />
+            <ClientProviders />
           </Suspense>
           <Header />
           {children}

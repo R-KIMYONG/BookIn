@@ -26,29 +26,10 @@ const ConfirmModal = ({
   formAction,
 }: ConfirmModalProps) => {
   useEffect(() => {
-    if (!isOpen) return;
-
-    const scrollY = window.scrollY;
-
-    // 스크롤바 너비 계산
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-
-    // padding 보정
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : '';
 
     return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.paddingRight = '';
-
-      window.scrollTo(0, scrollY);
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
   if (!isOpen) return null;

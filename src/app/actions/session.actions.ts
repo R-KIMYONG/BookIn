@@ -22,7 +22,7 @@ export const resetTempSession = async () => {
 
   cookieStore.set('bookin_session_expires_at', String(nextExpiresAt), {
     path: '/',
-    httpOnly: true,
+    httpOnly: false,
     sameSite: 'lax',
   });
 
@@ -42,6 +42,6 @@ export const logoutExpiredSession = async ({
   revalidatePath('/', 'layout');
 
   if (shouldRedirectToLogin && redirectTo) {
-    redirect(createRedirectUrl('/login', { session: 'expired', redirectTo }));
+    redirect(createRedirectUrl('/login', { redirectTo }));
   }
 };
