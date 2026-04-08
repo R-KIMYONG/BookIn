@@ -34,7 +34,7 @@ export const PATCH = async (req: NextRequest) => {
   });
 
   if (error) {
-    if (error.message === 'New password should be different from the old password.') {
+    if (error.message?.includes('different from the old password')) {
       return NextResponse.json({ message: '이전 비밀번호와 다른 비밀번호를 입력해주세요.' }, { status: 400 });
     }
     return NextResponse.json({ message: error.message }, { status: 400 });
