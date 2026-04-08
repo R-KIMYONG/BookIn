@@ -2,9 +2,9 @@
 
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import PendingEmailCountdown from './PendingEmailCountdown';
+import CountdownStatus from './CountdownStatus';
 import { createClient } from '@/utils/supabase/client';
 import { isValidEmail } from '@/app/lib/validation/isEmail';
 import { PendingEmailData } from '@/types/changeUserId.type';
@@ -13,8 +13,6 @@ import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 const ChangeUserId = ({ email, userId }: { email: string; userId: string }): ReactElement => {
   const queryClient = useQueryClient();
   const supabase = createClient();
-
-  const [hasExpired, setHasExpired] = useState<boolean>(false); //인증시간 만료여부 상태
 
   const [draftEmail, setDraftEmail] = useState<string>(''); // input에 수정중인 상태
 
@@ -38,10 +36,11 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
       return { pendingEmail, emailExpireAt };
     },
   });
-  //인증 대기 상태
-  const isPendingValid = !!pendingData?.pendingEmail && !!pendingData?.emailExpireAt && !hasExpired;
+  const now = Date.now();
   //인증 만료 상태
-  const isExpired = !!pendingData?.pendingEmail && !!pendingData?.emailExpireAt && hasExpired;
+  const isExpired = !!pendingData?.emailExpireAt && now >= pendingData.emailExpireAt;
+  //인증 대기 상태
+  const isPendingValid = !!pendingData?.pendingEmail && !!pendingData?.emailExpireAt && !isExpired;
 
   const viewState: 'editable' | 'pending' | 'expired' = useMemo(() => {
     if (isPendingValid) return 'pending'; //지금 인증대기중임
@@ -153,10 +152,6 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
       console.error(error);
     }
   };
-  //인증대기 시간 만료될경우 UI변경용 상태 업데이트
-  useEffect(() => {
-    setHasExpired(false);
-  }, [pendingData?.pendingEmail, pendingData?.emailExpireAt]);
 
   if (isError) {
     console.error(error);
@@ -175,10 +170,10 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     return (
       <div className="space-y-4">
         <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-4">
-          <PendingEmailCountdown
-            email={pendingData?.pendingEmail}
+          <CountdownStatus
             expireAt={pendingData?.emailExpireAt ?? null}
-            onExpiredChange={setHasExpired}
+            label={`인증 대기중: ${pendingData?.pendingEmail}`}
+            expiredText="인증 시간 만료"
           />
         </div>
 
@@ -194,10 +189,10 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     return (
       <div className="space-y-4">
         <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
-          <PendingEmailCountdown
-            email={pendingData?.pendingEmail}
+          <CountdownStatus
             expireAt={pendingData?.emailExpireAt ?? null}
-            onExpiredChange={setHasExpired}
+            label={`인증 대기중: ${pendingData?.pendingEmail}`}
+            expiredText="인증 시간 만료"
           />
         </div>
 

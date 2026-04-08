@@ -136,22 +136,17 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
     <>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* backdrop */}
           <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
-          {/* modal */}
           <div className="relative z-10 w-full max-w-sm rounded-xl bg-white p-5 shadow-lg">
-            {/* header */}
             <h2 className="text-lg font-semibold mb-2">비밀번호 변경</h2>
 
-            {/* 에러 메시지 */}
             {passwordMissMatch && <p className="text-xs text-red-500 text-center">비밀번호 일치하지 않습니다.</p>}
 
             {checkPrevPW === 'error' && (
               <p className="text-xs text-red-500 text-center">현재 비밀번호가 올바르지 않습니다.</p>
             )}
 
-            {/* 진행 단계 */}
             <div className="my-3 flex justify-center py-3">
               <div className="relative flex w-full max-w-xs rounded-full bg-gray-100 p-1">
                 <div
@@ -164,7 +159,6 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
               </div>
             </div>
 
-            {/* body */}
             <div className="mb-4">
               {checkPrevPW !== 'success' ? (
                 <PasswordFields
@@ -189,7 +183,6 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
               )}
             </div>
 
-            {/* footer */}
             <div className="flex justify-end gap-2">
               <ButtonComponent type="button" variant="danger" size="xs" label="닫기" onClick={handleClose} />
 

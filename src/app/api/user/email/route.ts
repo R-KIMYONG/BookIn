@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { sendEmailChangeMail } from '@/app/lib/mail/sendEmailChangeMail';
 import { hashToken } from '@/app/lib/crypto/hashToken';
-import { clearPendingEmail } from '@/app/lib/supabase/users';
+import { clearEmailChangeState } from '@/app/lib/supabase/users';
 import { isValidEmail } from '@/app/lib/validation/isEmail';
 
 const EMAIL_CHANGE_EXPIRES_MS = 60 * 60 * 1000; //한시간으로 설정
@@ -78,7 +78,7 @@ export const PATCH = async (request: NextRequest) => {
       });
     } catch (error) {
       //오류나면 update한 데이터를 reset
-      const { error: clearPendingError } = await clearPendingEmail(supabase, user.id);
+      const { error: clearPendingError } = await clearEmailChangeState(supabase, user.id);
 
       if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
 
@@ -111,7 +111,7 @@ export const DELETE = async () => {
   if (userError || !user)
     return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
-  const { error: clearPendingError } = await clearPendingEmail(supabase, user.id);
+  const { error: clearPendingError } = await clearEmailChangeState(supabase, user.id);
 
   if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
 
