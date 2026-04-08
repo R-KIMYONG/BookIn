@@ -121,7 +121,7 @@ const ResetPasswordPage = () => {
     try {
       await toastMutationPromise(changePassWordMutation.mutateAsync(newPassword), '비밀번호 재설중...');
     } catch (error) {
-      toast.error('비밀번호 변경 실패');
+      console.error(error);
     }
   };
 
