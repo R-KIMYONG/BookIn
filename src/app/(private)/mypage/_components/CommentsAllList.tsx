@@ -3,12 +3,12 @@ import { createClient } from '@/utils/supabase/client';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
-import { pageSize } from './BookComments';
 import { CommentsListProps } from '@/types/Bookcomments';
 import { useEffect } from 'react';
 import CommentsSkeleton from './CommentsSkeleton';
 import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
+import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
 
 const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListProps) => {
   const supabase = createClient();
@@ -19,8 +19,8 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
   } = useQuery<Mycommentlist, Error, Mycommentlist, [string, string, number]>({
     queryKey: ['myComments', userInfo.id, currentPage],
     queryFn: async () => {
-      const from = (currentPage - 1) * pageSize;
-      const to = from + pageSize - 1;
+      const from = (currentPage - 1) * COMMENTS_PAGE_SIZE;
+      const to = from + COMMENTS_PAGE_SIZE - 1;
       try {
         const { data, count, error } = await supabase
           .from('comments')
@@ -43,7 +43,7 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
     staleTime: 60_000,
     placeholderData: keepPreviousData,
   });
-  const totalPages = Math.max(1, Math.ceil((myCommentslist?.total ?? 0) / pageSize));
+  const totalPages = Math.max(1, Math.ceil((myCommentslist?.total ?? 0) / COMMENTS_PAGE_SIZE));
   useEffect(() => {
     if (!isPending && !isError) setTotalPages(totalPages);
   }, [totalPages, isPending, isError, setTotalPages]);
@@ -58,13 +58,13 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
         <li key={item.id}>
           <Link href={`/${item.post_id}`}>
             <div className="relative h-52 overflow-hidden rounded-xl">
-              {/* 이미지 */}
+   
               <Image alt={item.post_id} className="object-cover" src={item.cover || '/noImg.png'} fill priority />
 
-              {/* 오버레이 */}
+        
               <div className="absolute inset-0 bg-black/50" />
 
-              {/* 상단 텍스트 */}
+  
               <div className="absolute top-0 z-10 p-3 w-full">
                 <p
                   dangerouslySetInnerHTML={{ __html: item.content || '' }}
@@ -72,7 +72,7 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
                 />
               </div>
 
-              {/* 하단 */}
+       
               <div className="absolute bottom-0 z-10 w-full bg-white/20 p-2">
                 <p className="text-black text-[10px] font-bold">{userInfo.nickname}</p>
               </div>

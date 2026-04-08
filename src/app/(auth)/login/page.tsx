@@ -10,11 +10,9 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ error?: str
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
-        {/* 카드 */}
         <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
           <form action={login} className="p-6 sm:p-7">
             <input type="hidden" name="redirectTo" value={redirectTo} />
-            {/* Email */}
             <div className="mb-3">
               <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-gray-700">
                 Email
@@ -29,11 +27,8 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ error?: str
                 required
               />
             </div>
-
-            {/* Password */}
             <PasswordFields withConfirm={false} passwordLabel="Password" passwordName="password" showHint={false} />
 
-            {/* 부가 링크 */}
             <div className="my-5 flex items-center justify-between">
               <label className="flex items-center gap-2 text-xs text-gray-600">
                 <input type="checkbox" name="remember" className="h-4 w-4 rounded border-gray-300" />
@@ -41,7 +36,7 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ error?: str
               </label>
 
               {/* 추후 비번찾기 페이지 생기면 연결 */}
-              <Link href="/reset-password" className="text-xs font-semibold text-[#af5858] hover:underline">
+              <Link href="/forgot-password" className="text-xs font-semibold text-[#af5858] hover:underline">
                 비밀번호를 잊으셨나요?
               </Link>
             </div>

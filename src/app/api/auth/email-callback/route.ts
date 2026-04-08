@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { hashToken } from '@/app/lib/crypto/hashToken';
 import { createAdminClient } from '@/app/lib/supabase/admin';
-import { clearPendingEmail } from '@/app/lib/supabase/users';
+import { clearEmailChangeState } from '@/app/lib/supabase/users';
 
 export const GET = async (request: Request) => {
   // 사용자가 인증메일 클릭해서 들어오면 아래 링크 작동됨
@@ -29,14 +29,14 @@ export const GET = async (request: Request) => {
     .eq('id', userId)
     .single();
 
-  if (pendingDataError || !pendingData) {
+  if (pendingDataError || !pendingData) 
     return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
-  }
+  
 
   // 이미 취소된 경우
-  if (!pendingData.pending_email || !pendingData.email_change_token_hash) {
+  if (!pendingData.pending_email || !pendingData.email_change_token_hash) 
     return NextResponse.redirect(`${origin}/auth-code-error?reason=cancelled`);
-  }
+  
 
   const now = Date.now();
   const expireAt = pendingData.pending_email_expires_at
@@ -45,7 +45,7 @@ export const GET = async (request: Request) => {
 
   // 만료된 경우
   if (!expireAt || expireAt <= now) {
-    const { error: clearPendingError } = await clearPendingEmail(supabase, userId);
+    const { error: clearPendingError } = await clearEmailChangeState(supabase, userId);
     if (clearPendingError) {
       console.error('clearPendingEmail error:', clearPendingError);
     }
