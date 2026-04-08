@@ -1,9 +1,9 @@
-import { pageSize } from './BookComments';
+import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
 
 const CommentsSkeleton = () => {
   return (
     <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 min-h-[520px] p-4 box-border">
-      {Array.from({ length: pageSize }).map((_, i) => (
+      {Array.from({ length: COMMENTS_PAGE_SIZE }).map((_, i) => (
         <li key={i}>
           <div className="w-full space-y-5 p-4 rounded-xl border animate-pulse">
             {/* 이미지 영역 */}

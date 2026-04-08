@@ -86,7 +86,7 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
   };
 
   if (!isValidCategory) {
-    return <InvalidCategory onGoHome={() => router.push('/')} />;
+    return <InvalidCategory />;
   }
 
   if (isError) {

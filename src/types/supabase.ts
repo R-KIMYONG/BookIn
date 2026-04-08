@@ -134,6 +134,9 @@ export type Database = {
           email_change_token_hash: string | null
           id: string
           nickname: string
+          password_reset_email: string | null
+          password_reset_expires_at: string | null
+          password_reset_token_hash: string | null
           pending_email: string | null
           pending_email_expires_at: string | null
         }
@@ -144,6 +147,9 @@ export type Database = {
           email_change_token_hash?: string | null
           id?: string
           nickname: string
+          password_reset_email?: string | null
+          password_reset_expires_at?: string | null
+          password_reset_token_hash?: string | null
           pending_email?: string | null
           pending_email_expires_at?: string | null
         }
@@ -154,6 +160,9 @@ export type Database = {
           email_change_token_hash?: string | null
           id?: string
           nickname?: string
+          password_reset_email?: string | null
+          password_reset_expires_at?: string | null
+          password_reset_token_hash?: string | null
           pending_email?: string | null
           pending_email_expires_at?: string | null
         }

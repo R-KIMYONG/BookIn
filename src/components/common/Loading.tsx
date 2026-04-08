@@ -1,8 +1,7 @@
-'use client';
-
 type LoadingProps = {
   size?: 'sm' | 'md' | 'lg';
   text?: string;
+  fullScreen?: boolean;
 };
 
 const sizeMap = {
@@ -11,10 +10,16 @@ const sizeMap = {
   lg: 'w-10 h-10 border-[3px]',
 };
 
-const Loading = ({ size = 'md', text }: LoadingProps) => {
+const Loading = ({ size = 'md', text, fullScreen = false }: LoadingProps) => {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-12">
-      <div className={`animate-spin rounded-full border-current border-t-transparent ${sizeMap[size]}`} />
+    <div
+      className={
+        fullScreen
+          ? 'flex items-center justify-center min-h-[calc(100vh-3rem)]'
+          : 'flex flex-col items-center justify-center gap-3 py-12'
+      }
+    >
+      <div className={`animate-spin rounded-full border-gray-300 border-t-gray-600 ${sizeMap[size]}`} />
       {text && <p className="text-xs text-gray-500 tracking-wide">{text}</p>}
     </div>
   );

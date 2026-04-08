@@ -11,9 +11,9 @@ import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import AppPagination from '@/components/common/AppPagination';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import { useCommentMutation } from '@/hooks/useCommentMutation';
+import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
 
 const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, postId }: CommentListProps) => {
-  const pageSize = 10;
   const supabase = createClient();
   const { remove } = useCommentMutation(postId, userId);
   const { page, setCommentsUrl } = useCommentsUrlState();
@@ -32,8 +32,8 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
   } = useQuery<CommentListResult>({
     queryKey: ['comments', postId, page],
     queryFn: async () => {
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
+      const from = (page - 1) * COMMENTS_PAGE_SIZE;
+      const to = from + COMMENTS_PAGE_SIZE - 1;
 
       const [{ data: commentData, error: commentDataError }, { data: statsData, error: statsError }] =
         await Promise.all([
@@ -95,7 +95,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
     );
   }
 
-  const totalPages = Math.max(1, Math.ceil((comments.total ?? 0) / pageSize));
+  const totalPages = Math.max(1, Math.ceil((comments.total ?? 0) / COMMENTS_PAGE_SIZE));
   return (
     <div className="flex flex-col gap-4">
       <div className="mt-6 flex items-end justify-between">

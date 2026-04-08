@@ -36,18 +36,11 @@ const ConfirmModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 백그라운드 클릭 시  */}
       <div className="absolute inset-0 bg-black/50" onClick={!isLoading ? onClose : undefined} />
-
-      {/* modal */}
       <div className="relative z-10 w-full max-w-sm rounded-xl bg-white p-5 shadow-lg">
-        {/* 모달 헤더부분 */}
         <h2 className="text-lg font-semibold mb-2">{title}</h2>
 
-        {/* 모달 내용 */}
         <p className="text-sm text-gray-700 whitespace-pre-line mb-4">{message}</p>
-
-        {/* 모달 푸터 -> 제어 버튼 있어햐함 */}
         <div className="flex justify-end gap-2">
           <ButtonComponent type="button" label={cancelLabel} variant="secondary" size="sm" onClick={onClose} />
 

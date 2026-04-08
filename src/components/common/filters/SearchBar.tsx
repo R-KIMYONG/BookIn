@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { FiChevronDown, FiSearch, FiX } from 'react-icons/fi';
 import ButtonComponent from '../ui/ButtonComponent';
@@ -40,7 +40,7 @@ const SearchBar = ({
   return (
     <div className="w-full flex justify-start items-center gap-2">
       <form
-        onSubmit={(e:React.SubmitEvent<HTMLFormElement>) => {
+        onSubmit={(e: React.SubmitEvent<HTMLFormElement>) => {
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
 

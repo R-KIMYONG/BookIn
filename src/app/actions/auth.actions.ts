@@ -26,7 +26,9 @@ export const logout = async (formData: FormData) => {
 export const login = async (formData: FormData) => {
   const supabase = await createClient();
   const remember = formData.get('remember') === 'on';
-  const email = String(formData.get('email') ?? '');
+  const email = String(formData.get('email') ?? '')
+    .trim()
+    .toLowerCase();
   const password = String(formData.get('password') ?? '');
   const redirectTo = String(formData.get('redirectTo') ?? '/').trim();
   if (!email || !password) {
@@ -35,7 +37,6 @@ export const login = async (formData: FormData) => {
     redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.EMPTY }));
   }
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  
 
   if (error) {
     redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.INVALID, redirectTo }));
@@ -56,7 +57,9 @@ export const login = async (formData: FormData) => {
 export const signup = async (formData: FormData) => {
   const supabase = await createClient();
 
-  const email = String(formData.get('email') ?? '').trim();
+  const email = String(formData.get('email') ?? '')
+    .trim()
+    .toLowerCase();
   const password = String(formData.get('password') ?? '');
   const confirmPassword = String(formData.get('confirmPassword') ?? '');
   const nickname = String(formData.get('nickname') ?? '').trim();

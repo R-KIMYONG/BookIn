@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import dayjs from 'dayjs';
@@ -11,7 +10,7 @@ import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
 import { useEffect } from 'react';
 import { CommentsByBookResult, CommentsListProps } from '@/types/Bookcomments';
-import { pageSize } from './BookComments';
+import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
 
 const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListProps) => {
   const supabase = createClient();
@@ -22,8 +21,8 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
   } = useQuery<CommentsByBookResult>({
     queryKey: ['commentsByBook', userInfo.id, currentPage],
     queryFn: async () => {
-      const from = (currentPage - 1) * pageSize;
-      const to = from + pageSize - 1;
+      const from = (currentPage - 1) * COMMENTS_PAGE_SIZE;
+      const to = from + COMMENTS_PAGE_SIZE - 1;
       const { data, count, error } = await supabase
         .from('user_book_comments')
         .select('post_id,book_title,book_cover,comment_count,last_commented_at', { count: 'exact' })
@@ -44,7 +43,7 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
     enabled: !!userInfo.id,
     staleTime: 60_000,
   });
-  const totalPages = Math.max(1, Math.ceil((booksList?.total ?? 0) / pageSize));
+  const totalPages = Math.max(1, Math.ceil((booksList?.total ?? 0) / COMMENTS_PAGE_SIZE));
 
   useEffect(() => {
     if (!isPending && !isError) setTotalPages(totalPages);

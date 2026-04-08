@@ -1,19 +1,19 @@
 import 'server-only';
 import { transporter } from './mailer';
-import { getEmailChangeTemplate } from './templates/emailChangeTemplate';
+import { getPasswordResetTemplate } from './templates/passwordResetTemplate';
 
-export const sendEmailChangeMail = async ({
+export const sendPasswordResetMail = async ({
   email,
   confirmUrl,
 }: {
   email: string;
   confirmUrl: string;
 }): Promise<void> => {
-  const { html, text } = getEmailChangeTemplate(confirmUrl);
+  const { html, text } = getPasswordResetTemplate(confirmUrl);
   await transporter.sendMail({
     from: `"BookIn Support" <${process.env.NAVER_EMAIL}>`,
     to: email,
-    subject: '[BookIn] 이메일 변경 인증 요청',
+    subject: '[BookIn] 비밀번호 찾기 인증 요청',
     html,
     text,
   });
