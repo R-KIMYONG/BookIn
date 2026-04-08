@@ -39,12 +39,7 @@ export const POST = async (request: NextRequest) => {
   const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(consumedUser.id, {
     password,
   });
-  if (updateError) {
-    if (updateError.message === 'New password should be different from the old password.') {
-      return NextResponse.json({ message: '이전 비밀번호와 다른 비밀번호를 입력해주세요.' }, { status: 400 });
-    }
-    return NextResponse.json({ message: '비밀번호 변경 실패' }, { status: 500 });
-  }
+  if (updateError) return NextResponse.json({ message: '비밀번호 변경 실패' }, { status: 500 });
 
   return NextResponse.json({ message: '비밀번호가 변경되었습니다.' });
 };
