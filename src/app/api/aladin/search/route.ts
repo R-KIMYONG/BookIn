@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
     if (!response.ok) return NextResponse.json({ message: '알라딘 검색 결과를 불러오지 못했습니다.' }, { status: 502 });
 
     const data = await response.json();
-    console.log(data);
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error('Error fetching data:', error);

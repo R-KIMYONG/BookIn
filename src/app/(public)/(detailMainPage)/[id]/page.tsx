@@ -3,6 +3,7 @@ import EmptyState from '@/components/common/EmptyState';
 import Image from 'next/image';
 import CommentSection from './_components/CommentSection';
 import { AladinItem } from '@/types/MainDetail.type';
+import { createClient } from '@/utils/supabase/server';
 const getCheapest = (items: { price: number; link: string }[]) => {
   if (items.length === 0) return null;
   return items.sort((a, b) => a.price - b.price)[0];
@@ -14,11 +15,34 @@ const getDiscountRate = (base: number, target: number) => {
 };
 
 const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const supabase = await createClient();
   const { id } = await params;
+
   const data = await getAladinDetail(id);
   const item: AladinItem = data?.item?.[0];
   if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
 
+  const { data: existing } = await supabase.from('books').select('id').eq('isbn13', id).maybeSingle();
+
+  let bookId: string;
+
+  if (existing) {
+    bookId = existing.id;
+  } else {
+    const { data: inserted, error } = await supabase
+      .from('books')
+      .insert({
+        isbn13: id,
+        title: item.title,
+        author: item.author,
+        thumbnail_url: item.cover,
+      })
+      .select('id')
+      .single();
+
+    if (error) throw error;
+    bookId = inserted.id;
+  }
   //가격
   const standard = Number(item.priceStandard ?? 0);
   const sales = Number(item.priceSales ?? 0);
@@ -170,7 +194,7 @@ const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
 
         {/* 댓글부분 */}
         <div className="mt-8">
-          <CommentSection postId={id} cover={item.cover} book_title={item.title} />
+          <CommentSection bookId={bookId} />
         </div>
       </div>
     </>

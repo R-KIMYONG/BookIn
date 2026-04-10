@@ -16,66 +16,99 @@ export type Database = {
     Tables: {
       book_stats: {
         Row: {
+          book_id: string
           comment_count: number | null
           created_at: string
           like_count: number | null
-          post_id: string
           updated_at: string
           view_count: number | null
         }
         Insert: {
+          book_id: string
           comment_count?: number | null
           created_at?: string
           like_count?: number | null
-          post_id: string
           updated_at?: string
           view_count?: number | null
         }
         Update: {
+          book_id?: string
           comment_count?: number | null
           created_at?: string
           like_count?: number | null
-          post_id?: string
           updated_at?: string
           view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_stats_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: true
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      books: {
+        Row: {
+          author: string | null
+          created_at: string
+          id: string
+          isbn13: string
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          author?: string | null
+          created_at?: string
+          id?: string
+          isbn13: string
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          author?: string | null
+          created_at?: string
+          id?: string
+          isbn13?: string
+          thumbnail_url?: string | null
+          title?: string
         }
         Relationships: []
       }
       comments: {
         Row: {
-          book_title: string | null
-          content: string | null
-          cover: string | null
+          book_id: string
+          content: string
           created_at: string
           id: string
-          post_id: string | null
           updated_at: string | null
-          user_id: string | null
-          writer: string | null
+          user_id: string
         }
         Insert: {
-          book_title?: string | null
-          content?: string | null
-          cover?: string | null
+          book_id: string
+          content: string
           created_at?: string
           id?: string
-          post_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
-          writer?: string | null
+          user_id: string
         }
         Update: {
-          book_title?: string | null
-          content?: string | null
-          cover?: string | null
+          book_id?: string
+          content?: string
           created_at?: string
           id?: string
-          post_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
-          writer?: string | null
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "comments_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "comments_user_id_fkey"
             columns: ["user_id"]
@@ -87,33 +120,27 @@ export type Database = {
       }
       user_book_comments: {
         Row: {
-          book_cover: string | null
-          book_title: string | null
+          book_id: string
           comment_count: number
           created_at: string
           id: string
           last_commented_at: string | null
-          post_id: string
           user_id: string
         }
         Insert: {
-          book_cover?: string | null
-          book_title?: string | null
+          book_id: string
           comment_count?: number
           created_at?: string
           id?: string
           last_commented_at?: string | null
-          post_id: string
           user_id: string
         }
         Update: {
-          book_cover?: string | null
-          book_title?: string | null
+          book_id?: string
           comment_count?: number
           created_at?: string
           id?: string
           last_commented_at?: string | null
-          post_id?: string
           user_id?: string
         }
         Relationships: [
@@ -122,6 +149,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_book_comments_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
             referencedColumns: ["id"]
           },
         ]

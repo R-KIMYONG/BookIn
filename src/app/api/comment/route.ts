@@ -14,20 +14,16 @@ export const POST = async (request: NextRequest) => {
   } catch {
     return NextResponse.json({ message: '요청 데이터를 읽을 수 없습니다.' }, { status: 400 });
   }
-  const { content, post_id, writer, user_id, cover, book_title } = body;
+  const { content, book_id, user_id } = body;
   const cleanContent = sanitizeHtmlServer(content || '');
 
-  if (!user_id || !post_id)
+  if (!user_id || !book_id)
     return NextResponse.json({ message: '댓글 작성에 필요한 정보가 누락되었습니다.' }, { status: 400 });
 
   const { error: commentInsertError } = await supabase
     .from('comments')
-    .insert({ content: cleanContent, post_id, writer, user_id, updated_at: now, cover, book_title });
-
-  if (commentInsertError) {
-    console.log(commentInsertError);
-    return NextResponse.json({ message: '댓글 작성중 오류가 발생했습니다.' }, { status: 500 });
-  }
+    .insert({ content: cleanContent, book_id, user_id, updated_at: now });
+  if (commentInsertError) return NextResponse.json({ message: '댓글 작성중 오류가 발생했습니다.' }, { status: 500 });
 
   return NextResponse.json({ message: '댓글이 등록되었습니다.' }, { status: 201 });
 };
@@ -36,16 +32,16 @@ export const PUT = async (request: NextRequest) => {
   const now = new Date().toISOString();
   try {
     const updateComment = await request.json();
-    const { id, book_title, ...commentFields } = updateComment;
-    const cleanContent = sanitizeHtmlServer(commentFields.content || '');
+    const { id, content, user_id, book_id } = updateComment;
+    const cleanContent = sanitizeHtmlServer(content || '');
     if (!id) return NextResponse.json({ message: '수정할 댓글 정보를 찾을 수 없습니다.' }, { status: 400 });
 
-    if (!commentFields.user_id || !commentFields.post_id)
+    if (!user_id || !book_id)
       return NextResponse.json({ error: '댓글 수정에 필요한 정보가 누락되었습니다.' }, { status: 400 });
 
     const { error: commentUpdateError } = await supabase
       .from('comments')
-      .update({ ...commentFields, updated_at: now, book_title, content: cleanContent })
+      .update({ content: cleanContent, updated_at: now })
       .eq('id', id);
 
     if (commentUpdateError) {
@@ -70,13 +66,21 @@ export const DELETE = async (request: NextRequest) => {
 
     const { data: targetComment, error: targetError } = await supabase
       .from('comments')
-      .select('user_id, post_id')
+      .select('user_id, book_id')
       .eq('id', id)
       .single();
 
-    if (targetError || !targetComment?.user_id || !targetComment?.post_id) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (targetError || !targetComment?.user_id || !targetComment?.book_id) {
       console.error(targetError);
       return NextResponse.json({ message: '삭제할 댓글을 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    if (!user || user.id !== targetComment.user_id) {
+      return NextResponse.json({ message: '삭제할 댓글할 권한이 없습니다.' }, { status: 403 });
     }
 
     const { error: deleteCommentError } = await supabase.from('comments').delete().eq('id', id);

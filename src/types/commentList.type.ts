@@ -7,11 +7,17 @@ export type CommentListProps = {
   handleStartEdit: (comment: Tables<'comments'>) => void;
   handleCancelEdit: () => void;
   editingId: string | null;
-  postId: string;
+  bookId: string;
+};
+
+export type CommentWithUser = Tables<'comments'> & {
+  users?: {
+    nickname: string;
+  } | null;
 };
 
 export type CommentListResult = {
-  data: Tables<'comments'>[];
+  data: CommentWithUser[];
   total: number;
 };
 
@@ -27,9 +33,6 @@ export type CommentFormProps = {
   setTargetValue: Dispatch<SetStateAction<TargetValue>>;
   comment?: TargetValue | undefined;
   userId: string | undefined;
-  cover: string;
-  book_title: string;
-  userNickName: string;
   handleCancelEdit: () => void;
-  postId: string;
+  bookId: string;
 };
