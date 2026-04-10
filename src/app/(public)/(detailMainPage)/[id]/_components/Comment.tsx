@@ -1,10 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Tables } from '@/types/supabase';
 import useUser from '@/hooks/useUser';
-import { TargetValue } from '@/types/commentList.type';
+import { CommentWithUser, TargetValue } from '@/types/commentList.type';
 import CommentList from './CommentList';
 import dynamic from 'next/dynamic';
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
@@ -13,11 +12,10 @@ const CommentForm = dynamic(() => import('./CommentForm'), {
   ssr: false,
 });
 type Mode = 'create' | 'edit';
-const Comment = ({ cover, book_title }: { cover: string; book_title: string }) => {
+const Comment = ({ bookId }: { bookId: string;}) => {
   const [mode, setMode] = useState<Mode>('create');
   const { data: user } = useUser();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { id: postId } = useParams<{ id: string }>();
   const router = useRouter();
   const currentUrl = useCurrentUrl();
 
@@ -28,7 +26,7 @@ const Comment = ({ cover, book_title }: { cover: string; book_title: string }) =
     created_at: '',
   });
 
-  const handleStartEdit = (comment: Tables<'comments'>) => {
+  const handleStartEdit = (comment: CommentWithUser) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(comment.content ?? '', 'text/html');
     const textContent = doc.body.textContent || '';
@@ -69,7 +67,7 @@ const Comment = ({ cover, book_title }: { cover: string; book_title: string }) =
         handleStartEdit={handleStartEdit}
         handleCancelEdit={handleCancelEdit}
         editingId={editingId}
-        postId={postId}
+        bookId={bookId}
       />
 
       <div ref={formRef}>
@@ -79,11 +77,8 @@ const Comment = ({ cover, book_title }: { cover: string; book_title: string }) =
             targetValue={targetValue}
             setTargetValue={setTargetValue}
             handleCancelEdit={handleCancelEdit}
-            book_title={book_title}
-            cover={cover}
             userId={user?.id}
-            userNickName={user?.user_metadata?.nickname ?? ''}
-            postId={postId}
+            bookId={bookId}
           />
         ) : (
           <div className="mt-2 rounded-xl border border-gray-200 bg-gray-50 px-6 py-8 text-center">

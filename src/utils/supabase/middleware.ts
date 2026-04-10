@@ -55,7 +55,7 @@ export async function updateSession(request: NextRequest) {
 
         const response = NextResponse.redirect(url);
         response.cookies.delete('bookin_session_mode');
-        response.cookies.delete('booin_session_expires_at');
+        response.cookies.delete('bookin_session_expires_at');
         return response;
       }
       supabaseResponse.cookies.delete('bookin_session_mode');

@@ -25,16 +25,16 @@ const CommentsByBook = ({ userInfo, currentPage, setTotalPages }: CommentsListPr
       const to = from + COMMENTS_PAGE_SIZE - 1;
       const { data, count, error } = await supabase
         .from('user_book_comments')
-        .select('post_id,book_title,book_cover,comment_count,last_commented_at', { count: 'exact' })
+        .select('book_id,comment_count,last_commented_at,books(title,thumbnail_url)', { count: 'exact' })
         .eq('user_id', userInfo.id)
         .order('last_commented_at', { ascending: false })
         .range(from, to);
       if (error) throw error;
 
       const books = (data ?? []).map((item) => ({
-        post_id: item.post_id ?? '',
-        title: item.book_title ?? '',
-        cover: item.book_cover ?? '/noImg.png',
+        post_id: item.book_id ?? '',
+        title: item.books.title ?? '',
+        cover: item.books.thumbnail_url ?? '/noImg.png',
         comment_count: item.comment_count ?? 0,
         last_commented_at: item.last_commented_at ?? '',
       }));

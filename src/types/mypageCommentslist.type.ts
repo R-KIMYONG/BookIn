@@ -1,13 +1,14 @@
 export type Mycommentlist = {
   data: {
+    id: string;
     content: string;
     created_at: string;
-    id: string;
-    post_id: string;
     user_id: string;
-    writer: string;
-    cover: string;
-    updated_at: string;
+    book_id: string;
+    books: {
+      title: string;
+      thumbnail_url: string | null;
+    } | null;
   }[];
   total: number;
 };

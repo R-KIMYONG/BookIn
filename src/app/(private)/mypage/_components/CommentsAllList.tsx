@@ -24,7 +24,7 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
       try {
         const { data, count, error } = await supabase
           .from('comments')
-          .select('*', { count: 'exact' })
+          .select('*,books(title,thumbnail_url)', { count: 'exact' })
           .eq('user_id', userInfo.id)
           .range(from, to);
         if (error) {
@@ -56,15 +56,18 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
     <ul className="grid w-full content-start gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {myCommentslist.data.map((item) => (
         <li key={item.id}>
-          <Link href={`/${item.post_id}`}>
+          <Link href={`/${item.book_id}`}>
             <div className="relative h-52 overflow-hidden rounded-xl">
-   
-              <Image alt={item.post_id} className="object-cover" src={item.cover || '/noImg.png'} fill priority />
+              <Image
+                alt={item.book_id}
+                className="object-cover"
+                src={item.books?.thumbnail_url || '/noImg.png'}
+                fill
+                priority
+              />
 
-        
               <div className="absolute inset-0 bg-black/50" />
 
-  
               <div className="absolute top-0 z-10 p-3 w-full">
                 <p
                   dangerouslySetInnerHTML={{ __html: item.content || '' }}
@@ -72,7 +75,6 @@ const CommentsAllList = ({ userInfo, currentPage, setTotalPages }: CommentsListP
                 />
               </div>
 
-       
               <div className="absolute bottom-0 z-10 w-full bg-white/20 p-2">
                 <p className="text-black text-[10px] font-bold">{userInfo.nickname}</p>
               </div>
