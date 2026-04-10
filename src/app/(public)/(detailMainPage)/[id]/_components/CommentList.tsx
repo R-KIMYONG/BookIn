@@ -3,20 +3,20 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import useCommentsUrlState from '@/hooks/url/useCommentsUrlState';
+
 import { CommentListProps, CommentListResult } from '@/types/commentList.type';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import { createClient } from '@/utils/supabase/client';
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import AppPagination from '@/components/common/AppPagination';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import { useCommentMutation } from '@/hooks/useCommentMutation';
 import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
+import { getCommentsClient } from '@/app/lib/comment/getCommentsClient';
+import { useClientPagination } from '@/hooks/url/useClientPagination';
 
-const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, postId }: CommentListProps) => {
-  const supabase = createClient();
-  const { remove } = useCommentMutation(postId, userId);
-  const { page, setCommentsUrl } = useCommentsUrlState();
+const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, bookId }: CommentListProps) => {
+  const { remove } = useCommentMutation(bookId, userId);
+  const { page, setPage } = useClientPagination();
   const [isOpen, setIsOpen] = useState(false);
 
   const onOpen = () => setIsOpen(true);
@@ -30,35 +30,9 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
     isError,
     error,
   } = useQuery<CommentListResult>({
-    queryKey: ['comments', postId, page],
-    queryFn: async () => {
-      const from = (page - 1) * COMMENTS_PAGE_SIZE;
-      const to = from + COMMENTS_PAGE_SIZE - 1;
-
-      const [{ data: commentData, error: commentDataError }, { data: statsData, error: statsError }] =
-        await Promise.all([
-          supabase
-            .from('comments')
-            .select('*')
-            .eq('post_id', postId)
-            .order('created_at', { ascending: false })
-            .range(from, to),
-          supabase.from('book_stats').select('comment_count').eq('post_id', postId).maybeSingle(),
-        ]);
-      if (commentDataError) {
-        throw new Error(commentDataError.message ?? '댓글 조회 실패');
-      }
-
-      if (statsError) {
-        throw new Error(statsError.message ?? '댓글 수 조회 실패');
-      }
-
-      return {
-        data: commentData ?? [],
-        total: statsData?.comment_count ?? 0,
-      };
-    },
-    enabled: !!postId,
+    queryKey: ['comments', bookId, page],
+    queryFn: () => getCommentsClient({ bookId, page }),
+    enabled: !!bookId,
     staleTime: 60_000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
@@ -106,7 +80,6 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
           </p>
         </div>
       </div>
-
       <div className="border-y-2 border-black py-6">
         {comments.data.length === 0 ? (
           <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-10 text-center">
@@ -116,7 +89,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
         ) : (
           <ul className="divide-y divide-gray-200">
             {comments.data.map((comment) => {
-              const { id, content, writer, created_at, user_id } = comment;
+              const { id, content, users, created_at, user_id } = comment;
               const date = dayjs(created_at).locale('ko').format('YYYY-MM-DD HH:mm');
               const isMine = userId === user_id;
 
@@ -125,7 +98,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
                   {/* 헤더: 제목 + 날짜 */}
                   <div className="flex justify-between items-center text-xs text-gray-500">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-900">{writer}</span>
+                      <span className="font-semibold text-gray-900">{users?.nickname}</span>
                       <span>·</span>
                       <span>{date}</span>
                     </div>
@@ -151,14 +124,14 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
                     ) : null}
                   </div>
 
-                  {/* 내용 - Velog 스타일 */}
+                
                   <div
                     className="mt-2 text-sm leading-7 text-gray-800 break-words
                      prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{ __html: content || '' }}
                   />
 
-                  {/* 상태 표시 */}
+                
                   {isEdit && editingId === id && <p className="mt-2 text-xs text-[#AF5858] font-semibold">수정 중…</p>}
                 </li>
               );
@@ -181,12 +154,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
         onClose={handleCloseModal}
       />
 
-      <AppPagination
-        page={page}
-        totalPages={totalPages}
-        disabled={isFetching}
-        onChange={(p) => setCommentsUrl({ page: p })}
-      />
+      <AppPagination page={page} totalPages={totalPages} disabled={isFetching} onChange={setPage} />
     </div>
   );
 };

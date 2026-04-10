@@ -25,13 +25,10 @@ const CommentForm = ({
   targetValue, //수정대상의 내용
   setTargetValue, //수정대상의 내용을 제어
   userId, //사용자의 id
-  cover, //책 표지 comment_book에 넣기용
-  book_title,
-  userNickName,
   handleCancelEdit,
-  postId,
+  bookId,
 }: CommentFormProps) => {
-  const { add, update } = useCommentMutation(postId, userId);
+  const { add, update } = useCommentMutation(bookId, userId);
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
 
   const handleContentChange = (html: string, textLength: number) => {
@@ -45,7 +42,6 @@ const CommentForm = ({
   const handleEditorReady = useCallback((editor: Editor) => {
     setEditorInstance(editor);
   }, []);
-
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cleanContent: string = sanitizeHtmlClient(targetValue.content || '');
@@ -58,11 +54,8 @@ const CommentForm = ({
     const newComment: SubmitItem = {
       user_id: userId,
       content: cleanContent,
-      post_id: postId,
-      writer: userNickName,
+      book_id: bookId,
       updated_at: new Date().toISOString(),
-      cover,
-      book_title,
     };
 
     const requestPromise =
@@ -73,7 +66,7 @@ const CommentForm = ({
     const pendingMessage = isEdit ? '댓글 수정중...' : '댓글 업로드중...';
 
     try {
-      await toastMutationPromise(requestPromise, pendingMessage);
+      toastMutationPromise(requestPromise, pendingMessage);
       handleCancelEdit();
     } catch (error) {
       console.error(error);
