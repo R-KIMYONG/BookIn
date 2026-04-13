@@ -29,6 +29,8 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
   const go = (next: number) => {
     //현재 뷰에 있는 페이지중 원하는 페이지로 이동
     if (disabled) return;
+    const nextPage = clamp(next, 1, totalPages);
+    if (nextPage === safePage) return;
     onChange(clamp(next, 1, totalPages));
   };
 
@@ -64,7 +66,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
                       : '!bg-white !hover:bg-gray-100 !active:scale-[0.98]'
                   )}
                   onClick={() => go(pageNum)}
-                  disabled={disabled}
+                  disabled={disabled || pageNum === safePage}
                 >
                   {pageNum}
                 </ButtonComponent>
