@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import UserInfoSection from './_components/UserInfoSection';
+import UserInfoSection from './_components/MypageContainer';
 
 export const metadata: Metadata = {
   title: '마이페이지',
