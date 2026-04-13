@@ -10,18 +10,25 @@ import { useMyBooks } from '@/hooks/url/useMyBooks';
 import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
 import MyBooksSectionSkeleton from './MyBooksSectionSkeleton';
+import { MyBooksTabType } from '@/types/useMypageUrlState.type';
+import { useEffect, useState } from 'react';
 
 const MyBooksSection = ({ userInfo }: { userInfo: MypageUserInfo }) => {
-  const { tab, page, setMypageUrl } = useMypageUrlState();
+  const { tab: urlTab, page, setMypageUrl } = useMypageUrlState();
 
-  const { result, isPending, isError } = useMyBooks(tab, userInfo.id, page);
+  const [activeTab, setActiveTab] = useState<MyBooksTabType>(urlTab);
+  const { result, isPending, isError } = useMyBooks(urlTab, userInfo.id, page);
 
   const totalPages = Math.max(1, Math.ceil((result?.total ?? 0) / COMMENTS_PAGE_SIZE));
+  const isTabSwitching = activeTab !== urlTab;
+  useEffect(() => {
+    setActiveTab(urlTab);
+  }, [urlTab]);
 
   if (!result) {
     return (
       <>
-        <MyBooksTabs tab={tab} />
+        <MyBooksTabs tab={activeTab} onChange={setActiveTab} />
         <div className="my-2 lg:h-[calc(160px*2+16px)]">
           <MyBooksSectionSkeleton />
         </div>
@@ -44,22 +51,30 @@ const MyBooksSection = ({ userInfo }: { userInfo: MypageUserInfo }) => {
     },
   } as const;
 
+  const renderList = () => {
+    if (result.tab !== activeTab) return null;
+    switch (result.tab) {
+      case 'comment':
+        return <CommentBooksList data={result.data} />;
+      case 'like':
+        return <LikeBooksList data={result.data} />;
+      case 'bookmark':
+        return <BookmarkBooksList data={result.data} />;
+    }
+  };
+
   return (
     <>
-      <MyBooksTabs tab={tab} />
+      <MyBooksTabs tab={activeTab} onChange={setActiveTab} />
       <div className="my-2 lg:h-[calc(160px*2+16px)]">
-        {isError ? (
-          <ErrorState message={TAB_CONFIG[tab].error} />
-        ) : isPending ? (
+        {isTabSwitching || isPending ? (
           <MyBooksSectionSkeleton />
+        ) : isError ? (
+          <ErrorState message={TAB_CONFIG[activeTab].error} />
         ) : result.data.length === 0 ? (
-          <EmptyState description={TAB_CONFIG[tab].empty} />
+          <EmptyState description={TAB_CONFIG[activeTab].empty} />
         ) : (
-          <>
-            {result.tab === 'comment' && <CommentBooksList data={result.data} />}
-            {result.tab === 'like' && <LikeBooksList data={result.data} />}
-            {result.tab === 'bookmark' && <BookmarkBooksList data={result.data} />}
-          </>
+          renderList()
         )}
       </div>
       <AppPagination
