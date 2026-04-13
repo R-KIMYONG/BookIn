@@ -1,10 +1,12 @@
-export type MypageSectionType = 'userInfo' | 'commentList';
-export type CommentTabType = 'commentAll' | 'commentByBook';
+export type MypageSectionType = 'myBooks';
 
-export const MYPAGE_SECTION_LIST: MypageSectionType[] = ['userInfo', 'commentList'];
-export const COMMENT_TAB_LIST: CommentTabType[] = ['commentAll', 'commentByBook'];
+export type MyBooksTabType = 'like' | 'bookmark' | 'comment';
 
-export const MYPAGE_DEFAULT_SECTION: MypageSectionType = 'userInfo';
-export const COMMENT_DEFAULT_TAB: CommentTabType = 'commentByBook';
+export const MYPAGE_SECTION_LIST: MypageSectionType[] = ['myBooks'];
 
+export const MYBOOKS_TAB_LIST: MyBooksTabType[] = ['like', 'bookmark', 'comment'];
+
+export const MYPAGE_DEFAULT_SECTION: MypageSectionType = 'myBooks';
+
+export const MYBOOKS_DEFAULT_TAB: MyBooksTabType = 'like';
 export type MypageModalType = 'changePassword' | null;

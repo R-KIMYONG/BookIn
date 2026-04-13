@@ -1,12 +1,20 @@
 import { createClient } from '@/utils/supabase/server';
 
-export const getUserInfoServer = async (userId: string) => {
+export const getUserInfoServer = async () => {
   const supabase = await createClient();
 
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) throw new Error(authError.message);
+
+  if (!user) return null;
   const { data, error } = await supabase
     .from('users')
     .select('id,email,nickname,avatar,created_at')
-    .eq('id', userId)
+    .eq('id', user.id)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
