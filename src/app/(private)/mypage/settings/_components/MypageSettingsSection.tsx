@@ -18,7 +18,7 @@ const MypageSettingsSection = async () => {
 
   await queryClient.prefetchQuery({
     queryKey: ['userInfo', user.id],
-    queryFn: () => getUserInfoServer(user.id),
+    queryFn: () => getUserInfoServer(),
   });
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

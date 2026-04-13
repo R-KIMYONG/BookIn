@@ -1,11 +1,5 @@
-import { BookGroup } from './commentBooks.type';
-import { CommentTabType } from './useMypageUrlState.type';
+import { BookmarkBook, CommentBook, LikeBook } from './myBooks.type';
 import { MypageUserInfo } from './userInfo.type';
-
-export type CommentTabsProps = {
-  activeTab: CommentTabType;
-  setActiveTab: (item: CommentTabType) => void;
-};
 
 export type CommentsListProps = {
   userInfo: MypageUserInfo;
@@ -13,7 +7,22 @@ export type CommentsListProps = {
   setTotalPages: (page: number) => void;
 };
 
-export type CommentsByBookResult = {
-  data: BookGroup[];
-  total: number;
-};
+export type MyBooksListProps =
+  | {
+      tab: 'comment';
+      isPending: boolean;
+      isError: boolean;
+      data: CommentBook[];
+    }
+  | {
+      tab: 'like';
+      isPending: boolean;
+      isError: boolean;
+      data: LikeBook[];
+    }
+  | {
+      tab: 'bookmark';
+      isPending: boolean;
+      isError: boolean;
+      data: BookmarkBook[];
+    };
