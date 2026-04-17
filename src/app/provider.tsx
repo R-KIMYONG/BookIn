@@ -9,10 +9,8 @@ const QueryProvider = ({ children }: React.PropsWithChildren) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-
-        {children}
-        {process.env.NODE_ENV === 'development' ? <ReactQueryDevtools /> : null}
-
+      {children}
+      {process.env.NODE_ENV === 'development' ? <ReactQueryDevtools /> : null}
     </QueryClientProvider>
   );
 };

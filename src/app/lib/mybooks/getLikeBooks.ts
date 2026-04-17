@@ -4,10 +4,12 @@ import { SupabaseClient } from '@supabase/supabase-js';
 type Row = {
   book_id: string;
   created_at: string;
+  isbn13: string;
   books: {
+    isbn: string;
     title: string;
     thumbnail_url: string;
-    isbn13: string;
+    author: string;
   }[];
 };
 
@@ -27,7 +29,7 @@ export const getLikeBooks = async ({
 
   const { data, count, error } = await supabase
     .from('likes')
-    .select('*,books(title,thumbnail_url)', {
+    .select('*,books(title,thumbnail_url,author,isbn13)', {
       count: 'exact',
     })
     .eq('user_id', userId)
@@ -44,7 +46,8 @@ export const getLikeBooks = async ({
       title: bookInfo.title ?? '',
       cover: bookInfo.thumbnail_url ?? '/noImg.png',
       created_at: item.created_at,
-      isbn13: bookInfo.isbn13,
+      isbn13: item.isbn13 ?? bookInfo.isbn,
+      author: bookInfo.author ?? '',
     };
   });
 

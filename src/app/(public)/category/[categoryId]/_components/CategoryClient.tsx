@@ -13,6 +13,7 @@ import EmptyState from '@/components/common/EmptyState';
 import QueryTypeTabs from '@/components/common/filters/QueryTypeTabs';
 import { useRouter } from 'next/navigation';
 import { CategoryPageProps } from '@/types/categoryPage.type';
+import { useFetchLikes } from '@/hooks/useFetchLikes';
 
 const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: CategoryPageProps) => {
   const categoryIdNum = Number(params.categoryId);
@@ -84,6 +85,9 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
       scroll: false,
     });
   };
+  const isbnList = (data?.item ?? []).map((item) => item.isbn13);
+
+  useFetchLikes(isbnList);
 
   if (!isValidCategory) {
     return <InvalidCategory />;

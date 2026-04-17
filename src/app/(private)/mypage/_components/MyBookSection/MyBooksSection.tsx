@@ -11,7 +11,8 @@ import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
 import MyBooksSectionSkeleton from './MyBooksSectionSkeleton';
 import { MyBooksTabType } from '@/types/useMypageUrlState.type';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useFetchLikes } from '@/hooks/useFetchLikes';
 
 const MyBooksSection = ({ userInfo }: { userInfo: MypageUserInfo }) => {
   const { tab: urlTab, page, setMypageUrl } = useMypageUrlState();
@@ -24,6 +25,12 @@ const MyBooksSection = ({ userInfo }: { userInfo: MypageUserInfo }) => {
   useEffect(() => {
     setActiveTab(urlTab);
   }, [urlTab]);
+
+  const isbnList = useMemo(() => {
+    return result?.data.map((item) => item.isbn13) ?? [];
+  }, [result?.data]);
+
+  useFetchLikes(activeTab === 'like' ? isbnList : []);
 
   if (!result) {
     return (
