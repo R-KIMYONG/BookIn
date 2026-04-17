@@ -12,25 +12,42 @@ import SessionModalContainer from '@/components/session/SessionModalContainer';
 import ClientProviders from './client-providers';
 
 const inter = Inter({ subsets: ['latin'] });
-
 export const metadata: Metadata = {
-  title: '책in',
-  description: '도서 정보 관람이 가능하고, 사용자 간 의견 공유 커뮤니티가 마련되어있는 도서 관련 사이트',
+  title: {
+    default: 'BookIn',
+    template: '%s | BookIn',
+  },
+  description: '책 추천 및 기록 서비스',
   icons: {
     icon: '/projectbookin.ico',
   },
-};
 
+  openGraph: {
+    title: 'BookIn',
+    description: '책 추천 및 기록 서비스',
+    url: 'https://book-in-two.vercel.app/',
+    siteName: 'BookIn',
+    images: [
+      {
+        url: 'https://book-in-two.vercel.app/images/og.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'ko_KR',
+    type: 'website',
+  },
+};
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={inter.className}>
-        <ToastContainer autoClose={1000} stacked draggable />
         <QueryProvider>
+          <ToastContainer autoClose={1000} stacked draggable />
           <SessionModalContainer />
           <Suspense fallback={null}>
             <ClientProviders />

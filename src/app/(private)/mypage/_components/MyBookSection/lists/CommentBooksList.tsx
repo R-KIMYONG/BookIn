@@ -8,13 +8,21 @@ import BooksGridContainer from './BooksGridContainer';
 const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
   return (
     <BooksGridContainer>
-      {data.map((book) => {
+      {data.map((book, index) => {
+        const isAboveFold = index < 5;
         const date = dayjs(book.last_commented_at).locale('ko').format('YYYY-MM-DD HH:mm');
         return (
           <li key={book.book_id}>
             <Link href={`/${book.isbn13}`}>
               <div className="h-40 relative overflow-hidden rounded-md">
-                <Image src={book.cover} alt={book.title} fill className="object-cover" />
+                <Image
+                  src={book.cover}
+                  alt={book.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  priority={isAboveFold}
+                />
 
                 <div className="absolute inset-0 bg-black/40" />
 

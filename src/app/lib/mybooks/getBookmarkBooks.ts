@@ -8,6 +8,7 @@ type Row = {
     title: string;
     thumbnail_url: string;
     isbn13: string;
+    author: string;
   }[];
 };
 
@@ -27,7 +28,7 @@ export const getBookmarkBooks = async ({
 
   const { data, count, error } = await supabase
     .from('bookmarks')
-    .select('book_id, created_at,books(title,thumbnail_url,isbn13)', {
+    .select('*,books(title,thumbnail_url,isbn13,author)', {
       count: 'exact',
     })
     .eq('user_id', userId)
@@ -45,6 +46,7 @@ export const getBookmarkBooks = async ({
       cover: bookInfo.thumbnail_url ?? '/noImg.png',
       isbn13: bookInfo.isbn13,
       created_at: item.created_at,
+      author: bookInfo.author,
     };
   });
 

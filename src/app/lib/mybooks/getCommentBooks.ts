@@ -43,7 +43,7 @@ export const getCommentBooks = async ({
     return {
       book_id: item.book_id,
       title: bookInfo?.title ?? '',
-      cover: bookInfo?.thumbnail_url ?? '/noImg.png',
+      cover: bookInfo?.thumbnail_url ?? '/images/noImg.png',
       comment_count: item.comment_count,
       last_commented_at: item.last_commented_at,
       isbn13: bookInfo.isbn13 ?? '',

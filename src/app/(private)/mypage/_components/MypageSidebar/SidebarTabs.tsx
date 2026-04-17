@@ -6,7 +6,7 @@ const SidebarTabs = () => {
   const { mypageSection, setMypageUrl } = useMypageUrlState();
   const profileTabs: { label: string; sectionType: MypageSectionType }[] = [
     { label: '내 활동 책', sectionType: 'myBooks' },
-    // 추후 탭 생기면 여기에 추가   (src/types/useMypageUrlState.type.ts 에 타입 추가 필요
+    // 추후 탭 생기면 여기에 추가   (src/types/useMypageUrlState.type.ts 에 타입 추가 필요)
   ];
   return (
     <div className="px-3 py-3">

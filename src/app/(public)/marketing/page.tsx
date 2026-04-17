@@ -1,4 +1,4 @@
-export default function marketingPage() {
+const marketingPage = () => {
   return (
     <div className="w-[80%] my-0 mx-auto py-[50px] px-0 ">
       <h2 className="text-[32px] font-[700] mb-[24px] pb-[20px] text-center">마케팅정보수신동의</h2>
@@ -39,4 +39,5 @@ export default function marketingPage() {
       </div>
     </div>
   );
-}
+};
+export default marketingPage;

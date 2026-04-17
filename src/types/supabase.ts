@@ -17,27 +17,30 @@ export type Database = {
       book_stats: {
         Row: {
           book_id: string
-          comment_count: number | null
+          comment_count: number
           created_at: string
-          like_count: number | null
+          isbn13: string | null
+          like_count: number
           updated_at: string
-          view_count: number | null
+          view_count: number
         }
         Insert: {
           book_id: string
-          comment_count?: number | null
+          comment_count?: number
           created_at?: string
-          like_count?: number | null
+          isbn13?: string | null
+          like_count?: number
           updated_at?: string
-          view_count?: number | null
+          view_count?: number
         }
         Update: {
           book_id?: string
-          comment_count?: number | null
+          comment_count?: number
           created_at?: string
-          like_count?: number | null
+          isbn13?: string | null
+          like_count?: number
           updated_at?: string
-          view_count?: number | null
+          view_count?: number
         }
         Relationships: [
           {
@@ -54,18 +57,21 @@ export type Database = {
           book_id: string
           created_at: string
           id: string
+          isbn13: string
           user_id: string
         }
         Insert: {
           book_id: string
           created_at?: string
           id?: string
+          isbn13: string
           user_id: string
         }
         Update: {
           book_id?: string
           created_at?: string
           id?: string
+          isbn13?: string
           user_id?: string
         }
         Relationships: [
@@ -159,18 +165,21 @@ export type Database = {
           book_id: string
           created_at: string
           id: string
+          isbn13: string
           user_id: string
         }
         Insert: {
           book_id: string
           created_at?: string
           id?: string
+          isbn13: string
           user_id: string
         }
         Update: {
           book_id?: string
           created_at?: string
           id?: string
+          isbn13?: string
           user_id?: string
         }
         Relationships: [

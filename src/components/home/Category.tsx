@@ -2,7 +2,7 @@
 
 import CategoryItem from './CategoryItem';
 import { Book, Item, SearchResult } from '@/types/book.type';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import AppPagination from '../common/AppPagination';
 import getTotalPages from '@/utils/pagination';
@@ -12,6 +12,8 @@ import SearchBar from '../common/filters/SearchBar';
 import useHomeListUrlState from '@/hooks/url/useHomeListUrlState';
 import { SearchQueryType } from '@/types/searchBar.type';
 import SkeletonGrid from '../common/SkeletonGrid';
+import { useFetchLikes } from '@/hooks/useFetchLikes';
+import { useMemo } from 'react';
 
 type PagedResult<T> = {
   items: T[];
@@ -25,9 +27,8 @@ const emptyPaged = <T,>(itemsPerPage = 20): PagedResult<T> => ({
   itemsPerPage,
 });
 
-export default function Category() {
+const Category = () => {
   const { queryType, page, searchKeyWord, searchQueryType, setHomeUrl } = useHomeListUrlState();
-
   const isSearching = Boolean(searchKeyWord?.trim());
 
   const {
@@ -40,7 +41,7 @@ export default function Category() {
       const [_, qt, p] = queryKey as [string, QueryType, number];
       const url =
         `/api/aladin/list?QueryType=${qt}` + `&page=${p}` + (qt === 'ItemEditorChoice' ? `&CategoryId=170` : '');
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch(url);
 
       if (!res.ok) throw new Error(`AladinApi ${res.status}`);
       const data: Book = await res.json();
@@ -50,10 +51,10 @@ export default function Category() {
         itemsPerPage: Number(data.itemsPerPage ?? 20),
       };
     },
-    retry: 0,
+    retry: 1,
     refetchOnWindowFocus: false,
-    staleTime: 3000 * 60,
-    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 3, //3분
+    enabled: !isSearching,
   });
   const {
     data: searchData,
@@ -64,10 +65,9 @@ export default function Category() {
     queryFn: async ({ queryKey }) => {
       const [_, searchKeyWord, searchQueryType, page] = queryKey as [string, string | null, SearchQueryType, number];
       if (!searchKeyWord?.trim()) return emptyPaged<Item>(20);
-      const res = await fetch(
-        `/api/aladin/search?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${page}&QueryType=${searchQueryType}`,
-        { cache: 'no-store' }
-      );
+
+      const url = `/api/aladin/search?SearchKeyWord=${encodeURIComponent(searchKeyWord)}&page=${page}&QueryType=${searchQueryType}`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error('검색 실패');
       const data: SearchResult = await res.json();
       return {
@@ -76,9 +76,8 @@ export default function Category() {
         itemsPerPage: Number(data.itemsPerPage ?? 20),
       };
     },
-    staleTime: 30000,
+    staleTime: 1000 * 60, //1분
     enabled: isSearching,
-    placeholderData: keepPreviousData,
   });
   const searchTotal = searchData?.totalResults ?? 0;
 
@@ -108,12 +107,18 @@ export default function Category() {
   //데이터 새로 가져오기 검색중이면 검색의 데이터 다시 가져오기아닐 시 전체 리스트 리패칭
   const isPending = isSearching ? searchPending : bookItemPending;
 
-  const list = isSearching ? (searchData?.items ?? []) : (listData?.items ?? []);
+  const list = useMemo(() => {
+    return isSearching ? (searchData?.items ?? []) : (listData?.items ?? []);
+  }, [isSearching, searchData?.items, listData?.items]);
   //현재 화면에서 리스트카드의 정보 즉 각각의 카드
+  const isbnList = useMemo(() => {
+    return list.map((item) => item.isbn13?.trim() || item.isbn?.trim() || '').filter(Boolean);
+  }, [list]);
+
+  useFetchLikes(isbnList);
 
   const totalResults = isSearching ? (searchData?.totalResults ?? 0) : (listData?.totalResults ?? 0);
   //패칭해온 총결과
-
   const perPage = isSearching ? (searchData?.itemsPerPage ?? 20) : (listData?.itemsPerPage ?? 20);
   //API 응답의 itemsPerPage(페이지당 개수). 없거나 이상하면 20으로 fallback.
 
@@ -150,11 +155,10 @@ export default function Category() {
       {isPending ? (
         <SkeletonGrid count={20} />
       ) : (
-        <div className="w-full grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {list.map((item, index) => {
             const href = makeHref(item);
             const key = makeItemKey(item, index);
-
             return href ? (
               <Link href={href} key={key}>
                 <CategoryItem item={item} />
@@ -178,4 +182,5 @@ export default function Category() {
       </div>
     </section>
   );
-}
+};
+export default Category;
