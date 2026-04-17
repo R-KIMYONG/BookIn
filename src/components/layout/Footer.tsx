@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { FiGithub } from 'react-icons/fi';
 import { SiNotion } from 'react-icons/si';
 
-export default function Footer() {
+const Footer = () => {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t mt-5">
@@ -108,4 +108,5 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+};
+export default Footer;

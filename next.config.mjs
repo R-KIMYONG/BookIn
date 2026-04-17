@@ -5,7 +5,6 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'image.aladin.co.kr',
-        pathname: '/product/**',
       },
       {
         protocol: 'https',

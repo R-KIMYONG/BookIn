@@ -4,7 +4,7 @@ import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
-export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+const Error = ({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) => {
   useEffect(() => {
     console.error('[DetailPage Error]', error);
   }, [error]);
@@ -74,4 +74,5 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       </div>
     </div>
   );
-}
+};
+export default Error;

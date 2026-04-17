@@ -30,6 +30,7 @@ export const useMyBooks = (tab: MyBooksTabType, userId: string, page: number) =>
       return { tab: 'bookmark', ...res };
     },
     enabled: !!userId,
+    staleTime: 1000 * 60 * 3, //3분
   });
   return {
     ...query,

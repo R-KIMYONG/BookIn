@@ -1,0 +1,4 @@
+# tests
+src/test/**
+**/*.test.*
+**/*.spec.*

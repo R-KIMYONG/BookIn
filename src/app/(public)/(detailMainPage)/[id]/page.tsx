@@ -4,6 +4,7 @@ import Image from 'next/image';
 import CommentSection from './_components/CommentSection';
 import { AladinItem } from '@/types/MainDetail.type';
 import { createClient } from '@/utils/supabase/server';
+import DetailLikeContainer from './_components/DetailLikeContainer';
 const getCheapest = (items: { price: number; link: string }[]) => {
   if (items.length === 0) return null;
   return items.sort((a, b) => a.price - b.price)[0];
@@ -88,6 +89,13 @@ const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
   const ebookDiscount = cheapestEbook && standard ? getDiscountRate(standard, cheapestEbook.price) : 0;
 
   const category = item.categoryName?.split('>')?.pop() ?? '';
+  const bookInfo = {
+    isbn13: item.isbn13,
+    title: item.title,
+    cover: item.cover,
+    author: item.author,
+    isbn: item.isbn,
+  };
 
   return (
     <>
@@ -127,9 +135,10 @@ const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
               )}
 
               {/* 신뢰 */}
-              <div className="flex gap-4 text-xs text-gray-500">
+              <div className="flex items-center gap-4 text-xs text-gray-500">
                 {rating > 0 && <span>평점 {rating}</span>}
                 {salesPoint > 0 && <span>판매량 {salesPoint.toLocaleString()}</span>}
+                <DetailLikeContainer bookInfo={bookInfo} />
               </div>
 
               <div className="rounded-xl border px-4 py-4 space-y-3">

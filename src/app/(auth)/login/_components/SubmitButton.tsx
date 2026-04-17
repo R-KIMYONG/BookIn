@@ -7,7 +7,7 @@ type SubmitButtonProps = {
   label: string;
 };
 
-export default function SubmitButton({ label }: SubmitButtonProps) {
+const SubmitButton = ({ label }: SubmitButtonProps) => {
   const { pending } = useFormStatus();
 
   return (
@@ -21,4 +21,5 @@ export default function SubmitButton({ label }: SubmitButtonProps) {
       label={label}
     />
   );
-}
+};
+export default SubmitButton;

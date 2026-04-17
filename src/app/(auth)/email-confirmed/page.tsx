@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function EmailConfirmedPage() {
+const EmailConfirmedPage = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -46,4 +46,5 @@ export default function EmailConfirmedPage() {
       </div>
     </main>
   );
-}
+};
+export default EmailConfirmedPage;
