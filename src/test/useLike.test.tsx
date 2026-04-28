@@ -8,7 +8,7 @@ import { createTestQueryClient } from '@/test/testQueryClient';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-import { useLike, type LikeCache } from '@/hooks/useLike';
+import { useLike, type LikeCache } from '@/hooks/like/useLike';
 
 const wrapperWith = (client: any) => {
   return ({ children }: { children: React.ReactNode }) =>

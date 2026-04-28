@@ -16,9 +16,11 @@ export const createClient = async () => {
           options?: CookieOptions;
         }[]
       ) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options);
-        });
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {}
       },
     },
   });

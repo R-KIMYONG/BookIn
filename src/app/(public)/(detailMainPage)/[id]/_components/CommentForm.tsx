@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import { SubmitItem, useCommentMutation } from '@/hooks/useCommentMutation';
 import { sanitizeHtmlClient } from '@/app/lib/security/sanitizeHtml.client';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 
 const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
@@ -19,7 +19,8 @@ const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
     </div>
   ),
 });
-export const MAX_LENGTH = 200;
+const MAX_LENGTH = 200;
+const MAX_LINES = 6;
 const CommentForm = ({
   isEdit, //편집 상태
   targetValue, //수정대상의 내용
@@ -30,7 +31,7 @@ const CommentForm = ({
 }: CommentFormProps) => {
   const { add, update } = useCommentMutation(bookId, userId);
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
-
+  const formRef = useRef<HTMLFormElement | null>(null);
   const handleContentChange = (html: string, textLength: number) => {
     if (textLength > MAX_LENGTH) {
       toast.error('200자 이상은 작성 불가능합니다');
@@ -66,7 +67,7 @@ const CommentForm = ({
     const pendingMessage = isEdit ? '댓글 수정중...' : '댓글 업로드중...';
 
     try {
-      toastMutationPromise(requestPromise, pendingMessage);
+      toastMutationPromise(requestPromise, { pending: pendingMessage });
       handleCancelEdit();
     } catch (error) {
       console.error(error);
@@ -83,7 +84,7 @@ const CommentForm = ({
   const lineCount = editorInstance ? editorInstance.state.doc.content.childCount : 1;
   return (
     <>
-      <form onSubmit={handleSubmit} className="mt-4 border-t pt-4">
+      <form onSubmit={handleSubmit} ref={formRef} className="mt-4 border-t pt-4">
         <div className="flex flex-col justify-end gap-1 h-full">
           {/* 입력 영역 */}
           <div
@@ -92,8 +93,12 @@ const CommentForm = ({
           >
             <TiptapEditor
               value={targetValue.content ?? ''}
+              placeholder="댓글을 입력하세요."
+              maxLength={MAX_LENGTH}
+              maxLines={MAX_LINES}
               onChange={handleContentChange}
               onReady={handleEditorReady}
+              onSubmitShortcut={() => formRef.current?.requestSubmit()}
             />
 
             {/* 룰 */}
@@ -101,8 +106,12 @@ const CommentForm = ({
               <span>Enter 줄바꿈 · ⌘/Ctrl + Enter 등록</span>
 
               <div className="flex items-center gap-3">
-                <span>{lineCount} / 6줄</span>
-                <span>{textLength} / 200</span>
+                <span>
+                  {lineCount} / {MAX_LINES}줄
+                </span>
+                <span>
+                  {textLength} / {MAX_LENGTH}
+                </span>
               </div>
             </div>
           </div>

@@ -18,6 +18,13 @@ export type LikeBook = MyBookBase & {
 export type BookmarkBook = MyBookBase & {
   created_at: string;
   author: string;
+  memo: string | null;
+  tags: {
+    id: string;
+    name: string;
+    slug: string;
+    color: string | null;
+  }[];
 };
 
 export type MyBooksResult<T> = {

@@ -5,11 +5,10 @@ import Header from '@/components/layout/header/Header';
 import Footer from '@/components/layout/Footer';
 import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from './provider';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Suspense } from 'react';
-import SessionModalContainer from '@/components/session/SessionModalContainer';
 import ClientProviders from './client-providers';
+import GlobalOverlays from './GlobalOverlays';
 
 const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
@@ -21,7 +20,6 @@ export const metadata: Metadata = {
   icons: {
     icon: '/projectbookin.ico',
   },
-
   openGraph: {
     title: 'BookIn',
     description: '책 추천 및 기록 서비스',
@@ -47,8 +45,7 @@ export default async function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <QueryProvider>
-          <ToastContainer autoClose={1000} stacked draggable />
-          <SessionModalContainer />
+          <GlobalOverlays />
           <Suspense fallback={null}>
             <ClientProviders />
           </Suspense>

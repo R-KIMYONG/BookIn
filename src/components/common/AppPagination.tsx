@@ -9,18 +9,17 @@ import { AppPaginationProps } from '@/types/apppagenation.type';
 
 const clamp = (page: number, min: number, totalPages: number) => Math.min(totalPages, Math.max(min, page)); //1이상  총수 이하만 허용
 
-function range(start: number, end: number) {
+const range = (start: number, end: number) => {
   const out: number[] = [];
   for (let i = start; i <= end; i++) out.push(i);
   return out;
-}
+};
 
 const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationProps) => {
   //page=현재페이지를 나타남, totalPages=총페이지를 나타남, onChange=몇번페이지로 가라, disabled=비활성화 여부
   const [error, setError] = useState<boolean>(false);
   const safePage = clamp(page, 1, totalPages);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-  const visibleCount = isMobile ? 3 : 5;
+  const visibleCount = 5;
 
   const blockStart = Math.max(1, Math.min(safePage - Math.floor(visibleCount / 2), totalPages - (visibleCount - 1)));
   const blockEnd = Math.min(totalPages, blockStart + (visibleCount - 1));

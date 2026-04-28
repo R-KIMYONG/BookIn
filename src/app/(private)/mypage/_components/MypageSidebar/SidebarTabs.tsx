@@ -11,22 +11,16 @@ const SidebarTabs = () => {
   return (
     <div className="px-3 py-3">
       <nav>
-        <ul className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+        <ul className="flex flex-wrap gap-2">
           {profileTabs.map((tab) => {
             const isActive = mypageSection === tab.sectionType;
 
             return (
               <li key={tab.sectionType}>
                 <ButtonComponent
-                  className={`!rounded-2xl !border !transition-all
-                            ${
-                              isActive
-                                ? '!border-[#af5858] !bg-[#af5858] !text-white'
-                                : '!border-gray-200 !bg-white !text-gray-700 hover:!border-[#af5858] hover:!text-[#af5858]'
-                            }`}
-                  size="md"
+                  size="sm"
                   fullWidth={true}
-                  variant="ghost"
+                  variant={isActive ? 'primary' : 'secondary'}
                   onClick={() => {
                     if (mypageSection !== tab.sectionType) {
                       setMypageUrl({

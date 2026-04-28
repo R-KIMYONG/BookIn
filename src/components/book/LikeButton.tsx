@@ -1,15 +1,16 @@
-import { LikeCache, useLike } from '@/hooks/useLike';
+import { LikeCache, useLike } from '@/hooks/like/useLike';
 import useUser from '@/hooks/useUser';
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import ButtonComponent from '../common/ui/ButtonComponent';
 
 const LikeButton = ({
-  clasName,
+  style,
   bookInfo,
 }: {
-  clasName?: string;
+  style?: string;
   bookInfo: { isbn13: string; title: string; cover: string; author: string };
 }) => {
   const { toggle, isLoading } = useLike(bookInfo);
@@ -48,23 +49,21 @@ const LikeButton = ({
   const liked = data?.liked ?? false;
   const count = data?.liked_count ?? 0;
   return (
-    <>
-      <button
-        onClick={handleClick}
-        className={`flex items-center gap-1 px-2 py-1 rounded-full 
-              bg-black/50 backdrop-blur-sm text-white
-              transition-all duration-200 ease-out
-              hover:bg-black/70 ${clasName}`}
-        disabled={isLoading}
-      >
-        {liked ? (
+    <ButtonComponent
+      onClick={handleClick}
+      leftIcon={
+        liked ? (
           <FaHeart className="text-red-500 transition-colors duration-200 w-4 h-4" />
         ) : (
           <FaRegHeart className="text-gray-300 hover:text-red-400 transition duration-200 w-4 h-4" />
-        )}
-        <p>{count}</p>
-      </button>
-    </>
+        )
+      }
+      label={count}
+      disabled={isLoading}
+      className={`${style}  !bg-black/50 !backdrop-blur-sm text-white !rounded-full transition-all duration-200 ease-out hover:!bg-black/70`}
+      variant="ghost"
+      size="sm"
+    />
   );
 };
 

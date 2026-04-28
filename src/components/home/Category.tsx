@@ -12,8 +12,9 @@ import SearchBar from '../common/filters/SearchBar';
 import useHomeListUrlState from '@/hooks/url/useHomeListUrlState';
 import { SearchQueryType } from '@/types/searchBar.type';
 import SkeletonGrid from '../common/SkeletonGrid';
-import { useFetchLikes } from '@/hooks/useFetchLikes';
+import { useFetchLikes } from '@/hooks/like/useFetchLikes';
 import { useMemo } from 'react';
+import { useFetchBookmark } from '@/hooks/bookmark/useFetchBookmark';
 
 type PagedResult<T> = {
   items: T[];
@@ -116,6 +117,7 @@ const Category = () => {
   }, [list]);
 
   useFetchLikes(isbnList);
+  useFetchBookmark(isbnList);
 
   const totalResults = isSearching ? (searchData?.totalResults ?? 0) : (listData?.totalResults ?? 0);
   //패칭해온 총결과

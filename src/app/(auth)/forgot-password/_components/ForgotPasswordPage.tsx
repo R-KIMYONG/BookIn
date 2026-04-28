@@ -105,7 +105,7 @@ const ForgotPasswordPage = () => {
     }
 
     try {
-      await toastMutationPromise(resetPasswordMutation.mutateAsync(trimmed), '비밀번호 변경요청중...');
+      await toastMutationPromise(resetPasswordMutation.mutateAsync(trimmed), { pending: '비밀번호 변경요청중...' });
     } catch (error) {
       console.error(error);
       toast.error('요청 중 오류가 발생했습니다.');
@@ -118,7 +118,7 @@ const ForgotPasswordPage = () => {
     if (!retryEmail) return;
 
     try {
-      await toastMutationPromise(resetPasswordMutation.mutateAsync(retryEmail), '재요청 중...');
+      await toastMutationPromise(resetPasswordMutation.mutateAsync(retryEmail), { pending: '재요청 중...' });
     } catch (error) {
       console.error(error);
     }

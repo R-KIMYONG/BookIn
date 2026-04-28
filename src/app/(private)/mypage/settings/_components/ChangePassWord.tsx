@@ -94,10 +94,9 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
     }
 
     try {
-      await toastMutationPromise(
-        changePassWordMutation.mutateAsync(passwordForm.newPassword),
-        '비밀번호 업데이트중...'
-      );
+      await toastMutationPromise(changePassWordMutation.mutateAsync(passwordForm.newPassword), {
+        pending: '비밀번호 업데이트중...',
+      });
     } catch (error) {
       console.error(error);
     }
@@ -122,10 +121,9 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
     }
 
     try {
-      await toastMutationPromise(
-        checkPrevPassWordMutation.mutateAsync(passwordForm.prevPassword),
-        '현재 비밀번호 확인중...'
-      );
+      await toastMutationPromise(checkPrevPassWordMutation.mutateAsync(passwordForm.prevPassword), {
+        pending: '현재 비밀번호 확인중...',
+      });
       setCheckPrevPW('success');
     } catch (error) {
       console.error(error);
