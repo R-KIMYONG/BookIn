@@ -4,7 +4,8 @@ import Image from 'next/image';
 import CommentSection from './_components/CommentSection';
 import { AladinItem } from '@/types/MainDetail.type';
 import { createClient } from '@/utils/supabase/server';
-import DetailLikeContainer from './_components/DetailLikeContainer';
+import DetailActionsContainer from './_components/DetailActionsContainer';
+import DetailBookmarkTags from './_components/DetailBookmarkTags';
 const getCheapest = (items: { price: number; link: string }[]) => {
   if (items.length === 0) return null;
   return items.sort((a, b) => a.price - b.price)[0];
@@ -15,18 +16,28 @@ const getDiscountRate = (base: number, target: number) => {
   return Math.round(((base - target) / base) * 100);
 };
 
-const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
+const MainDetail = async ({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ commentPage?: string }>;
+}) => {
   const supabase = await createClient();
   const { id } = await params;
+  const { commentPage } = await searchParams;
+  const page = Math.max(1, Number(commentPage ?? 1) || 1);
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const userId = user?.id ?? null;
   const data = await getAladinDetail(id);
   const item: AladinItem = data?.item?.[0];
   if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
-
   const { data: existing } = await supabase.from('books').select('id').eq('isbn13', id).maybeSingle();
 
   let bookId: string;
-
   if (existing) {
     bookId = existing.id;
   } else {
@@ -138,9 +149,11 @@ const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 {rating > 0 && <span>평점 {rating}</span>}
                 {salesPoint > 0 && <span>판매량 {salesPoint.toLocaleString()}</span>}
-                <DetailLikeContainer bookInfo={bookInfo} />
+                <DetailActionsContainer bookInfo={bookInfo} />
               </div>
-
+              <div>
+                <DetailBookmarkTags isbn13={bookInfo?.isbn13} userId={userId} />
+              </div>
               <div className="rounded-xl border px-4 py-4 space-y-3">
                 {/* 정가 */}
                 {hasSale && (
@@ -203,7 +216,7 @@ const MainDetail = async ({ params }: { params: Promise<{ id: string }> }) => {
 
         {/* 댓글부분 */}
         <div className="mt-8">
-          <CommentSection bookId={bookId} />
+          <CommentSection bookId={bookId} page={page} userId={userId} />
         </div>
       </div>
     </>

@@ -11,8 +11,6 @@ const SessionModalContainer = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    // if (modal?.type === 'expired') return;
-
     const raw = sessionStorage.getItem(STORAGE_KEY);
 
     if (!raw) return;

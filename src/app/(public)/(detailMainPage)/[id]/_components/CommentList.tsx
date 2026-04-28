@@ -14,9 +14,17 @@ import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
 import { getCommentsClient } from '@/app/lib/comment/getCommentsClient';
 import { useClientPagination } from '@/hooks/url/useClientPagination';
 
-const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editingId, bookId }: CommentListProps) => {
+const CommentList = ({
+  isEdit,
+  userId,
+  handleStartEdit,
+  handleCancelEdit,
+  editingId,
+  bookId,
+  initialPage,
+}: CommentListProps) => {
   const { remove } = useCommentMutation(bookId, userId);
-  const { page, setPage } = useClientPagination();
+  const { page, setPage } = useClientPagination({ paramKey: 'commentPage', defaultPage: initialPage });
   const [isOpen, setIsOpen] = useState(false);
 
   const onOpen = () => setIsOpen(true);
@@ -40,7 +48,7 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
 
   const handleDelete = async (id: string) => {
     try {
-      await toastMutationPromise(remove.mutateAsync(id), '댓글 삭제중...');
+      await toastMutationPromise(remove.mutateAsync(id), { pending: '댓글 삭제중...' });
       onClose();
       setTargetDeleteId(null);
     } catch (error) {
@@ -124,14 +132,12 @@ const CommentList = ({ isEdit, userId, handleStartEdit, handleCancelEdit, editin
                     ) : null}
                   </div>
 
-                
                   <div
                     className="mt-2 text-sm leading-7 text-gray-800 break-words
                      prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{ __html: content || '' }}
                   />
 
-                
                   {isEdit && editingId === id && <p className="mt-2 text-xs text-[#AF5858] font-semibold">수정 중…</p>}
                 </li>
               );

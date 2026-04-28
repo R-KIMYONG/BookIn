@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import UserInfoSection from './_components/MypageContainer';
+import MypageContainer from './_components/MypageContainer';
 
 export const metadata: Metadata = {
   title: '마이페이지',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
 };
 const ProfilePage = () => {
-  return <UserInfoSection />;
+  return <MypageContainer />;
 };
 
 export default ProfilePage;

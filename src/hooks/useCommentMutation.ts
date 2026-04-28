@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type SubmitItem = Pick<Tables<'comments'>, 'user_id' | 'content' | 'book_id' | 'updated_at'>;
 type UpdateSubmitItem = SubmitItem & Pick<Tables<'comments'>, 'id'>;
-export const useCommentMutation = (bookId: string, userId?: string) => {
+export const useCommentMutation = (bookId: string, userId?: string | null) => {
   const queryClient = useQueryClient();
 
   const invalidate = () => {

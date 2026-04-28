@@ -2,6 +2,7 @@ import { Item } from '@/types/book.type';
 import Image from 'next/image';
 import { FaStar } from 'react-icons/fa';
 import LikeButton from '../book/LikeButton';
+import BookmarkButton from '../book/BookmarkButton';
 type CategoryItemProps = {
   item: Item;
   disabled?: boolean;
@@ -22,15 +23,27 @@ const CategoryItem = ({ item, disabled }: CategoryItemProps) => {
           className="object-cover"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 200px"
         />
-        <LikeButton
-          bookInfo={{
-            isbn13: item.isbn13,
-            title: item.title,
-            cover: item.cover,
-            author: item.author,
-          }}
-          clasName="absolute bottom-2 left-2 z-20 flex gap-1 items-center text-xs text-white"
-        />
+
+        <div className="absolute bottom-2 z-20 flex gap-1 items-center text-xs text-white justify-between w-full px-4">
+          <LikeButton
+            bookInfo={{
+              isbn13: item.isbn13,
+              title: item.title,
+              cover: item.cover,
+              author: item.author,
+            }}
+          />
+
+          <BookmarkButton
+            bookInfo={{
+              isbn13: item.isbn13,
+              title: item.title,
+              cover: item.cover,
+              author: item.author,
+            }}
+            scope="home"
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
       </div>
 

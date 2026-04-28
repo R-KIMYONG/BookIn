@@ -3,11 +3,12 @@ import { Tables } from './supabase';
 
 export type CommentListProps = {
   isEdit: boolean;
-  userId: string | undefined;
+  userId: string | null;
   handleStartEdit: (comment: Tables<'comments'>) => void;
   handleCancelEdit: () => void;
   editingId: string | null;
   bookId: string;
+  initialPage: number;
 };
 
 export type CommentWithUser = Tables<'comments'> & {

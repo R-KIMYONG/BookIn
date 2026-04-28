@@ -56,7 +56,7 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
     }
 
     try {
-      await toastMutationPromise(changeNickNameMutation.mutateAsync(nextNickname), '닉네임 변경중...');
+      await toastMutationPromise(changeNickNameMutation.mutateAsync(nextNickname), { pending: '닉네임 변경중...' });
     } catch (error) {
       console.error(error);
     }

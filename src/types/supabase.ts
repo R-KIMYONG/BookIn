@@ -52,12 +52,84 @@ export type Database = {
           },
         ]
       }
+      bookmark_tag_links: {
+        Row: {
+          bookmark_id: string
+          created_at: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          bookmark_id: string
+          created_at?: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          bookmark_id?: string
+          created_at?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmark_tag_links_bookmark_id_fkey"
+            columns: ["bookmark_id"]
+            isOneToOne: false
+            referencedRelation: "bookmarks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookmark_tag_links_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "bookmark_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookmark_tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmark_tags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookmarks: {
         Row: {
           book_id: string
           created_at: string
           id: string
           isbn13: string
+          memo: string | null
           user_id: string
         }
         Insert: {
@@ -65,6 +137,7 @@ export type Database = {
           created_at?: string
           id?: string
           isbn13: string
+          memo?: string | null
           user_id: string
         }
         Update: {
@@ -72,6 +145,7 @@ export type Database = {
           created_at?: string
           id?: string
           isbn13?: string
+          memo?: string | null
           user_id?: string
         }
         Relationships: [

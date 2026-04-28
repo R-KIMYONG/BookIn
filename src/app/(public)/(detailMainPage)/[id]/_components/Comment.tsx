@@ -12,9 +12,17 @@ const CommentForm = dynamic(() => import('./CommentForm'), {
   ssr: false,
 });
 type Mode = 'create' | 'edit';
-const Comment = ({ bookId }: { bookId: string;}) => {
+const Comment = ({
+  bookId,
+  initialUserId,
+  initialPage,
+}: {
+  bookId: string;
+  initialPage: number;
+  initialUserId: string | null;
+}) => {
   const [mode, setMode] = useState<Mode>('create');
-  const { data: user } = useUser();
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const router = useRouter();
   const currentUrl = useCurrentUrl();
@@ -63,21 +71,22 @@ const Comment = ({ bookId }: { bookId: string;}) => {
     <div className="container mx-auto p-4">
       <CommentList
         isEdit={mode === 'edit'}
-        userId={user?.id}
+        userId={initialUserId}
         handleStartEdit={handleStartEdit}
         handleCancelEdit={handleCancelEdit}
         editingId={editingId}
         bookId={bookId}
+        initialPage={initialPage}
       />
 
       <div ref={formRef}>
-        {user ? (
+        {initialUserId ? (
           <CommentForm
             isEdit={mode === 'edit'}
             targetValue={targetValue}
             setTargetValue={setTargetValue}
             handleCancelEdit={handleCancelEdit}
-            userId={user?.id}
+            userId={initialUserId}
             bookId={bookId}
           />
         ) : (

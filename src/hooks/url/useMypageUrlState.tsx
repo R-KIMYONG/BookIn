@@ -35,10 +35,12 @@ const useMypageUrlState = () => {
     tab?: MyBooksTabType;
     page?: number | null;
     modal?: MypageModalType;
+
   }) => {
     const nextSection = next.section ?? mypageSection;
     const nextTab = next.tab ?? tab;
     const nextPage = next.page ?? 1;
+
 
     setParams({
       section: nextSection,

@@ -13,7 +13,7 @@ import EmptyState from '@/components/common/EmptyState';
 import QueryTypeTabs from '@/components/common/filters/QueryTypeTabs';
 import { useRouter } from 'next/navigation';
 import { CategoryPageProps } from '@/types/categoryPage.type';
-import { useFetchLikes } from '@/hooks/useFetchLikes';
+import { useFetchLikes } from '@/hooks/like/useFetchLikes';
 
 const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: CategoryPageProps) => {
   const categoryIdNum = Number(params.categoryId);
