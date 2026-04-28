@@ -1,28 +1,20 @@
 import { getUserInfoServer } from '@/app/lib/auth/getUserInfoServer';
-import { createClient } from '@/utils/supabase/server';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import MypageSettings from './MypageSettings';
+import { redirect } from 'next/navigation';
 
 const MypageSettingsSection = async () => {
   const queryClient = new QueryClient();
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error) throw new Error(error.message);
-
-  if (!user) throw new Error('로그인 사용자 정보가 없습니다.');
+  const userInfo = await getUserInfoServer();
+  if (!userInfo) redirect('/login');
 
   await queryClient.prefetchQuery({
-    queryKey: ['userInfo', user.id],
-    queryFn: () => getUserInfoServer(),
+    queryKey: ['userInfo', userInfo.id],
+    queryFn: () => userInfo,
   });
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <MypageSettings userId={user.id} />
+      <MypageSettings userId={userInfo.id} />
     </HydrationBoundary>
   );
 };

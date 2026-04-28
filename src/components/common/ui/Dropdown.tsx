@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import ButtonComponent from './ButtonComponent';
+import { ButtonVariant } from '@/types/button.type';
 
 export type DropdownItem<T> =
   | { type: 'action'; label: string; value: T; renderType?: 'list' | 'button' }
@@ -12,11 +13,12 @@ type DropdownProps<T> = {
   items: DropdownItem<T>[];
   onSelect: (value: T) => void;
   align?: 'left' | 'right';
+  variant?: ButtonVariant;
 };
 
-const Dropdown = <T,>({ trigger, items, onSelect, align }: DropdownProps<T>) => {
+const Dropdown = <T,>({ trigger, items, onSelect, align, variant = 'primary' }: DropdownProps<T>) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
   const positionClass = (align ?? 'left') === 'right' ? 'right-0' : 'left-0';
 
@@ -63,7 +65,7 @@ const Dropdown = <T,>({ trigger, items, onSelect, align }: DropdownProps<T>) => 
       onMouseLeave={isDesktop ? handleLeave : undefined}
     >
       {/* 트리거메뉴 */}
-      <ButtonComponent type="button" size="xs" variant="primary" className="text-white" onClick={handleClick}>
+      <ButtonComponent type="button" size="xs" variant={variant} className="text-white" onClick={handleClick}>
         {trigger}
       </ButtonComponent>
 
@@ -84,8 +86,7 @@ const Dropdown = <T,>({ trigger, items, onSelect, align }: DropdownProps<T>) => 
             ring-1 
             ring-black/5
             z-50 
-            group-hover:pointer-events-auto
-            pointer-events-none 
+            pointer-events-auto 
             overscroll-contain 
             flex flex-col gap-1`}
         >

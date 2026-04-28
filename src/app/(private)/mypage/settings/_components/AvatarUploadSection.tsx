@@ -60,7 +60,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
         return;
       }
       try {
-        await toastMutationPromise(updateAvatarImgMutation.mutateAsync(file), '아바타 업로드 중...');
+        await toastMutationPromise(updateAvatarImgMutation.mutateAsync(file), { pending: '아바타 업로드 중...' });
       } catch (error) {
         console.error(error);
       }

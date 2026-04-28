@@ -104,7 +104,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     }
 
     try {
-      await toastMutationPromise(changeUserEmailMutation.mutateAsync(newEmail), '이메일변경 요청중...');
+      await toastMutationPromise(changeUserEmailMutation.mutateAsync(newEmail), { pending: '이메일변경 요청중...' });
     } catch (error) {
       console.error(error);
     }
@@ -137,7 +137,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
   //인증 대기 취소
   const handleCancelPending = async () => {
     try {
-      await toastMutationPromise(clearPendingEmailMutation.mutateAsync(), '인증 대기 취소중...');
+      await toastMutationPromise(clearPendingEmailMutation.mutateAsync(), { pending: '인증 대기 취소중...' });
     } catch (error) {
       console.error(error);
     }
@@ -147,7 +147,9 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
   const handleRetry = async () => {
     if (!pendingData?.pendingEmail) return;
     try {
-      await toastMutationPromise(changeUserEmailMutation.mutateAsync(pendingData.pendingEmail), '재요청중...');
+      await toastMutationPromise(changeUserEmailMutation.mutateAsync(pendingData.pendingEmail), {
+        pending: '재요청중...',
+      });
     } catch (error) {
       console.error(error);
     }

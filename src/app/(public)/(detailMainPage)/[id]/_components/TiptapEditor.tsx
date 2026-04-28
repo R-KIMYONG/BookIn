@@ -4,17 +4,27 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useRef } from 'react';
 import Placeholder from '@tiptap/extension-placeholder';
-import { MAX_LENGTH } from './CommentForm';
 import { toast } from 'react-toastify';
 import type { Editor } from '@tiptap/react';
 import type { EditorView } from 'prosemirror-view';
 type TiptapEditorProps = {
   value: string;
+  placeholder?: string;
+  maxLength: number;
+  maxLines: number;
   onChange: (html: string, textLength: number) => void;
   onReady?: (editor: Editor) => void;
+  onSubmitShortcut?: () => void;
 };
-const MAX_LINES = 6;
-const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
+const TiptapEditor = ({
+  value,
+  onChange,
+  onReady,
+  placeholder,
+  maxLines,
+  maxLength,
+  onSubmitShortcut,
+}: TiptapEditorProps) => {
   const valueRef = useRef(value);
   const getLengthFromEditor = (editor: Editor) => editor.getText().replace(/\n/g, '').length;
 
@@ -43,7 +53,7 @@ const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
           },
         },
       }),
-      Placeholder.configure({ placeholder: '댓글을 입력하세요.', emptyEditorClass: 'is-editor-empty' }),
+      Placeholder.configure({ placeholder: placeholder ?? '내용을 입력하세요.', emptyEditorClass: 'is-editor-empty' }),
     ],
     editorProps: {
       handleKeyDown(view, event) {
@@ -61,6 +71,11 @@ const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
             return true;
           }
 
+          if (onSubmitShortcut) {
+            onSubmitShortcut();
+            return true;
+          }
+
           const form = view.dom.closest('form');
           form?.requestSubmit();
 
@@ -69,15 +84,15 @@ const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
         if (event.metaKey || event.ctrlKey) return false;
 
         // 줄 제한
-        if (event.key === 'Enter' && lines >= MAX_LINES) {
-          toast.error(`최대 ${MAX_LINES}줄까지 입력 가능합니다`, {
+        if (event.key === 'Enter' && lines >= maxLines) {
+          toast.error(`최대 ${maxLines}줄까지 입력 가능합니다`, {
             toastId: 'line-limit',
           });
           event.preventDefault();
           return true;
         }
         //글자수 제한
-        if (length >= MAX_LENGTH && !allowedKeys.includes(event.key)) {
+        if (length >= maxLength && !allowedKeys.includes(event.key)) {
           event.preventDefault();
           return true;
         }
@@ -89,9 +104,9 @@ const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
 
         const replacedLength = to - from;
         const nextLength = current - replacedLength + text.length;
-        if (nextLength > MAX_LENGTH) {
+        if (nextLength > maxLength) {
           if (!toast.isActive('typing-limit')) {
-            toast.error('최대 200자까지 입력 가능합니다', { toastId: 'typing-limit' });
+            toast.error(`최대 ${maxLength}자까지 입력 가능합니다`, { toastId: 'typing-limit' });
           }
           return true;
         }
@@ -105,7 +120,7 @@ const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
         const currentLength = view.state.doc.textContent.replace(/\n/g, '').length;
         const pasteText = event.clipboardData?.getData('text') || '';
 
-        if (currentLines + pasteLines - 1 > MAX_LINES || currentLength + pasteText.length > MAX_LENGTH) {
+        if (currentLines + pasteLines - 1 > maxLines || currentLength + pasteText.length > maxLength) {
           toast.error('입력 제한을 초과하여 붙여넣을 수 없습니다', { toastId: 'paste' });
           event.preventDefault();
           return true;
@@ -118,8 +133,8 @@ const TiptapEditor = ({ value, onChange, onReady }: TiptapEditorProps) => {
     content: value,
     onUpdate: ({ editor }) => {
       const length = getLengthFromEditor(editor);
-      if (length > MAX_LENGTH) {
-        toast.error('최대 200자까지 입력 가능합니다', { toastId: 'limit' });
+      if (length > maxLength) {
+        toast.error(`최대 ${maxLength}자까지 입력 가능합니다`, { toastId: 'limit' });
         return;
       }
 

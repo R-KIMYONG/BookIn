@@ -119,7 +119,7 @@ const ResetPasswordPage = () => {
     }
 
     try {
-      await toastMutationPromise(changePassWordMutation.mutateAsync(newPassword), '비밀번호 재설중...');
+      await toastMutationPromise(changePassWordMutation.mutateAsync(newPassword), { pending: '비밀번호 재설중...' });
     } catch (error) {
       console.error(error);
     }
@@ -129,7 +129,7 @@ const ResetPasswordPage = () => {
     if (!token) return;
 
     try {
-      await toastMutationPromise(cancelMutation.mutateAsync(), '요청 취소 중...');
+      await toastMutationPromise(cancelMutation.mutateAsync(), { pending: '요청 취소 중...' });
     } catch (error) {
       console.error(error);
     }

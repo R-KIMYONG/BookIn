@@ -12,22 +12,16 @@ type Modal =
 
 type State = {
   modal: Modal | null;
-
   openSoon: (onExtend: () => void) => void;
-
   openExpired: (redirectTo: string) => void;
-
   close: () => void;
 };
 
 export const useSessionModal = create<State>((set, get) => ({
   modal: null,
-
   openSoon: (onExtend) => {
     const current = get().modal;
-
     if (current?.type === 'expired') return;
-
     set({
       modal: {
         type: 'soon',
@@ -35,7 +29,6 @@ export const useSessionModal = create<State>((set, get) => ({
       },
     });
   },
-
   openExpired: (redirectTo) =>
     set({
       modal: {

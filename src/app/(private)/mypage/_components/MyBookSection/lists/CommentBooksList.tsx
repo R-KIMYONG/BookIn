@@ -11,31 +11,33 @@ const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
       {data.map((book, index) => {
         const isAboveFold = index < 5;
         const date = dayjs(book.last_commented_at).locale('ko').format('YYYY-MM-DD HH:mm');
+
         return (
           <li key={book.book_id}>
             <Link href={`/${book.isbn13}`}>
-              <div className="h-40 relative overflow-hidden rounded-md">
+              <div className="h-60 relative overflow-hidden rounded-md">
                 <Image
                   src={book.cover}
                   alt={book.title}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 44vw, 200px"
                   priority={isAboveFold}
                 />
 
                 <div className="absolute inset-0 bg-black/40" />
 
-                <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <p className="font-bold line-clamp-1 text-xs">{book.title}</p>
-
-                  <div className="flex flex-col justify-between text-xs mt-1">
-                    <span>댓글 {book.comment_count}개</span>
-                    <span>{book.last_commented_at ? date : ''}</span>
-                  </div>
-                </div>
+                {/* <div className="absolute bottom-3 left-3 right-3 text-white"></div> */}
               </div>
             </Link>
+            <div className="mt-2 h-14 px-2 text-xs">
+              <p className="font-bold line-clamp-1 ">{book.title}</p>
+
+              <div className="flex justify-between mt-1">
+                <span>{book.last_commented_at ? date : ''}</span>
+                <span>댓글 {book.comment_count}개</span>
+              </div>
+            </div>
           </li>
         );
       })}
