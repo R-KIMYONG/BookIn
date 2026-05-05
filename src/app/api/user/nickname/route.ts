@@ -1,4 +1,4 @@
-import { MAX_LENGTH_NICKNME } from '@/app/(private)/mypage/settings/_components/ChangeUserNickName';
+import { MAX_LENGTH_NICKNME } from '@/constants/user';
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 

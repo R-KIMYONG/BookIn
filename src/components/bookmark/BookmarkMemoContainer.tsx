@@ -22,8 +22,6 @@ const BookmarkMemoContainer = () => {
   const queryClient = useQueryClient();
   const { isOpen, isbn, close } = useBookmarkMemoUrlState();
   const { data: user, isLoading: userLoading } = useUser();
-  // const user = queryClient.getQueryData(['user']);
-  // console.log(user?.id);
   const bookKey = (isbn ?? '').trim();
   const userId = user?.id ?? '';
 
@@ -73,18 +71,12 @@ const BookmarkMemoContainer = () => {
       });
       toast.dismiss(`bookmark-memo-suggest-${bookKey}`);
       if (userId) {
-        queryClient.invalidateQueries({
-          predicate: (q) =>
-            Array.isArray(q.queryKey) &&
-            q.queryKey[0] === 'myBooks' &&
-            q.queryKey[1] === 'bookmark' &&
-            q.queryKey[2] === userId,
-        });
+        queryClient.invalidateQueries({ queryKey: ['myBooks'] });
+        queryClient.invalidateQueries({ queryKey: ['userTags', userId] });
       }
-
       queryClient.removeQueries({ queryKey: ['bookmarkMemo', userId, bookKey] });
       queryClient.invalidateQueries({ queryKey: ['detailBookmarkTags', userId, bookKey] });
-      queryClient.invalidateQueries({ queryKey: ['bookmarkFetch', bookKey] });
+      queryClient.invalidateQueries({ queryKey: ['bookmarkFetch'] });
     },
   });
 

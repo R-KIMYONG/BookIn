@@ -1,22 +1,22 @@
-import Link from 'next/link';
+import ButtonComponent from './ui/ButtonComponent';
 
 type ErrorStateProps = {
-  message?: string;
+  title?: string;
+  description?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 };
 
-const ErrorState = ({ message = '데이터를 불러오는 중 오류가 발생했습니다.' }: ErrorStateProps) => {
+const ErrorState = ({ title = '문제가 발생했습니다.', description, action }: ErrorStateProps) => {
   return (
-    <div className="flex justify-center items-center min-h-full">
-      <div className="text-center">
-        <p>{message}</p>
-
-        <Link
-          href="/"
-          className="mt-4 inline-flex items-center justify-center bg-[#af5858] text-white w-[80px] h-[30px] rounded-full text-xs font-bold hover:bg-opacity-80 transition"
-        >
-          홈으로
-        </Link>
-      </div>
+    <div className="text-center">
+      <p className="font-semibold text-gray-900">{title}</p>
+      {description && <p className="text-sm text-gray-500 mt-2">{description}</p>}
+      {action && (
+        <ButtonComponent onClick={action.onClick} className="mt-4" size="sm" variant="primary" label={action.label} />
+      )}
     </div>
   );
 };

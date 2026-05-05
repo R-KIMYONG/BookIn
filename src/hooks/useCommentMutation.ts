@@ -10,7 +10,7 @@ export const useCommentMutation = (bookId: string, userId?: string | null) => {
     queryClient.invalidateQueries({ queryKey: ['comments', bookId] });
     if (userId) {
       queryClient.invalidateQueries({ queryKey: ['commentsByBook', userId] });
-      queryClient.invalidateQueries({ queryKey: ['myComments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['myBooks'] });
     }
   };
 

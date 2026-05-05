@@ -2,11 +2,12 @@
 
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import { MAX_LENGTH_NICKNME } from '@/constants/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 
-export const MAX_LENGTH_NICKNME = 10;
+
 const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): ReactElement => {
   const [draftNickname, setDraftNickname] = useState<string>(nickname);
   const queryClient = useQueryClient();
