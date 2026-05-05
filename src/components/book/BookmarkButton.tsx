@@ -47,12 +47,16 @@ const BookmarkButton = ({
       return;
     }
 
-    const isAddingBookmark = !bookmarked;
     lockRef.current = true;
     toggle(bookmarked, {
-      onSuccess: () => {
-        if (!isAddingBookmark) return;
+      onSuccess: (result) => {
+        const toastId = `bookmark-memo-suggest-${bookInfo.isbn13}`;
+        if (!result.bookmarked) {
+          toast.dismiss(toastId);
+          return;
+        }
         if (scope !== 'home') return;
+
         toast.info(
           ({ closeToast }) => (
             <div className="flex items-center justify-between gap-3">
@@ -77,7 +81,7 @@ const BookmarkButton = ({
             </div>
           ),
 
-          { toastId: `bookmark-memo-suggest-${bookInfo.isbn13}`, autoClose: 5000, closeButton: true }
+          { toastId, autoClose: 5000, closeButton: true }
         );
       },
       onSettled: () => {

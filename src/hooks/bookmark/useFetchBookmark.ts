@@ -22,7 +22,15 @@ export const useFetchBookmark = (isbnList: string[]) => {
     if (!data) return;
 
     data.forEach((server) => {
-      queryClient.setQueryData(['bookmark', server.isbn13], server);
+      queryClient.setQueryData(['bookmark', server.isbn13], (old: BookmarkCache) => {
+        if (!old) return server;
+
+        if (old.bookmarked !== server.bookmarked) {
+          return old;
+        }
+
+        return server;
+      });
     });
   }, [data, queryClient]);
 

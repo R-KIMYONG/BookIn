@@ -17,7 +17,7 @@ const Header = async () => {
 
   const isLoggedIn = !!user;
   return (
-    <header className="w-full bg-main sticky top-0 z-20 backdrop-blur">
+    <header className="w-full bg-main sticky top-0 z-50 backdrop-blur">
       {/* 데스크탑버전에서 보이는 버전 */}
       <div className="border-b border-white/10">
         <nav className="relative flex h-12 items-center px-4 md:px-10">

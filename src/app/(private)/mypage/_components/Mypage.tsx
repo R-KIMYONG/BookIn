@@ -1,12 +1,21 @@
 'use client';
 import { MypageUserInfo } from '@/types/userInfo.type';
-import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 import { ReactElement } from 'react';
 import MypageSidebar from './MypageSidebar/MypageSidebar';
 import MyBooksSection from './MyBookSection/MyBooksSection';
+import { useMypageQueryState } from '@/hooks/useMypageQueryState';
 
 const Mypage = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement => {
-  const { mypageSection } = useMypageUrlState();
+  const { query } = useMypageQueryState();
+
+  const renderSection = () => {
+    switch (query.section) {
+      case 'myBooks':
+        return <MyBooksSection userInfo={userInfo} />;
+      case 'recommend':
+        return <div className="mx-auto w-1/2 text-center py-10">서비스 준비중...</div>;
+    }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-2 overflow-x-hidden">
@@ -19,7 +28,8 @@ const Mypage = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement => {
 
           {/* 본문(내 활동 책) */}
           <section className="overflow-hidden shadow-sm">
-            {mypageSection === 'myBooks' && <MyBooksSection userInfo={userInfo} />}
+            {/* {query.section === 'myBooks' && <MyBooksSection userInfo={userInfo} />} */}
+            {renderSection()}
           </section>
         </div>
       </div>

@@ -68,13 +68,7 @@ export const useLike = (bookInfo: { isbn13: string; title: string; cover: string
     },
     onSettled: () => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({
-        predicate: (q) =>
-          Array.isArray(q.queryKey) &&
-          q.queryKey[0] === 'myBooks' &&
-          q.queryKey[1] === 'like' &&
-          q.queryKey[2] === user.id,
-      });
+      queryClient.invalidateQueries({ queryKey: ['myBooks'] });
     },
   });
 

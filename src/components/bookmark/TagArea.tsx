@@ -30,7 +30,7 @@ const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => 
 
   if (tagNames.length === 0) return null;
   return (
-    <div className="mt-2 px-2">
+    <div className="relative ">
       <div ref={wrapRef} className={shouldClamp ? 'p-1 max-h-8 overflow-hidden' : ''}>
         <div className="flex flex-wrap gap-1.5">
           {tagNames.map((tag) => (
@@ -46,12 +46,15 @@ const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => 
       </div>
 
       {!isDetail && isOverflow && onMore && (
-        <ButtonComponent type="button" onClick={onMore} size="xs" variant="ghost" className="text-[10px] text-gray-500">
-          <div className="flex">
-            <FiPlus className="h-3 w-3 " />
-            <p>더보기</p>
-          </div>
-        </ButtonComponent>
+        <ButtonComponent
+          type="button"
+          onClick={onMore}
+          size="xs"
+          variant="ghost"
+          className="absolute -bottom-0 lg:-bottom-7 left-0 text-[10px] text-gray-500 hover:!bg-gray-50"
+          leftIcon={<FiPlus className="h-3 w-3 " />}
+          label="더보기"
+        />
       )}
     </div>
   );

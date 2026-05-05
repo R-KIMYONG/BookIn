@@ -1,9 +1,8 @@
 import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 import { MyBooksTabType } from '@/types/useMypageUrlState.type';
 
 const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: MyBooksTabType) => void }) => {
-  const { setMypageUrl } = useMypageUrlState();
+
   const myBooksTabs: { label: string; value: MyBooksTabType }[] = [
     { label: '좋아요', value: 'like' },
     { label: '북마크', value: 'bookmark' },
@@ -21,7 +20,6 @@ const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: M
             onClick={() => {
               if (tab !== t.value) {
                 onChange(t.value);
-                setMypageUrl({ tab: t.value, page: 1 });
               }
             }}
             variant={isActive ? 'primary' : 'secondary'}

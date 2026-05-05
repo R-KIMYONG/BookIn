@@ -38,7 +38,7 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
         const memoExists = hasMemo(book.memo);
         const date = dayjs(book.created_at).locale('ko').format('YYYY-MM-DD HH:mm');
         const bookInfo = { isbn13: book.isbn13, cover: book.cover, title: book.title, author: book.author };
-        
+
         const tagNames = (book.tags ?? [])
           .map((tag) => {
             return {
@@ -68,7 +68,7 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
                   <p className="font-bold line-clamp-1 text-xs">{book.title}</p>
 
                   <div className="flex flex-col justify-between text-xs mt-1">
-                    <span>{book.created_at ? date : ''}</span>
+                    <span className="mb-2">{book.created_at ? date : ''}</span>
 
                     <ButtonComponent
                       type="button"
@@ -91,7 +91,18 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
                 </div>
               </div>
             </Link>
-            <TagArea tagNames={tagNames} onMore={() => open(book.isbn13, 'mypage')} scope={'mypage'}/>
+            <div className="mt-2 h-16 lg:h-10 text-xs flex">
+              {tagNames.length > 0 ? (
+                <TagArea tagNames={tagNames} onMore={() => open(book.isbn13, 'mypage')} scope="mypage" />
+              ) : (
+                <span
+                  className="text-gray-400 cursor-pointer hover:text-gray-500"
+                  onClick={() => open(book.isbn13, 'mypage')}
+                >
+                  태그를 추가해보세요
+                </span>
+              )}
+            </div>
           </li>
         );
       })}

@@ -39,7 +39,6 @@ export const useBookmark = (bookInfo: { isbn13: string; title: string; cover: st
       });
 
       const result = await res.json();
-      console.log(result);
       if (!res.ok) {
         console.error('[bookmark][api-failed]', {
           requestId,
@@ -81,6 +80,8 @@ export const useBookmark = (bookInfo: { isbn13: string; title: string; cover: st
     },
     onSuccess: (fresh: BookmarkCache) => {
       queryClient.setQueryData(queryKey, fresh);
+
+      queryClient.invalidateQueries({ queryKey: ['bookmarkFetch'] });
     },
     onError: (_err, _vars, context) => {
       console.error('[bookmark][mutation-error]', { _err, context });
@@ -90,16 +91,10 @@ export const useBookmark = (bookInfo: { isbn13: string; title: string; cover: st
     },
     onSettled: () => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({
-        predicate: (q) =>
-          Array.isArray(q.queryKey) &&
-          q.queryKey[0] === 'myBooks' &&
-          q.queryKey[1] === 'bookmark' &&
-          q.queryKey[2] === user.id,
-      });
+      queryClient.invalidateQueries({ queryKey: ['myBooks'] });
       queryClient.removeQueries({ queryKey: ['bookmarkMemo', user.id, isbn13] });
       queryClient.invalidateQueries({ queryKey: ['detailBookmarkTags', user.id, isbn13] });
-      queryClient.invalidateQueries({ queryKey: ['bookmark', isbn13] });
+      queryClient.invalidateQueries({ queryKey: queryKey });
     },
   });
 

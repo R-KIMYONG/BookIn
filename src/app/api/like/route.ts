@@ -50,7 +50,6 @@ export const POST = async (request: NextRequest) => {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const { data: book, error: bookError } = await supabase
     .from('books')
     .upsert(
