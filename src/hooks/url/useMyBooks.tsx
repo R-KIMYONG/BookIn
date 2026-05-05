@@ -1,7 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/utils/supabase/client';
 import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
-import { BookmarkFilter, BookmarkSort, MyBooksTabType } from '@/types/useMypageUrlState.type';
+import {
+  FILTER_DEFAULT,
+  MyBooksFilter,
+  MyBooksSort,
+  MyBooksTabType,
+  SearchField,
+  SORT_DEFAULT,
+} from '@/types/useMypageUrlState.type';
 import { getCommentBooks } from '@/app/lib/mybooks/getCommentBooks';
 import { getLikeBooks } from '@/app/lib/mybooks/getLikeBooks';
 import { getBookmarkBooks } from '@/app/lib/mybooks/getBookmarkBooks';
@@ -16,21 +23,51 @@ export const useMyBooks = (
   tab: MyBooksTabType,
   userId: string,
   page: number,
-  sort?: BookmarkSort,
-  memoFilter?: BookmarkFilter
+  sort?: MyBooksSort,
+  memoFilter?: MyBooksFilter,
+  search?: string,
+  searchField?: SearchField,
+  tagId?: string
 ) => {
   const supabase = createClient();
-  const bookmarkSortKey = tab === 'bookmark' ? (sort ?? 'created_desc') : undefined;
-  const bookmarkFilterKey = tab === 'bookmark' ? memoFilter : null;
+
   const query = useQuery<MyBooksQueryResult>({
-    queryKey: ['myBooks', tab, userId, page, bookmarkSortKey, bookmarkFilterKey],
+    queryKey: [
+      'myBooks',
+      {
+        tab,
+        userId,
+        page,
+        sort: sort ?? SORT_DEFAULT,
+        filter: tab === 'bookmark' ? (memoFilter ?? FILTER_DEFAULT) : undefined,
+        search: search ?? '',
+        searchField,
+        tagSlug: tab === 'bookmark' ? tagId : undefined,
+      },
+    ],
     queryFn: async () => {
       if (tab === 'comment') {
-        const res = await getCommentBooks({ supabase, userId, page, pageSize: COMMENTS_PAGE_SIZE });
+        const res = await getCommentBooks({
+          supabase,
+          userId,
+          page,
+          pageSize: COMMENTS_PAGE_SIZE,
+          sort,
+          search,
+          searchField,
+        });
         return { tab: 'comment', ...res };
       }
       if (tab === 'like') {
-        const res = await getLikeBooks({ supabase, userId, page, pageSize: COMMENTS_PAGE_SIZE });
+        const res = await getLikeBooks({
+          supabase,
+          userId,
+          page,
+          pageSize: COMMENTS_PAGE_SIZE,
+          sort,
+          search,
+          searchField,
+        });
         return { tab: 'like', ...res };
       }
       const res = await getBookmarkBooks({
@@ -40,6 +77,9 @@ export const useMyBooks = (
         pageSize: COMMENTS_PAGE_SIZE,
         sort: sort ?? 'created_desc',
         memoFilter: memoFilter ?? 'all',
+        search,
+        searchField,
+        tagId,
       });
       return { tab: 'bookmark', ...res };
     },

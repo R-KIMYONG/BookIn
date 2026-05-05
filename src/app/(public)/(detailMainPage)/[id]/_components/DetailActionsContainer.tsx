@@ -16,7 +16,6 @@ const DetailActionsContainer = ({
   bookInfo: { title: string; cover: string; author: string; isbn13: string; isbn: string };
 }) => {
   const { open } = useBookmarkMemoUrlState();
-
   const bookKey = useMemo(() => {
     return bookInfo.isbn13?.trim() || bookInfo.isbn?.trim() || '';
   }, [bookInfo.isbn13, bookInfo.isbn]);
@@ -71,7 +70,7 @@ const DetailActionsContainer = ({
           }`}
           aria-label="북마크 메모 작성"
           leftIcon={<FiEdit3 className="h-3.5 w-3.5" />}
-          label={memoExists? '편집':'메모'}
+          label={memoExists ? '편집' : '메모'}
         />
       )}
     </div>

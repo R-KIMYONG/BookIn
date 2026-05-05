@@ -4,12 +4,12 @@ import ButtonComponent from '@/components/common/ui/ButtonComponent';
 import PasswordFields from '@/components/form/PasswordFields';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isValidPassword } from '@/app/lib/validation/isPassword';
-import useMypageUrlState from '@/hooks/url/useMypageUrlState';
 import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
+import { useMypageQueryState } from '@/hooks/useMypageQueryState';
 
 const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
-  const { modalType, setMypageUrl } = useMypageUrlState();
-  const isOpen = modalType === 'changePassword';
+  const { query, setQuery } = useMypageQueryState();
+  const isOpen = query.modal === 'changePassword';
   const queryClient = useQueryClient();
   const [checkPrevPW, setCheckPrevPW] = useState<'idle' | 'success' | 'error'>('idle');
 
@@ -29,11 +29,11 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
     passwordForm.newPassword.slice(0, passwordForm.confirmPassword.length) !== passwordForm.confirmPassword;
 
   const handleOpen = () => {
-    setMypageUrl({ modal: 'changePassword' });
+    setQuery({ modal: 'changePassword' });
   };
 
   const handleClose = () => {
-    setMypageUrl({ modal: null });
+    setQuery({ modal: null });
     setCheckPrevPW('idle');
     setPasswordForm({
       newPassword: '',

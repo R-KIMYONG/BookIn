@@ -17,6 +17,14 @@ const useUrlParams = () => {
     return Number.isFinite(num) && num >= 1 ? num : fallback;
   };
 
+  const getAllParams = () => {
+    const obj: Record<string, string | null> = {};
+    searchParams.forEach((value, key) => {
+      obj[key] = value;
+    });
+    return obj;
+  };
+
   const setParams = (
     next: Record<string, string | number | null | undefined>,
     options: SetOptions = { scroll: false, replace: false }
@@ -24,7 +32,8 @@ const useUrlParams = () => {
     const params = new URLSearchParams(searchParams.toString());
     const nextArray = Object.entries(next); // [ [page,2],[target,'Book'],[target,'ebook'] ]이런형태로 변경
 
-    for (const [key, value] of nextArray) {  // [key,value]는 nextArray중의 각요소를 뜻함 [page,2]  / [target,'Book']이렇게해서 아래 if문에 진입 
+    for (const [key, value] of nextArray) {
+      // [key,value]는 nextArray중의 각요소를 뜻함 [page,2]  / [target,'Book']이렇게해서 아래 if문에 진입
       if (value === null || value === undefined || value === '') params.delete(key);
       else params.set(key, String(value));
       //최종목적은 URL에 없으면 지우고 있으면 설정하는거임
@@ -35,7 +44,7 @@ const useUrlParams = () => {
     nav(url, { scroll: options.scroll ?? false });
   };
 
-  return { getParams, getOrDefault, getInt, setParams };
+  return { getParams, getOrDefault, getInt, setParams, getAllParams };
 };
 
 export default useUrlParams;

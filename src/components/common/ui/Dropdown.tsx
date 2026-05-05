@@ -85,7 +85,7 @@ const Dropdown = <T,>({ trigger, items, onSelect, align, variant = 'primary' }: 
             shadow-lg 
             ring-1 
             ring-black/5
-            z-50 
+            z-10 
             pointer-events-auto 
             overscroll-contain 
             flex flex-col gap-1`}
