@@ -1,22 +1,22 @@
-import { QT_LIST, QueryType } from '@/types/useListUrlState.type';
+import { DEFAULT_QT, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
 import useUrlParams from './useUrlParams';
-import { SEARCH_QT_LIST, SearchQueryType } from '@/types/searchBar.type';
+import { DEFAULT_SEARCH_QT, SEARCH_QT_LIST, SearchQueryType } from '@/shared/constants/search';
 
 const useHomeListUrlState = () => {
   const { getParams, getInt, setParams } = useUrlParams();
 
   const queryTypeParam = getParams('qt'); //현재 URL상 qt(queryType을 가져와라)
-  const page = getInt('page', 1); //현재 URL상 page를  가져오는데 없으면 1로 fallback
+  const page = getInt('page', 1);
   const searchKeyWord = (getParams('q') ?? '').trim(); //현재 URL상 검색키워드 가져와인데 없으면 빈칸 + 앞뒤 빈칸 지우기
 
-  const queryType: QueryType | null = QT_LIST.includes(queryTypeParam as QueryType)
+  const queryType: QueryType | null = QUERY_TYPE_LIST.includes(queryTypeParam as QueryType)
     ? (queryTypeParam as QueryType)
     : 'Bestseller';
 
   const sqParam = (getParams('sq') ?? '').trim();
   const searchQueryType: SearchQueryType = SEARCH_QT_LIST.includes(sqParam as SearchQueryType)
     ? (sqParam as SearchQueryType)
-    : 'Keyword';
+    : DEFAULT_SEARCH_QT;
 
   const setHomeUrl = (next: {
     queryType?: QueryType;
@@ -30,9 +30,10 @@ const useHomeListUrlState = () => {
     const prevSearchQuery = searchQueryType;
 
     //업데이트값
-    const nextQueryType = next.queryType === null ? 'Bestseller' : (next.queryType ?? prevQueryType);
+    const nextQueryType = next.queryType === null ? DEFAULT_QT : (next.queryType ?? prevQueryType);
     const nextSearchKeyWord = next.searchKeyWord === null ? '' : (next.searchKeyWord ?? prevSearchKeyWord).trim();
-    const nextSearchQuery = next.searchQueryType === null ? 'Keyword' : (next.searchQueryType ?? prevSearchQuery);
+    const nextSearchQuery =
+      next.searchQueryType === null ? DEFAULT_SEARCH_QT : (next.searchQueryType ?? prevSearchQuery);
 
     const qParam = nextSearchKeyWord ? nextSearchKeyWord : null;
 

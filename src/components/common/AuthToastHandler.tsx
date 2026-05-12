@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { AUTH_CODE, AUTH_FEEDBACK_TEXT } from '@/app/lib/auth/authActionFeedback';
+import { AUTH_CODE, AUTH_FEEDBACK_TEXT } from '@/shared/lib/auth/authActionFeedback';
 import { useQueryClient } from '@tanstack/react-query';
 
 const AuthToastHandler = () => {
@@ -13,8 +13,10 @@ const AuthToastHandler = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const error = searchParams.get('error');
-    const message = searchParams.get('message');
+    const params = new URLSearchParams(searchParams.toString());
+
+    const error = params.get('error');
+    const message = params.get('message');
 
     if (!error && !message) return;
 
@@ -34,11 +36,10 @@ const AuthToastHandler = () => {
       queryClient.removeQueries({ queryKey: ['userInfo'] });
       queryClient.removeQueries({ queryKey: ['pendingEmail'] });
     }
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete('error');
-    nextParams.delete('message');
+    params.delete('error');
+    params.delete('message');
 
-    const nextQuery = nextParams.toString();
+    const nextQuery = params.toString();
     const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
 
     router.replace(nextUrl, { scroll: false });

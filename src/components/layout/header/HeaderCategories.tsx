@@ -1,15 +1,10 @@
 'use client';
 
 import Dropdown from '@/components/common/ui/Dropdown';
-import { Genre } from '@/types/genre.type';
+import { Genre, GenresResult } from '@/shared/domain/category/types';
 import { useRouter } from 'next/navigation';
 
-type HeaderCategoriesProps = {
-  koGenres: Genre[];
-  foGenres: Genre[];
-  ebGenres: Genre[];
-};
-const HeaderCategories = ({ koGenres, foGenres, ebGenres }: HeaderCategoriesProps) => {
+const HeaderCategories = ({ koGenres, foGenres, ebGenres }: GenresResult) => {
   const router = useRouter();
 
   const groups: { key: string; label: string; items: Genre[] }[] = [

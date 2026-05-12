@@ -1,6 +1,7 @@
-import { getAladinItemList, MAX_RESULTS } from '@/app/lib/aladin/getAladinItemList';
-import { TARGET_LIST, TargetTypes } from '@/types/category.type';
-import { QT_LIST, QueryType } from '@/types/useListUrlState.type';
+import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
+import { getAladinItemList } from '@/shared/lib/aladin/getAladinItemList';
+
+import { MAX_RESULTS, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
   const rawTarget = (searchParams.get('target') ?? 'Book').trim();
   const target = TARGET_LIST.includes(rawTarget as TargetTypes) ? (rawTarget as TargetTypes) : 'Book';
   const rawQt = (searchParams.get('QueryType') ?? 'Bestseller').trim();
-  const queryType = QT_LIST.includes(rawQt as QueryType) ? (rawQt as QueryType) : 'Bestseller';
+  const queryType = QUERY_TYPE_LIST.includes(rawQt as QueryType) ? (rawQt as QueryType) : 'Bestseller';
 
   const categoryId = (searchParams.get('CategoryId') ?? '').trim() || undefined;
 

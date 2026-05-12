@@ -1,33 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useUser from '../useUser';
-export type LikeCache = {
-  isbn13: string;
-  liked: boolean;
-  liked_count: number;
-};
-export const useLike = (bookInfo: { isbn13: string; title: string; cover: string; author: string }) => {
+import useUser from '../auth/useUser';
+import { LikeCache } from '@/shared/domain/like/types';
+import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
+import { BookInfo } from '@/shared/types/bookInfo';
+import { toggleLike } from '@/shared/lib/like/toggleLike';
+import { likeKeys } from '@/shared/domain/like/queryKeys';
+export const useLike = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
-  const queryKey = ['like', bookInfo.isbn13];
+  const queryKey = likeKeys.detail(bookInfo.isbn13);
+
   const { data: user } = useUser();
 
   const mutation = useMutation({
-    mutationFn: async (liked: boolean) => {
-      const method = liked ? 'DELETE' : 'POST';
-
-      const res = await fetch('/api/like', {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookInfo),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) throw new Error(result.message ?? '좋아요 실패');
-
-      return result;
-    },
+    mutationFn: () => toggleLike({ bookInfo }),
 
     // optimistic update
     onMutate: async () => {
@@ -35,10 +20,10 @@ export const useLike = (bookInfo: { isbn13: string; title: string; cover: string
 
       const prev = queryClient.getQueryData<LikeCache>(queryKey);
 
-      const current = prev ?? {
+      const current: LikeCache = {
         isbn13: bookInfo.isbn13,
-        liked: false,
-        liked_count: 0,
+        liked: prev?.liked ?? false,
+        liked_count: prev?.liked_count ?? 0,
       };
 
       const next = {
@@ -52,14 +37,11 @@ export const useLike = (bookInfo: { isbn13: string; title: string; cover: string
       return { prev };
     },
     onSuccess: (fresh) => {
-      queryClient.setQueryData(queryKey, (old?: LikeCache) => {
-        if (!old) return fresh;
-
-        return {
-          ...old,
-          liked: fresh.liked,
-        };
-      });
+      queryClient.setQueryData(queryKey, (old?: LikeCache) => ({
+        isbn13: bookInfo.isbn13,
+        liked: fresh.liked,
+        liked_count: fresh.liked_count ?? old?.liked_count ?? 0,
+      }));
     },
     onError: (_err, _vars, context) => {
       if (context?.prev) {
@@ -68,12 +50,12 @@ export const useLike = (bookInfo: { isbn13: string; title: string; cover: string
     },
     onSettled: () => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: ['myBooks'] });
+      queryClient.invalidateQueries({ queryKey: myBooksKeys.all });
     },
   });
 
   return {
-    toggle: (liked: boolean, options?: Parameters<typeof mutation.mutate>[1]) => mutation.mutate(liked, options),
+    toggle: (options?: Parameters<typeof mutation.mutate>[1]) => mutation.mutate(undefined, options),
     isLoading: mutation.isPending,
   };
 };

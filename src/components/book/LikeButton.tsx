@@ -1,18 +1,20 @@
-import { LikeCache, useLike } from '@/hooks/like/useLike';
-import useUser from '@/hooks/useUser';
+import { useLike } from '@/hooks/like/useLike';
+import useUser from '@/hooks/auth/useUser';
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import ButtonComponent from '../common/ui/ButtonComponent';
+import Button from '../common/ui/Button';
+import { LikeCache } from '@/shared/domain/like/types';
+import { BookInfo } from '@/shared/types/bookInfo';
+import { likeKeys } from '@/shared/domain/like/queryKeys';
 
-const LikeButton = ({
-  style,
-  bookInfo,
-}: {
+type LikeButtonProps = {
   style?: string;
-  bookInfo: { isbn13: string; title: string; cover: string; author: string };
-}) => {
+  bookInfo: BookInfo;
+};
+
+const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
   const { toggle, isLoading } = useLike(bookInfo);
   const lockRef = useRef(false);
   const { data: user } = useUser();
@@ -29,13 +31,13 @@ const LikeButton = ({
       return;
     }
     lockRef.current = true;
-    toggle(liked, {
+    toggle({
       onSettled: () => {
         lockRef.current = false;
       },
     });
   };
-  const queryKey = ['like', bookInfo.isbn13];
+  const queryKey = likeKeys.detail(bookInfo.isbn13);
   const fallback: LikeCache = {
     isbn13: bookInfo.isbn13,
     liked: false,
@@ -49,7 +51,7 @@ const LikeButton = ({
   const liked = data?.liked ?? false;
   const count = data?.liked_count ?? 0;
   return (
-    <ButtonComponent
+    <Button
       onClick={handleClick}
       leftIcon={
         liked ? (

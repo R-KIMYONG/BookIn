@@ -1,4 +1,4 @@
-import { BookmarkBook } from '@/types/myBooks.type';
+import { BookmarkBook } from '@/shared/domain/mybooks/types';
 import BooksGridContainer from './BooksGridContainer';
 import dayjs from 'dayjs';
 import Link from 'next/link';
@@ -6,11 +6,12 @@ import Image from 'next/image';
 import BookmarkButton from '@/components/book/BookmarkButton';
 import { MdFiberNew } from 'react-icons/md';
 import { FiEdit3 } from 'react-icons/fi';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import TagArea from '@/components/bookmark/TagArea';
+import { NEW_DAYS } from '@/shared/domain/bookmark/constants';
 
-const NEW_DAYS = 3;
+
 const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
   const { open } = useBookmarkMemoUrlState();
   const isNewBookmark = (created_at?: string) => {
@@ -70,7 +71,7 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
                   <div className="flex flex-col justify-between text-xs mt-1">
                     <span className="mb-2">{book.created_at ? date : ''}</span>
 
-                    <ButtonComponent
+                    <Button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();

@@ -1,12 +1,11 @@
 'use client';
 
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { MAX_LENGTH_NICKNME } from '@/constants/user';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+import Button from '@/components/common/ui/Button';
+import { MAX_LENGTH_NICKNME } from '@/shared/constants/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
-
 
 const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): ReactElement => {
   const [draftNickname, setDraftNickname] = useState<string>(nickname);
@@ -89,7 +88,7 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
       </div>
 
       <div className="flex justify-end">
-        <ButtonComponent
+        <Button
           type="submit"
           label={changeNickNameMutation.isPending ? '저장중...' : '저장'}
           variant="primary"

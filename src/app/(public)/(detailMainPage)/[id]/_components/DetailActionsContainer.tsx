@@ -1,11 +1,13 @@
 'use client';
 import BookmarkButton from '@/components/book/BookmarkButton';
 import LikeButton from '@/components/book/LikeButton';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { BookmarkCache } from '@/hooks/bookmark/useBookmark';
+import Button from '@/components/common/ui/Button';
 import { useFetchBookmark } from '@/hooks/bookmark/useFetchBookmark';
+import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
 import { useFetchLikes } from '@/hooks/like/useFetchLikes';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
+import { BookmarkCache } from '@/shared/domain/bookmark/types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { FiEdit3 } from 'react-icons/fi';
@@ -20,7 +22,7 @@ const DetailActionsContainer = ({
     return bookInfo.isbn13?.trim() || bookInfo.isbn?.trim() || '';
   }, [bookInfo.isbn13, bookInfo.isbn]);
 
-  const queryKey = ['bookmark', bookKey];
+  const queryKey = bookmarkKeys.detail(bookKey);
 
   const fallback: BookmarkCache = {
     isbn13: bookInfo.isbn13,
@@ -38,8 +40,8 @@ const DetailActionsContainer = ({
   const ids = useMemo(() => (bookKey ? [bookKey] : []), [bookKey]);
 
   useFetchLikes(ids);
-
   useFetchBookmark(ids);
+  useFetchLikeCount(ids);
 
   const normalized = useMemo(
     () => ({
@@ -55,7 +57,7 @@ const DetailActionsContainer = ({
 
       <BookmarkButton bookInfo={normalized} scope="detail" />
       {bookmarked && (
-        <ButtonComponent
+        <Button
           type="button"
           onClick={(e) => {
             e.preventDefault();

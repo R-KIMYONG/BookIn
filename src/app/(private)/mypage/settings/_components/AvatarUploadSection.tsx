@@ -1,6 +1,6 @@
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import { isImageExtension } from '@/app/lib/validation/isImageExtension';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+import { isImageExtension } from '@/shared/utils/validation/isImageExtension';
+import Button from '@/components/common/ui/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
@@ -73,7 +73,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
         <Image src={userAvatar || '/images/noImg.png'} alt="avatarImg" className="object-cover" priority fill />
       </div>
 
-      <ButtonComponent
+      <Button
         type="button"
         label={updateAvatarImgMutation.isPending ? '업로드 중...' : '프로필 변경'}
         variant="outline"
@@ -84,7 +84,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
         leftIcon={<RiCameraLine />}
       >
         프로필 이미지 변경
-      </ButtonComponent>
+      </Button>
 
       <input
         ref={avatarImgRef}

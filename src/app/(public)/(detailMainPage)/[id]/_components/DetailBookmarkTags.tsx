@@ -4,13 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import TagArea from '@/components/bookmark/TagArea';
 import { Tag } from '@/components/bookmark/BookmarkTagPicker';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
+import { MINUTE } from '@/shared/constants/time';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 
 type DetailBookmarkRes = { tags: Tag[] };
 const DetailBookmarkTags = ({ isbn13, userId }: { isbn13: string; userId: string | null }) => {
   const enabled = !!userId && !!isbn13;
   const { open } = useBookmarkMemoUrlState();
+
   const { data, isPending, isError } = useQuery<DetailBookmarkRes>({
-    queryKey: ['detailBookmarkTags', userId, isbn13],
+    queryKey: bookmarkKeys.tags.detail(userId, isbn13),
     queryFn: async () => {
       const res = await fetch(`/api/bookmark/tags?isbn13=${encodeURIComponent(isbn13)}`, { cache: 'no-store' });
       const body = await res.json();
@@ -20,7 +23,7 @@ const DetailBookmarkTags = ({ isbn13, userId }: { isbn13: string; userId: string
       return { tags };
     },
     enabled: enabled,
-    staleTime: 1000 * 60 * 3,
+    staleTime: 3 * MINUTE,
   });
 
   if (!enabled) return null;

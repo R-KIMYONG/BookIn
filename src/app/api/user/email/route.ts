@@ -1,10 +1,10 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
-import { sendEmailChangeMail } from '@/app/lib/mail/sendEmailChangeMail';
-import { hashToken } from '@/app/lib/crypto/hashToken';
-import { clearEmailChangeState } from '@/app/lib/supabase/users';
-import { isValidEmail } from '@/app/lib/validation/isEmail';
+import { hashToken } from '@/shared/lib/crypto/hashToken';
+import { clearEmailChangeState } from '@/shared/lib/supabase/users';
+import { isValidEmail } from '@/shared/utils/validation/isEmail';
+import { sendEmailChangeMail } from '@/shared/lib/mail/sendEmailChangeMail';
 
 const EMAIL_CHANGE_EXPIRES_MS = 60 * 60 * 1000; //한시간으로 설정
 

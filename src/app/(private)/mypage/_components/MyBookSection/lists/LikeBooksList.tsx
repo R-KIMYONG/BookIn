@@ -1,4 +1,4 @@
-import { LikeBook } from '@/types/myBooks.type';
+import { LikeBook } from '@/shared/domain/mybooks/types';
 import BooksGridContainer from './BooksGridContainer';
 import dayjs from 'dayjs';
 import Link from 'next/link';
@@ -27,7 +27,6 @@ const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
 
                 <div className="absolute inset-0 bg-black/40" />
                 <LikeButton bookInfo={bookInfo} style="absolute top-2 left-2" />
-                {/* <div className="absolute bottom-3 left-3 right-3 text-white"></div> */}
               </div>
             </Link>
             <div className="mt-2 h-14 px-2 text-xs">

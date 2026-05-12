@@ -1,9 +1,7 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import dayjs from 'dayjs';
-import { CommentBook } from '@/types/myBooks.type';
+import { CommentBook } from '@/shared/domain/mybooks/types';
 import BooksGridContainer from './BooksGridContainer';
 const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
   return (
@@ -24,15 +22,11 @@ const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 44vw, 200px"
                   priority={isAboveFold}
                 />
-
                 <div className="absolute inset-0 bg-black/40" />
-
-                {/* <div className="absolute bottom-3 left-3 right-3 text-white"></div> */}
               </div>
             </Link>
             <div className="mt-2 h-14 px-2 text-xs">
               <p className="font-bold line-clamp-1 ">{book.title}</p>
-
               <div className="flex justify-between mt-1">
                 <span>{book.last_commented_at ? date : ''}</span>
                 <span>댓글 {book.comment_count}개</span>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 
 type GlobalProps = {
   error: Error & { digest?: string };
@@ -78,7 +78,7 @@ const GlobalError = ({ error, reset }: GlobalProps) => {
               )}
 
               <div className="mt-5 flex flex-wrap gap-2">
-                <ButtonComponent
+                <Button
                   variant="primary"
                   size="sm"
                   onClick={() => {
@@ -90,8 +90,8 @@ const GlobalError = ({ error, reset }: GlobalProps) => {
                   isLoading={loadingAction === 'retry'}
                 >
                   다시 시도
-                </ButtonComponent>
-                <ButtonComponent
+                </Button>
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
@@ -102,13 +102,13 @@ const GlobalError = ({ error, reset }: GlobalProps) => {
                   loadingText="이동중..."
                 >
                   홈으로
-                </ButtonComponent>
-                <ButtonComponent variant="ghost" size="sm" onClick={() => setShowDetail((v) => !v)}>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setShowDetail((v) => !v)}>
                   {showDetail ? '상세 닫기' : '상세 보기'}
-                </ButtonComponent>
-                <ButtonComponent variant="secondary" size="sm" onClick={handleCopy}>
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleCopy}>
                   {copied ? '복사됨!' : '에러 정보 복사'}
-                </ButtonComponent>
+                </Button>
               </div>
 
               {/* 상세 정보 */}

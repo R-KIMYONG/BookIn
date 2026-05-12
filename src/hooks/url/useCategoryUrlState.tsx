@@ -1,26 +1,27 @@
 import { useEffect } from 'react';
 import useUrlParams from './useUrlParams';
-import { QT_LIST, QueryType } from '@/types/useListUrlState.type';
-import { SEARCH_QT_LIST, SearchQueryType } from '@/types/searchBar.type';
-import { TARGET_LIST, TargetTypes } from '@/types/category.type';
+import { DEFAULT_QT, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
+import { DEFAULT_SEARCH_QT, SEARCH_QT_LIST, SearchQueryType } from '@/shared/constants/search';
+import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
 
-
-const DEFAULT_QT: QueryType = 'Bestseller';
 const useCategoryUrlState = (args: { categoryId: number; defaultTarget: TargetTypes }) => {
-  const { getParams, getInt, setParams } = useUrlParams();
+  const { getParams, getInt, setParams, getAllParams } = useUrlParams();
+
+  // const params = getAllParams();
 
   const page = getInt('page', 1);
-  const searchKeyWord = (getParams('q') ?? '').trim();
-  const targetParam = (getParams('target') ?? '').trim();
+  const searchKeyWord = (getParams('search') ?? '').trim(); //검색키워드 추출
+
+  const targetParam = (getParams('target') ?? '').trim(); //어느 대분류 예) 국내도서 외국도서 ebook중 하나
   const target: TargetTypes | '' = TARGET_LIST.includes(targetParam as TargetTypes) ? (targetParam as TargetTypes) : '';
 
-  const qtParam = (getParams('qt') ?? '').trim();
-  const queryType: QueryType = QT_LIST.includes(qtParam as QueryType) ? (qtParam as QueryType) : DEFAULT_QT;
+  const qtParam = (getParams('qt') ?? '').trim(); //어느탭인지 구분 예)베스트셀러,새로 나온책,화제의책,베스트예감,편집자추천
+  const queryType: QueryType = QUERY_TYPE_LIST.includes(qtParam as QueryType) ? (qtParam as QueryType) : DEFAULT_QT;
 
-  const sqParam = (getParams('sq') ?? '').trim();
+  const sqParam = (getParams('sq') ?? '').trim(); //이거는 뭘로 검색할건지 추철 제목,작가,출판사,키워드
   const searchQueryType: SearchQueryType = SEARCH_QT_LIST.includes(sqParam as SearchQueryType)
     ? (sqParam as SearchQueryType)
-    : 'Keyword';
+    : DEFAULT_SEARCH_QT;
 
   useEffect(() => {
     if (!target) {

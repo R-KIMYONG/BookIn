@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import { hashToken } from '@/app/lib/crypto/hashToken';
-import { createAdminClient } from '@/app/lib/supabase/admin';
-import { clearEmailChangeState } from '@/app/lib/supabase/users';
+import { createClient } from '@/shared/lib/supabase/server';
+import { hashToken } from '@/shared/lib/crypto/hashToken';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
+import { clearEmailChangeState } from '@/shared/lib/supabase/users';
 
 export const GET = async (request: Request) => {
   // 사용자가 인증메일 클릭해서 들어오면 아래 링크 작동됨
@@ -29,14 +29,11 @@ export const GET = async (request: Request) => {
     .eq('id', userId)
     .single();
 
-  if (pendingDataError || !pendingData) 
-    return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
-  
+  if (pendingDataError || !pendingData) return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
 
   // 이미 취소된 경우
-  if (!pendingData.pending_email || !pendingData.email_change_token_hash) 
+  if (!pendingData.pending_email || !pendingData.email_change_token_hash)
     return NextResponse.redirect(`${origin}/auth-code-error?reason=cancelled`);
-  
 
   const now = Date.now();
   const expireAt = pendingData.pending_email_expires_at

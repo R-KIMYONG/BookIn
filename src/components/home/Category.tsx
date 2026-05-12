@@ -1,20 +1,23 @@
 'use client';
 
 import CategoryItem from './CategoryItem';
-import { Book, Item, SearchResult } from '@/types/book.type';
-import { useQuery } from '@tanstack/react-query';
+import { Book, Item, SearchResult } from '@/shared/types/api';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import AppPagination from '../common/AppPagination';
-import getTotalPages from '@/utils/pagination';
-import { QueryType } from '@/types/useListUrlState.type';
+import getTotalPages from '@/shared/utils/pagination';
+import { QueryType } from '@/shared/domain/aladin/constants';
 import QueryTypeTabs from '../common/filters/QueryTypeTabs';
 import SearchBar from '../common/filters/SearchBar';
 import useHomeListUrlState from '@/hooks/url/useHomeListUrlState';
-import { SearchQueryType } from '@/types/searchBar.type';
+import { SearchQueryType } from '@/shared/constants/search';
 import SkeletonGrid from '../common/SkeletonGrid';
 import { useFetchLikes } from '@/hooks/like/useFetchLikes';
 import { useMemo } from 'react';
 import { useFetchBookmark } from '@/hooks/bookmark/useFetchBookmark';
+import { MINUTE } from '@/shared/constants/time';
+import { normalizeBook } from '@/shared/lib/book/normalizeBook';
+import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
 
 type PagedResult<T> = {
   items: T[];
@@ -47,14 +50,15 @@ const Category = () => {
       if (!res.ok) throw new Error(`AladinApi ${res.status}`);
       const data: Book = await res.json();
       return {
-        items: data.item ?? [],
+        items: (data.item ?? []).map(normalizeBook),
         totalResults: Number(data.totalResults ?? 0),
         itemsPerPage: Number(data.itemsPerPage ?? 20),
       };
     },
     retry: 1,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 3, //3분
+    staleTime: 3 * MINUTE, //3분
+    placeholderData: keepPreviousData,
     enabled: !isSearching,
   });
   const {
@@ -72,12 +76,13 @@ const Category = () => {
       if (!res.ok) throw new Error('검색 실패');
       const data: SearchResult = await res.json();
       return {
-        items: data.item ?? [],
+        items: (data.item ?? []).map(normalizeBook),
         totalResults: Number(data.totalResults ?? 0),
         itemsPerPage: Number(data.itemsPerPage ?? 20),
       };
     },
-    staleTime: 1000 * 60, //1분
+    staleTime: 1 * MINUTE, //1분
+    placeholderData: keepPreviousData,
     enabled: isSearching,
   });
   const searchTotal = searchData?.totalResults ?? 0;
@@ -113,19 +118,18 @@ const Category = () => {
   }, [isSearching, searchData?.items, listData?.items]);
   //현재 화면에서 리스트카드의 정보 즉 각각의 카드
   const isbnList = useMemo(() => {
-    return list.map((item) => item.isbn13?.trim() || item.isbn?.trim() || '').filter(Boolean);
+    return list.map((item) => item.isbn13).filter(Boolean);
   }, [list]);
-
   useFetchLikes(isbnList);
   useFetchBookmark(isbnList);
-
+  useFetchLikeCount(isbnList);
+  
   const totalResults = isSearching ? (searchData?.totalResults ?? 0) : (listData?.totalResults ?? 0);
   //패칭해온 총결과
   const perPage = isSearching ? (searchData?.itemsPerPage ?? 20) : (listData?.itemsPerPage ?? 20);
   //API 응답의 itemsPerPage(페이지당 개수). 없거나 이상하면 20으로 fallback.
 
   const totalPages = getTotalPages(totalResults, perPage);
-
   return (
     <section className="w-full max-w-7xl mx-auto flex flex-col gap-2 overflow-x-hidden">
       <div className="flex flex-col flex-wrap gap-2 md:flex-row md:items-start md:justify-between py-4 box-border">

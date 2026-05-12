@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { logout } from '@/app/actions/auth.actions';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 
 const HeaderLogoutForm = () => {
   const pathname = usePathname();
@@ -10,7 +10,7 @@ const HeaderLogoutForm = () => {
   return (
     <form action={logout}>
       <input type="hidden" name="next" value={pathname} />
-      <ButtonComponent type="submit" variant="navbarDark" label="로그아웃" size="xs" className="w-full" />
+      <Button type="submit" variant="navbarDark" label="로그아웃" size="xs" className="w-full" />
     </form>
   );
 };

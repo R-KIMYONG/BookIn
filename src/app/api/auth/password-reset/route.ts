@@ -1,11 +1,11 @@
-import { hashToken } from '@/app/lib/crypto/hashToken';
-import { sendPasswordResetMail } from '@/app/lib/mail/sendPasswordResetMail';
-import { clearPasswordResetState } from '@/app/lib/supabase/users';
-import { isValidEmail } from '@/app/lib/validation/isEmail';
-import { RESEND_COOLDOWN_MS, RESET_PASSWORD_EXPIRES_MS } from '@/constants/auth';
-import { createClient } from '@/utils/supabase/server';
+import { hashToken } from '@/shared/lib/crypto/hashToken';
+import { clearPasswordResetState } from '@/shared/lib/supabase/users';
+import { isValidEmail } from '@/shared/utils/validation/isEmail';
+import { RESEND_COOLDOWN_MS, RESET_PASSWORD_EXPIRES_MS } from '@/shared/constants/auth';
+import { createClient } from '@/shared/lib/supabase/server';
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendPasswordResetMail } from '@/shared/lib/mail/sendPasswordResetMail';
 
 export const POST = async (request: NextRequest) => {
   const supabase = await createClient();

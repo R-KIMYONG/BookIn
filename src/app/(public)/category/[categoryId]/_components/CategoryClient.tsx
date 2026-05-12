@@ -1,10 +1,10 @@
 'use client';
 import useCategoryUrlState from '@/hooks/url/useCategoryUrlState';
-import { Book } from '@/types/book.type';
+import { Book } from '@/shared/types/api';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import InvalidCategory from './InvalidCategory';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import AppPagination from '@/components/common/AppPagination';
 import CategoryItem from '@/components/home/CategoryItem';
 import Link from 'next/link';
@@ -12,8 +12,18 @@ import SkeletonGrid from '@/components/common/SkeletonGrid';
 import EmptyState from '@/components/common/EmptyState';
 import QueryTypeTabs from '@/components/common/filters/QueryTypeTabs';
 import { useRouter } from 'next/navigation';
-import { CategoryPageProps } from '@/types/categoryPage.type';
 import { useFetchLikes } from '@/hooks/like/useFetchLikes';
+import { Genre } from '@/shared/domain/category/types';
+import { MINUTE } from '@/shared/constants/time';
+import { useFetchBookmark } from '@/hooks/bookmark/useFetchBookmark';
+import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
+
+export type CategoryPageProps = {
+  params: { categoryId: string };
+  koreanGenres: Genre[];
+  foreignGenres: Genre[];
+  ebookGenres: Genre[];
+};
 
 const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: CategoryPageProps) => {
   const categoryIdNum = Number(params.categoryId);
@@ -59,12 +69,12 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
       return body as Book;
     },
     placeholderData: keepPreviousData,
-    staleTime: 60_000,
+    staleTime: 3 * MINUTE,
     enabled: isValidCategory,
   });
   const { data: lastPageData } = useQuery({
     //외국도서탭, ebook탭으로 API 요청 시 가짜 totalResults수신된 부분 확인되여 진짜 마지막페이지를 이진탐색+이분탐색으로 찾음
-    queryKey: ['lastPage', categoryIdNum, target, queryType],
+    queryKey: ['lastPage', queryType, categoryIdNum, target],
     queryFn: async () => {
       const res = await fetch(
         `/api/aladin/last-page?QueryType=${queryType}&target=${target}&CategoryId=${categoryIdNum}`
@@ -72,7 +82,7 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
       if (!res.ok) throw new Error('lastPage 실패');
       return res.json() as Promise<{ lastPage: number }>;
     },
-    staleTime: 1000 * 60 * 10,
+    staleTime: 10 * MINUTE,
     enabled: isValidCategory,
   });
 
@@ -88,6 +98,8 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
   const isbnList = (data?.item ?? []).map((item) => item.isbn13);
 
   useFetchLikes(isbnList);
+  useFetchBookmark(isbnList);
+  useFetchLikeCount(isbnList);
 
   if (!isValidCategory) {
     return <InvalidCategory />;
@@ -100,8 +112,8 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
           <p className="font-semibold">문제가 발생했어요</p>
           <p className="text-sm text-gray-600 mt-2">{error?.message ?? '알 수 없는 오류'}</p>
           <div className="mt-4 flex gap-2">
-            <ButtonComponent size="sm" variant="secondary" label="홈으로" onClick={() => router.push('/')} />
-            <ButtonComponent
+            <Button size="sm" variant="secondary" label="홈으로" onClick={() => router.push('/')} />
+            <Button
               size="sm"
               variant="primary"
               label="현재 페이지 1로"
@@ -133,7 +145,7 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
             const active = tab.id === categoryIdNum;
 
             return (
-              <ButtonComponent
+              <Button
                 key={`${tab.id}-${tab.label}-${index}`}
                 size="xs"
                 variant={active ? 'primary' : 'secondary'}
@@ -157,7 +169,7 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
             buttonLabel="홈으로"
           />
         ) : (
-          <div className="grid grid-flow-row auto-rows-auto grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+          <div className="w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {data?.item.map((item, index) => {
               const key = `${item.isbn13 ?? 'no-isbn'}-${item.itemId ?? 'no-id'}-${index}`;
 
