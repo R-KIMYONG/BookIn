@@ -1,12 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/shared/lib/supabase/client';
 import { Tag } from '@/components/bookmark/BookmarkTagPicker';
+import { MINUTE } from '@/shared/constants/time';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 
-export const useUserTags = (userId?: string) => {
+export const useUserTags = (userId: string) => {
   const supabase = createClient();
 
   return useQuery({
-    queryKey: ['userTags', userId],
+    queryKey: bookmarkKeys.tags.user(userId),
     enabled: !!userId,
     queryFn: async () => {
       if (!userId) throw new Error('userId required');
@@ -25,6 +27,6 @@ export const useUserTags = (userId?: string) => {
 
       return Array.from(map.values());
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 5 * MINUTE,
   });
 };

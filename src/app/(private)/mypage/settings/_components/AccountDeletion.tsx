@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactElement, useState } from 'react';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import { deleteAccount } from '@/app/actions/auth.actions';
 
@@ -25,7 +25,7 @@ const AccountDeletion = (): ReactElement => {
       />
 
       <div className="mt-4 flex justify-end">
-        <ButtonComponent type="button" label="회원 탈퇴" variant="danger" size="sm" onClick={onOpen} />
+        <Button type="button" label="회원 탈퇴" variant="danger" size="sm" onClick={onOpen} />
       </div>
     </>
   );

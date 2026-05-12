@@ -1,8 +1,8 @@
-import { hashToken } from '@/app/lib/crypto/hashToken';
-import { createAdminClient } from '@/app/lib/supabase/admin';
-import { consumePasswordResetToken } from '@/app/lib/supabase/passwordReset';
-import { isValidPassword } from '@/app/lib/validation/isPassword';
-import { createClient } from '@/utils/supabase/server';
+import { hashToken } from '@/shared/lib/crypto/hashToken';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
+import { consumePasswordResetToken } from '@/shared/lib/supabase/passwordReset';
+import { isValidPassword } from '@/shared/utils/validation/isPassword';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = async (request: NextRequest) => {

@@ -1,5 +1,5 @@
 import Mypage from './Mypage';
-import { getUserInfoServer } from '@/app/lib/auth/getUserInfoServer';
+import { getUserInfoServer } from '@/shared/lib/auth/getUserInfoServer';
 import { redirect } from 'next/navigation';
 
 const MypageContainer = async () => {

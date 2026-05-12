@@ -1,10 +1,10 @@
 'use server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/shared/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
-import { clearTempSessionCookies } from '../lib/auth/sessionCookies';
+import { clearTempSessionCookies } from '../../shared/lib/auth/sessionCookies';
 import { redirect } from 'next/navigation';
-import { createRedirectUrl } from '../lib/navigation/createRedirectUrl';
+import { createRedirectUrl } from '../../shared/utils/navigation/createRedirectUrl';
 
 export const resetTempSession = async () => {
   const cookieStore = await cookies();

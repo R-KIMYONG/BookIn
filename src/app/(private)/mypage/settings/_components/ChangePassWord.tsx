@@ -1,11 +1,11 @@
 import React, { ReactElement, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import PasswordFields from '@/components/form/PasswordFields';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isValidPassword } from '@/app/lib/validation/isPassword';
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import { useMypageQueryState } from '@/hooks/useMypageQueryState';
+import { isValidPassword } from '@/shared/utils/validation/isPassword';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 
 const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
   const { query, setQuery } = useMypageQueryState();
@@ -182,10 +182,10 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
             </div>
 
             <div className="flex justify-end gap-2">
-              <ButtonComponent type="button" variant="danger" size="xs" label="닫기" onClick={handleClose} />
+              <Button type="button" variant="danger" size="xs" label="닫기" onClick={handleClose} />
 
               {checkPrevPW !== 'success' ? (
-                <ButtonComponent
+                <Button
                   type="button"
                   variant="primary"
                   size="xs"
@@ -194,7 +194,7 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
                   isLoading={checkPrevPassWordMutation.isPending}
                 />
               ) : (
-                <ButtonComponent
+                <Button
                   type="button"
                   variant="primary"
                   size="xs"
@@ -208,7 +208,7 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
         </div>
       )}
       <div className="mt-4 flex justify-end">
-        <ButtonComponent type="button" label="비밀번호 변경" variant="primary" size="sm" onClick={handleOpen} />
+        <Button type="button" label="비밀번호 변경" variant="primary" size="sm" onClick={handleOpen} />
       </div>
     </>
   );

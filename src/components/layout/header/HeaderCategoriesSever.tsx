@@ -1,4 +1,4 @@
-import { getGenres } from '@/app/lib/category/getGenres';
+import { getGenres } from '@/shared/domain/category/getGenres';
 import HeaderCategories from './HeaderCategories';
 
 const HeaderCategoriesServer = () => {

@@ -1,8 +1,8 @@
 'use client';
 
-import { createClient } from '@/utils/supabase/client';
-import { MypageUserInfo } from '@/types/userInfo.type';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import { createClient } from '@/shared/lib/supabase/client';
+import { MypageUserInfo } from '@/shared/domain/user/types';
+import Button from '@/components/common/ui/Button';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -57,7 +57,7 @@ const MypageSettings = ({ userId }: { userId: string }) => {
         <div className="border-b border-gray-100 px-5 py-5 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <ButtonComponent
+              <Button
                 type="button"
                 onClick={() => router.push('/mypage')}
                 variant="ghost"
@@ -74,9 +74,9 @@ const MypageSettings = ({ userId }: { userId: string }) => {
             </div>
 
             <div className="shrink-0">
-              <ButtonComponent size="sm" variant="outline" leftIcon={<RiHome3Line />} onClick={() => router.push('/')}>
+              <Button size="sm" variant="outline" leftIcon={<RiHome3Line />} onClick={() => router.push('/')}>
                 홈으로
-              </ButtonComponent>
+              </Button>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
-import { MAX_LENGTH_NICKNME } from '@/constants/user';
-import { createClient } from '@/utils/supabase/server';
+import { MAX_LENGTH_NICKNME } from '@/shared/constants/user';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const PATCH = async (request: NextRequest) => {

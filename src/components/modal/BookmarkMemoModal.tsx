@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import type { Editor } from '@tiptap/react';
@@ -156,7 +156,7 @@ const BookmarkMemoModal = ({
               <p className="mt-1 text-xs text-red-600 break-words">{loadError}</p>
 
               <div className="mt-3 flex justify-end">
-                <ButtonComponent
+                <Button
                   type="button"
                   variant="ghost"
                   size="sm"
@@ -201,7 +201,7 @@ const BookmarkMemoModal = ({
         <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
           <div>
             {!isLoadingMemo && !loadError && hasMemo && (
-              <ButtonComponent
+              <Button
                 label="메모 삭제"
                 variant="danger"
                 size="sm"
@@ -212,8 +212,8 @@ const BookmarkMemoModal = ({
           </div>
 
           <div className="flex gap-2">
-            <ButtonComponent label="취소" variant="secondary" size="sm" onClick={onClose} disabled={isSaving} />
-            <ButtonComponent
+            <Button label="취소" variant="secondary" size="sm" onClick={onClose} disabled={isSaving} />
+            <Button
               label={isSaving ? '저장중...' : '저장'}
               variant="primary"
               size="sm"

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import ButtonComponent from '../common/ui/ButtonComponent';
+import Button from '../common/ui/Button';
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -42,11 +42,11 @@ const ConfirmModal = ({
 
         <p className="text-sm text-gray-700 whitespace-pre-line mb-4">{message}</p>
         <div className="flex justify-end gap-2">
-          <ButtonComponent type="button" label={cancelLabel} variant="secondary" size="sm" onClick={onClose} />
+          <Button type="button" label={cancelLabel} variant="secondary" size="sm" onClick={onClose} />
 
           {formAction ? (
             <form action={formAction}>
-              <ButtonComponent
+              <Button
                 type="submit"
                 label={confirmLabel}
                 variant={confirmColor === 'danger' ? 'danger' : 'primary'}
@@ -55,7 +55,7 @@ const ConfirmModal = ({
               />
             </form>
           ) : (
-            <ButtonComponent
+            <Button
               type="button"
               label={confirmLabel}
               variant={confirmColor === 'danger' ? 'danger' : 'primary'}

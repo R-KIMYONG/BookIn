@@ -1,24 +1,15 @@
 'use client';
 
 import { Tag } from '@/components/bookmark/BookmarkTagPicker';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import Dropdown, { DropdownItem } from '@/components/common/ui/Dropdown';
-import { MyBooksFilter, MyBooksSort, MyBooksTabType, SEARCH_SCOPE, SearchField } from '@/types/useMypageUrlState.type';
+import Button from '@/components/common/ui/Button';
+import Dropdown from '@/components/common/ui/Dropdown';
+import { DropdownItem } from '@/components/common/ui/Dropdown/types';
+import { FILTER_OPTIONS, MyBooksFilter } from '@/shared/domain/mybooks/filter';
+import { SEARCH_SCOPE, SearchField } from '@/shared/domain/mybooks/search';
+import { MyBooksSort, SORT_OPTIONS } from '@/shared/domain/mybooks/sort';
+import { MyBooksTabType } from '@/shared/domain/mypage/tab';
 import { FiArrowDown, FiChevronDown, FiEdit3, FiSearch, FiX } from 'react-icons/fi';
 import { HiHashtag } from 'react-icons/hi';
-
-const FILTER_OPTIONS: { value: MyBooksFilter; label: string }[] = [
-  { value: 'all', label: '전체' },
-  { value: 'memo', label: '메모 있음' },
-  { value: 'no_memo', label: '메모 없음' },
-];
-
-const SORT_OPTIONS: { value: MyBooksSort; label: string }[] = [
-  { value: 'created_desc', label: '최신순' },
-  { value: 'created_asc', label: '오래된순' },
-  { value: 'title_asc', label: '제목 오름차순' },
-  { value: 'title_desc', label: '제목 내림차순' },
-];
 
 type MyBooksToolbarProps = {
   tab: MyBooksTabType;
@@ -130,7 +121,7 @@ const MyBooksToolbar = ({
           maxLength={15}
         />
 
-        {search && <ButtonComponent size="xs" variant="ghost" onClick={() => onSearchChange('')} label={<FiX />} />}
+        {search && <Button size="xs" variant="ghost" onClick={() => onSearchChange('')} label={<FiX />} />}
       </div>
 
       {/* 정렬 */}

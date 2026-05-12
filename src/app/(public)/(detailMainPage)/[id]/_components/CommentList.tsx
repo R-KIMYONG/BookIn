@@ -3,17 +3,27 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-
-import { CommentListProps, CommentListResult } from '@/types/commentList.type';
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+import Button from '@/components/common/ui/Button';
 import AppPagination from '@/components/common/AppPagination';
 import ConfirmModal from '@/components/modal/ConfirmModal';
-import { useCommentMutation } from '@/hooks/useCommentMutation';
-import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
-import { getCommentsClient } from '@/app/lib/comment/getCommentsClient';
+import { useCommentMutation } from '@/hooks/comment/useCommentMutation';
+import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
+import { getCommentsClient } from '@/shared/lib/comment/getCommentsClient';
 import { useClientPagination } from '@/hooks/url/useClientPagination';
+import { Tables } from '@/shared/types/supabase';
+import { MINUTE } from '@/shared/constants/time';
+import { commentKeys } from '@/shared/domain/comment/queryKeys';
 
+type CommentListProps = {
+  isEdit: boolean;
+  userId: string | null;
+  handleStartEdit: (comment: Tables<'comments'>) => void;
+  handleCancelEdit: () => void;
+  editingId: string | null;
+  bookId: string;
+  initialPage: number;
+};
 const CommentList = ({
   isEdit,
   userId,
@@ -37,11 +47,11 @@ const CommentList = ({
     isFetching,
     isError,
     error,
-  } = useQuery<CommentListResult>({
-    queryKey: ['comments', bookId, page],
+  } = useQuery({
+    queryKey: commentKeys.list(bookId, page),
     queryFn: () => getCommentsClient({ bookId, page }),
     enabled: !!bookId,
-    staleTime: 60_000,
+    staleTime: 1 * MINUTE,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -77,7 +87,7 @@ const CommentList = ({
     );
   }
 
-  const totalPages = Math.max(1, Math.ceil((comments.total ?? 0) / COMMENTS_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil((comments.total ?? 0) / DEFAULT_PAGE_SIZE));
   return (
     <div className="flex flex-col gap-4">
       <div className="mt-6 flex items-end justify-between">
@@ -113,13 +123,13 @@ const CommentList = ({
 
                     {isMine ? (
                       <div className="flex gap-2">
-                        <ButtonComponent
+                        <Button
                           variant="outline"
                           size="xs"
                           label={isEdit && id === editingId ? '취소' : '수정'}
                           onClick={() => (isEdit && editingId === id ? handleCancelEdit() : handleStartEdit(comment))}
                         />
-                        <ButtonComponent
+                        <Button
                           variant="danger"
                           size="xs"
                           label="삭제"

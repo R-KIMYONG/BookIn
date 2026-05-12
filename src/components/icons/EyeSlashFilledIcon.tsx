@@ -1,4 +1,4 @@
-import { IconProps } from '@/types/icons.type';
+import { IconProps } from '@/shared/types/ui';
 import { ReactElement } from 'react';
 
 export const EyeSlashFilledIcon = ({ size = 20, className }: IconProps): ReactElement => (

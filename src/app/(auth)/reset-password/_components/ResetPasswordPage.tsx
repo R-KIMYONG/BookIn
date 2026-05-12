@@ -1,21 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PasswordFields from '@/components/form/PasswordFields';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import { toast } from 'react-toastify';
-import { isValidPassword } from '@/app/lib/validation/isPassword';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
+import { isValidPassword } from '@/shared/utils/validation/isPassword';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import ConfirmModal from '@/components/modal/ConfirmModal';
+import useUrlParams from '@/hooks/url/useUrlParams';
+import { useResetPassword } from '@/hooks/auth/useResetPassword';
 
 const ResetPasswordPage = () => {
   const router = useRouter();
+  const { getParams } = useUrlParams();
 
-  const searchParams = useSearchParams();
-
-  const token = searchParams.get('token') ?? '';
+  const token = getParams('token') ?? '';
 
   const [passwordForm, setPasswordForm] = useState<{ newPassword: string; confirmPassword: string }>({
     newPassword: '',
@@ -24,21 +24,7 @@ const ResetPasswordPage = () => {
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
 
-  const { data, isPending, isError } = useQuery({
-    queryKey: ['validateToken', token],
-    enabled: !!token,
-    queryFn: async () => {
-      const res = await fetch(`/api/auth/password-reset-validate?token=${token}`, {
-        method: 'GET',
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) throw new Error(result?.message ?? '검증 실패');
-
-      return result;
-    },
-  });
+  const { validateQuery, confirmMutation, cancelMutation } = useResetPassword(token);
 
   const passwordMissMatch =
     passwordForm.confirmPassword.length > 0 && passwordForm.newPassword !== passwordForm.confirmPassword;
@@ -50,50 +36,6 @@ const ResetPasswordPage = () => {
       [name]: value,
     }));
   };
-
-  const changePassWordMutation = useMutation({
-    mutationFn: async (newPassword: string) => {
-      const res = await fetch('/api/auth/password-reset-confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          password: newPassword,
-          token,
-        }),
-      });
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result?.message || '비밀번호 변경 실패');
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      router.replace('/login');
-    },
-  });
-
-  const cancelMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch('/api/auth/password-reset-confirm', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result?.message ?? '취소 실패');
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      setIsCancelModalOpen(false);
-      router.push('/login');
-    },
-  });
 
   const handleSubmit = async () => {
     const { newPassword, confirmPassword } = passwordForm;
@@ -119,7 +61,7 @@ const ResetPasswordPage = () => {
     }
 
     try {
-      await toastMutationPromise(changePassWordMutation.mutateAsync(newPassword), { pending: '비밀번호 재설중...' });
+      await toastMutationPromise(confirmMutation.mutateAsync(newPassword), { pending: '비밀번호 재설중...' });
     } catch (error) {
       console.error(error);
     }
@@ -130,6 +72,7 @@ const ResetPasswordPage = () => {
 
     try {
       await toastMutationPromise(cancelMutation.mutateAsync(), { pending: '요청 취소 중...' });
+      setIsCancelModalOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -149,7 +92,7 @@ const ResetPasswordPage = () => {
 
   if (!token) return null;
 
-  if (isPending) {
+  if (validateQuery.isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-sm text-gray-500">유효성 확인 중...</p>
@@ -157,7 +100,7 @@ const ResetPasswordPage = () => {
     );
   }
 
-  if (isError) {
+  if (validateQuery.isError) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-sm text-red-500">서버 오류가 발생했습니다. 다시 시도해주세요.</p>
@@ -165,14 +108,14 @@ const ResetPasswordPage = () => {
     );
   }
 
-  if (!data?.valide) {
+  if (!validateQuery.data?.valid) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
         <p className="text-sm text-gray-600">링크가 만료되었거나 유효하지 않습니다.</p>
 
-        <ButtonComponent label="비밀번호 재요청" onClick={() => router.replace('/forgot-password')} />
+        <Button label="비밀번호 재요청" onClick={() => router.replace('/forgot-password')} />
 
-        <ButtonComponent label="로그인으로" variant="secondary" onClick={() => router.replace('/login')} />
+        <Button label="로그인으로" variant="secondary" onClick={() => router.replace('/login')} />
       </div>
     );
   }
@@ -203,7 +146,7 @@ const ResetPasswordPage = () => {
                 onChange={handleChange}
               />
               <div className="mt-4 flex justify-end gap-2">
-                <ButtonComponent
+                <Button
                   type="button"
                   size="sm"
                   variant="secondary"
@@ -213,12 +156,12 @@ const ResetPasswordPage = () => {
                   }}
                   disabled={cancelMutation.isPending}
                 />
-                <ButtonComponent
+                <Button
                   type="submit"
                   variant="primary"
                   size="sm"
-                  label={changePassWordMutation.isPending ? '변경 중...' : '비밀번호 재설정'}
-                  disabled={!isValid || changePassWordMutation.isPending}
+                  label={confirmMutation.isPending ? '변경 중...' : '비밀번호 재설정'}
+                  disabled={!isValid || confirmMutation.isPending}
                 />
               </div>
             </form>

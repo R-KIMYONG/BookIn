@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 
 const MypageError = ({ error, reset }: { error: Error; reset: () => void }) => {
   const router = useRouter();
@@ -29,7 +29,7 @@ const MypageError = ({ error, reset }: { error: Error; reset: () => void }) => {
       </p>
 
       <div className="flex gap-3">
-        <ButtonComponent
+        <Button
           variant="primary"
           size="sm"
           onClick={() => {
@@ -42,7 +42,7 @@ const MypageError = ({ error, reset }: { error: Error; reset: () => void }) => {
           label="다시 시도"
         />
 
-        <ButtonComponent
+        <Button
           variant="outline"
           size="sm"
           onClick={() => {
@@ -54,7 +54,7 @@ const MypageError = ({ error, reset }: { error: Error; reset: () => void }) => {
           loadingText="이동중..."
           label="홈으로 이동"
         />
-        <ButtonComponent
+        <Button
           variant="outline"
           size="sm"
           onClick={() => {

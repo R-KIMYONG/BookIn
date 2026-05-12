@@ -1,6 +1,6 @@
-import { sanitizeHtmlServer } from '@/app/lib/security/sanitizeHtml.server';
-import { Tables } from '@/types/supabase';
-import { createClient } from '@/utils/supabase/server';
+import { sanitizeHtmlServer } from '@/shared/utils/security/sanitizeHtml.server';
+import { Tables } from '@/shared/types/supabase';
+import { createClient } from '@/shared/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 

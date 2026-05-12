@@ -1,14 +1,18 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import CountdownStatus from './CountdownStatus';
-import { createClient } from '@/utils/supabase/client';
-import { isValidEmail } from '@/app/lib/validation/isEmail';
-import { PendingEmailData } from '@/types/changeUserId.type';
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
+import { createClient } from '@/shared/lib/supabase/client';
+import { isValidEmail } from '@/shared/utils/validation/isEmail';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+
+type PendingEmailData = {
+  pendingEmail: string;
+  emailExpireAt: number | null;
+};
 
 const ChangeUserId = ({ email, userId }: { email: string; userId: string }): ReactElement => {
   const queryClient = useQueryClient();
@@ -162,7 +166,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
         <p className="text-sm font-medium text-red-600">이메일 인증 상태를 불러오지 못했습니다.</p>
         <p className="mt-1 text-xs text-gray-500">네트워크 상태를 확인한 뒤 다시 시도해주세요.</p>
         <div className="mt-3 flex justify-end">
-          <ButtonComponent size="sm" variant="primary" label="다시 시도" onClick={() => refetch()} />
+          <Button size="sm" variant="primary" label="다시 시도" onClick={() => refetch()} />
         </div>
       </div>
     );
@@ -180,8 +184,8 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
         </div>
 
         <div className="flex justify-end gap-2">
-          <ButtonComponent type="button" size="sm" label="취소" variant="secondary" onClick={handleCancelPending} />
-          <ButtonComponent type="button" size="sm" label="재요청" variant="primary" onClick={handleRetry} />
+          <Button type="button" size="sm" label="취소" variant="secondary" onClick={handleCancelPending} />
+          <Button type="button" size="sm" label="재요청" variant="primary" onClick={handleRetry} />
         </div>
       </div>
     );
@@ -199,13 +203,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
         </div>
 
         <div className="flex justify-end">
-          <ButtonComponent
-            type="button"
-            size="sm"
-            label="인증 취소"
-            variant="secondary"
-            onClick={handleCancelPending}
-          />
+          <Button type="button" size="sm" label="인증 취소" variant="secondary" onClick={handleCancelPending} />
         </div>
       </div>
     );
@@ -237,7 +235,7 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
       </div>
 
       <div className="mt-4 flex justify-end">
-        <ButtonComponent
+        <Button
           type="submit"
           size="sm"
           label={changeUserEmailMutation.isPending ? '요청중...' : '이메일 변경'}

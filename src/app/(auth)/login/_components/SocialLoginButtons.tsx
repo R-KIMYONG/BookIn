@@ -1,11 +1,11 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { createClient } from '@/utils/supabase/client';
+import Button from '@/components/common/ui/Button';
+import { createClient } from '@/shared/lib/supabase/client';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
 import { SiKakaotalk } from 'react-icons/si';
-import { SocialConfig } from '@/types/button.type';
+import { SocialConfig } from '@/components/common/ui/Button/type';
 
 const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
   const supabase = createClient();
@@ -14,7 +14,7 @@ const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
       provider,
       options: {
         // 로그인 성공 후 돌아올 곳 (원하는 라우팅 정책에 맞게)
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${redirectTo}`,
       },
     });
   };
@@ -40,7 +40,7 @@ const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
   return (
     <div className="flex justify-center gap-4 mt-2">
       {socialProviders.map((provider) => (
-        <ButtonComponent
+        <Button
           key={provider.name}
           variant="ghost"
           size="md"
@@ -49,7 +49,7 @@ const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
           aria-label={provider.label}
         >
           {provider.icon}
-        </ButtonComponent>
+        </Button>
       ))}
     </div>
   );

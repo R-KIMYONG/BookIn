@@ -1,4 +1,5 @@
-import { createClient } from '@/utils/supabase/server';
+import { upsertBook } from '@/shared/lib/book/upsertBook';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (request: NextRequest) => {
@@ -67,30 +68,11 @@ export const POST = async (request: NextRequest) => {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
 
-  const { data: book, error: bookError } = await supabase
-    .from('books')
-    .upsert(
-      {
-        isbn13,
-        title,
-        thumbnail_url: cover,
-        author,
-      },
-      {
-        onConflict: 'isbn13',
-      }
-    )
-    .select('id')
-    .single();
-
-  if (bookError) {
-    console.error('bookError:', bookError);
-    return NextResponse.json({ error: '책 정보를 저장하는 중 오류가 발생했습니다.' }, { status: 500 });
-  }
+  const bookId = await upsertBook({ supabase, bookInfo: { isbn13, title, cover, author } });
 
   const { error: bookmarkError } = await supabase.from('bookmarks').insert({
     user_id: user.id,
-    book_id: book.id,
+    book_id: bookId,
     isbn13: isbn13,
   });
 

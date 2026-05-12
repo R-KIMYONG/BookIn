@@ -3,12 +3,11 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layout/header/Header';
 import Footer from '@/components/layout/Footer';
-import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from './provider';
 import 'react-toastify/dist/ReactToastify.css';
-import { Suspense } from 'react';
-import ClientProviders from './client-providers';
 import GlobalOverlays from './GlobalOverlays';
+import { createClient } from '@/shared/lib/supabase/server';
+import TopButton from '@/components/common/ui/TopButton';
 
 const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
@@ -41,14 +40,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <QueryProvider>
+        <QueryProvider initialUser={user}>
           <GlobalOverlays />
-          <Suspense fallback={null}>
-            <ClientProviders />
-          </Suspense>
           <Header />
           {children}
           <TopButton />

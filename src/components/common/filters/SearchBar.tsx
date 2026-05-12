@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { FiChevronDown, FiSearch, FiX } from 'react-icons/fi';
-import ButtonComponent from '../ui/ButtonComponent';
-import { SearchQueryType } from '@/types/searchBar.type';
+import Button from '../ui/Button';
+import { SearchQueryType } from '@/shared/constants/search';
 
 type SearchBarProps = {
   value: string;
@@ -82,7 +82,7 @@ const SearchBar = ({
             onChange={(e) => setKeyword(e.target.value)}
             className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-0"
           />
-          <ButtonComponent
+          <Button
             type="submit"
             variant="primary"
             size="xs"
@@ -91,8 +91,8 @@ const SearchBar = ({
             className="!w-8 !h-8 !min-w-8 !p-0 flex items-center justify-center"
           >
             <FiSearch size={16} />
-          </ButtonComponent>
-          <ButtonComponent
+          </Button>
+          <Button
             className="!w-8 !h-8 !min-w-8 !p-0 flex items-center justify-center"
             type="button"
             label="초기화"
@@ -104,7 +104,7 @@ const SearchBar = ({
             }}
           >
             <FiX size={16} />
-          </ButtonComponent>
+          </Button>
         </div>
       </form>
     </div>

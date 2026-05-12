@@ -1,11 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import cn from '@/utils/cn';
-import ButtonComponent from './ui/ButtonComponent';
+import cn from '@/shared/utils/cn';
+import Button from './ui/Button';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { toast } from 'react-toastify';
-import { AppPaginationProps } from '@/types/apppagenation.type';
+
+type AppPaginationProps = {
+  page: number;
+  totalPages: number;
+  onChange: (next: number) => void;
+  disabled?: boolean;
+};
 
 const clamp = (page: number, min: number, totalPages: number) => Math.min(totalPages, Math.max(min, page)); //1이상  총수 이하만 허용
 
@@ -19,7 +25,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
   //page=현재페이지를 나타남, totalPages=총페이지를 나타남, onChange=몇번페이지로 가라, disabled=비활성화 여부
   const [error, setError] = useState<boolean>(false);
   const safePage = clamp(page, 1, totalPages);
-  const visibleCount = 5;
+  const visibleCount = 3;
 
   const blockStart = Math.max(1, Math.min(safePage - Math.floor(visibleCount / 2), totalPages - (visibleCount - 1)));
   const blockEnd = Math.min(totalPages, blockStart + (visibleCount - 1));
@@ -45,17 +51,17 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
       <div className="w-full flex flex-col items-center gap-3">
         <div className="px-4 flex items-center gap-2">
           <div className="flex items-center gap-1 shrink-0">
-            <ButtonComponent variant="secondary" size="sm" onClick={prev10} disabled={disabled || !canPrev}>
+            <Button variant="secondary" size="sm" onClick={prev10} disabled={disabled || !canPrev}>
               <MdKeyboardDoubleArrowLeft />
-            </ButtonComponent>
-            <ButtonComponent variant="secondary" size="sm" onClick={prev} disabled={disabled || !canPrev}>
+            </Button>
+            <Button variant="secondary" size="sm" onClick={prev} disabled={disabled || !canPrev}>
               <MdChevronLeft />
-            </ButtonComponent>
+            </Button>
           </div>
           <div className="flex flex-nowrap">
             <div className="inline-flex gap-1 px-1">
               {pages.map((pageNum) => (
-                <ButtonComponent
+                <Button
                   key={pageNum}
                   variant="ghost"
                   className={cn(
@@ -68,17 +74,17 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
                   disabled={disabled || pageNum === safePage}
                 >
                   {pageNum}
-                </ButtonComponent>
+                </Button>
               ))}
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <ButtonComponent variant="secondary" size="sm" onClick={next} disabled={disabled || !canNext}>
+            <Button variant="secondary" size="sm" onClick={next} disabled={disabled || !canNext}>
               <MdChevronRight />
-            </ButtonComponent>
-            <ButtonComponent variant="secondary" size="sm" onClick={next10} disabled={disabled || !canNext}>
+            </Button>
+            <Button variant="secondary" size="sm" onClick={next10} disabled={disabled || !canNext}>
               <MdKeyboardDoubleArrowRight />
-            </ButtonComponent>
+            </Button>
           </div>
         </div>
         <form
@@ -121,7 +127,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
             <span className="text-xs text-gray-400">/ {totalPages}</span>
           </div>
 
-          <ButtonComponent type="submit" label="이동" variant="secondary" />
+          <Button type="submit" label="이동" variant="secondary" />
         </form>
       </div>
     </>

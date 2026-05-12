@@ -1,6 +1,6 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
@@ -53,13 +53,13 @@ const Error = ({ error, reset }: { error: Error & { digest?: string }; reset: ()
             {error?.digest ? <p className="mt-2 text-[11px] text-gray-400">Digest: {error.digest}</p> : null}
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <ButtonComponent type="button" variant="primary" label="다시 시도" onClick={() => reset()} size="md" />
+            <Button type="button" variant="primary" label="다시 시도" onClick={() => reset()} size="md" />
 
-            <ButtonComponent type="button" variant="secondary" size="md">
+            <Button type="button" variant="secondary" size="md">
               <Link href="/">홈으로</Link>
-            </ButtonComponent>
+            </Button>
 
-            <ButtonComponent
+            <Button
               type="button"
               variant="secondary"
               label="이전 페이지"

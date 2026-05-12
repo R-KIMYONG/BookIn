@@ -1,11 +1,17 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import useCountdown from '@/hooks/useCountdown';
-import { SessionModalProps } from '@/types/useCountDownOptions.type';
-import { getCookie } from '@/utils/cookie';
+import Button from '@/components/common/ui/Button';
+import useCountdown from '@/hooks/common/useCountdown';
+import { getCookie } from '@/shared/lib/cookie';
 import { useEffect } from 'react';
-
+type SessionModalProps = {
+  isOpen: boolean;
+  isExpired: boolean;
+  onClose: () => void;
+  onExtend?: () => void;
+  onGoLogin?: () => void;
+  showGoLoginButton?: boolean;
+};
 const SessionModal = ({ isOpen, isExpired, onClose, onExtend, onGoLogin, showGoLoginButton }: SessionModalProps) => {
   const expiresAt = Number(getCookie('bookin_session_expires_at'));
 
@@ -70,22 +76,16 @@ const SessionModal = ({ isOpen, isExpired, onClose, onExtend, onGoLogin, showGoL
           <div className="mt-5 flex justify-end gap-2">
             {isReallyExpired ? (
               <>
-                <ButtonComponent type="button" label="닫기" variant="secondary" size="sm" onClick={onClose} />
+                <Button type="button" label="닫기" variant="secondary" size="sm" onClick={onClose} />
 
                 {showGoLoginButton && (
-                  <ButtonComponent
-                    type="button"
-                    label="로그인 하러가기"
-                    variant="primary"
-                    size="sm"
-                    onClick={onGoLogin}
-                  />
+                  <Button type="button" label="로그인 하러가기" variant="primary" size="sm" onClick={onGoLogin} />
                 )}
               </>
             ) : (
               <>
-                <ButtonComponent type="button" label="나중에" variant="secondary" size="sm" onClick={onClose} />
-                <ButtonComponent type="button" label="연장하기" variant="primary" size="sm" onClick={onExtend} />
+                <Button type="button" label="나중에" variant="secondary" size="sm" onClick={onClose} />
+                <Button type="button" label="연장하기" variant="primary" size="sm" onClick={onExtend} />
               </>
             )}
           </div>

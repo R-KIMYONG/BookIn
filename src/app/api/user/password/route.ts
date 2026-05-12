@@ -1,9 +1,9 @@
-import { isValidPassword } from '@/app/lib/validation/isPassword';
-import { createClient } from '@/utils/supabase/server';
+import { isValidPassword } from '@/shared/utils/validation/isPassword';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const PATCH = async (req: NextRequest) => {
-  let password: unknown;
+  let password: string;
 
   try {
     const body = await req.json();

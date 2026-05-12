@@ -1,6 +1,6 @@
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { useMypageQueryState } from '@/hooks/useMypageQueryState';
-import { MypageSectionType } from '@/types/useMypageUrlState.type';
+import Button from '@/components/common/ui/Button';
+import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
+import { MypageSectionType } from '@/shared/domain/mypage/section';
 
 const SidebarTabs = () => {
   const { query, setQuery } = useMypageQueryState();
@@ -18,7 +18,7 @@ const SidebarTabs = () => {
 
             return (
               <li key={tab.sectionType}>
-                <ButtonComponent
+                <Button
                   size="sm"
                   fullWidth={true}
                   variant={isActive ? 'primary' : 'secondary'}

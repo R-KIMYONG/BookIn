@@ -1,4 +1,4 @@
-import { getUserInfoServer } from '@/app/lib/auth/getUserInfoServer';
+import { getUserInfoServer } from '@/shared/lib/auth/getUserInfoServer';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import MypageSettings from './MypageSettings';
 import { redirect } from 'next/navigation';

@@ -3,12 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { server } from '@/test/msw/server';
 import { http, HttpResponse } from 'msw';
-
 import { createTestQueryClient } from '@/test/testQueryClient';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-
-import { useLike, type LikeCache } from '@/hooks/like/useLike';
+import { useLike } from '@/hooks/like/useLike';
+import { LikeCache } from '@/shared/domain/like/types';
 
 const wrapperWith = (client: any) => {
   return ({ children }: { children: React.ReactNode }) =>
@@ -30,7 +29,7 @@ describe('useLike', () => {
   it('서버 에러면 optimistic을 rollback 한다', async () => {
     // 이번 테스트만 POST 실패하도록
     server.use(
-      http.post('/api/like', async () => {
+      http.post('/api/like/user', async () => {
         return HttpResponse.json({ message: 'fail' }, { status: 500 });
       })
     );
@@ -59,7 +58,7 @@ describe('useLike', () => {
     });
 
     act(() => {
-      result.current.toggle(false);
+      result.current.toggle();
     });
 
     // optimistic이 "한 번이라도" 발생했는지
