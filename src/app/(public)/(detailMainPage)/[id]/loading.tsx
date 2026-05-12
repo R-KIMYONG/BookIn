@@ -1,5 +1,3 @@
-'use client';
-
 const Box = ({ className }: { className?: string }) => <div className={`bg-gray-200 animate-pulse ${className}`} />;
 
 const Loading = () => {

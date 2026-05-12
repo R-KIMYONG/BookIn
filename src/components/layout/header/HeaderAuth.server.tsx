@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import LoginLink from './LoginLink';
 import HeaderLogoutForm from './HeaderLogoutForm';
 import UserMenu from './UserMenu';
-import TempSessionController from './TempSessionController';
+import TempSessionController from '../session/TempSessionController';
+
 
 const HeaderAuth = async ({
   isLoggedIn,
@@ -20,7 +21,7 @@ const HeaderAuth = async ({
           <div className="md:flex hidden items-center gap-2">
             <TempSessionController isLoggedIn={isLoggedIn} tempSessionExpiresAt={tempSessionExpiresAt} />
             <Link href="/mypage">
-              <ButtonComponent variant="navbarLight" label="마이페이지" size="xs" />
+              <Button variant="navbarLight" label="마이페이지" size="xs" />
             </Link>
 
             <HeaderLogoutForm />
@@ -36,7 +37,7 @@ const HeaderAuth = async ({
           <div className="md:flex hidden items-center gap-2">
             <LoginLink />
             <Link href="/terms">
-              <ButtonComponent variant="navbarDark" label="회원가입" size="xs" />
+              <Button variant="navbarDark" label="회원가입" size="xs" />
             </Link>
           </div>
           {/* 모바일 */}

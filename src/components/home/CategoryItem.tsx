@@ -1,14 +1,10 @@
-import { Item } from '@/types/book.type';
+import { Item } from '@/shared/types/api';
 import Image from 'next/image';
 import { FaStar } from 'react-icons/fa';
 import LikeButton from '../book/LikeButton';
 import BookmarkButton from '../book/BookmarkButton';
-type CategoryItemProps = {
-  item: Item;
-  disabled?: boolean;
-};
 
-const CategoryItem = ({ item, disabled }: CategoryItemProps) => {
+const CategoryItem = ({ item, disabled }: { item: Item; disabled?: boolean }) => {
   const rating = item.customerReviewRank ?? 0;
   return (
     <article

@@ -1,14 +1,16 @@
 'use client';
 
 import { toast } from 'react-toastify';
-import { CommentFormProps } from '@/types/commentList.type';
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import dynamic from 'next/dynamic';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { SubmitItem, useCommentMutation } from '@/hooks/useCommentMutation';
-import { sanitizeHtmlClient } from '@/app/lib/security/sanitizeHtml.client';
-import { useCallback, useRef, useState } from 'react';
+import Button from '@/components/common/ui/Button';
+import { useCommentMutation } from '@/hooks/comment/useCommentMutation';
+import { sanitizeHtmlClient } from '@/shared/utils/security/sanitizeHtml.client';
+import { useCallback, useRef, useState, Dispatch, SetStateAction } from 'react';
 import type { Editor } from '@tiptap/react';
+import { MAX_LENGTH, MAX_LINES } from '@/shared/constants/comment';
+import { TargetValue } from './Comment/types';
+import { SubmitItem } from '@/shared/domain/comment/types';
 
 const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
   ssr: false,
@@ -19,8 +21,17 @@ const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
     </div>
   ),
 });
-const MAX_LENGTH = 200;
-const MAX_LINES = 6;
+
+type CommentFormProps = {
+  isEdit: boolean;
+  targetValue: TargetValue;
+  setTargetValue: Dispatch<SetStateAction<TargetValue>>;
+  comment?: TargetValue | undefined;
+  userId: string | undefined;
+  handleCancelEdit: () => void;
+  bookId: string;
+};
+
 const CommentForm = ({
   isEdit, //편집 상태
   targetValue, //수정대상의 내용
@@ -59,15 +70,31 @@ const CommentForm = ({
       updated_at: new Date().toISOString(),
     };
 
-    const requestPromise =
-      isEdit && targetValue.id
-        ? update.mutateAsync({ ...newComment, id: targetValue.id })
-        : add.mutateAsync(newComment);
+    if (isEdit && targetValue.id) {
+      await handleUpdate(newComment);
+    } else {
+      await handleCreate(newComment);
+    }
+  };
 
-    const pendingMessage = isEdit ? '댓글 수정중...' : '댓글 업로드중...';
+  const handleCreate = async (newComment: SubmitItem) => {
+    try {
+      await add.mutateAsync(newComment);
+
+      handleCancelEdit();
+    } catch (error) {
+      toast.error('댓글 등록 실패');
+    }
+  };
+
+  const handleUpdate = async (newComment: SubmitItem) => {
+    if (!targetValue.id) return;
 
     try {
-      toastMutationPromise(requestPromise, { pending: pendingMessage });
+      await toastMutationPromise(update.mutateAsync({ ...newComment, id: targetValue.id }), {
+        pending: '댓글 수정중...',
+      });
+
       handleCancelEdit();
     } catch (error) {
       console.error(error);
@@ -80,7 +107,7 @@ const CommentForm = ({
     return (div.textContent || '').replace(/\n/g, '').length;
   };
   const textLength = getTextLength(targetValue.content ?? '');
-  const isDisabled = textLength === 0 || add.isPending || update.isPending;
+  const isDisabled = textLength === 0 || update.isPending;
   const lineCount = editorInstance ? editorInstance.state.doc.content.childCount : 1;
   return (
     <>
@@ -118,7 +145,7 @@ const CommentForm = ({
 
           {/* 버튼 - 옆으로 이동 */}
           <div className="flex items-end gap-2">
-            <ButtonComponent
+            <Button
               variant="primary"
               size="sm"
               type="submit"
@@ -127,7 +154,7 @@ const CommentForm = ({
               disabled={isDisabled}
             />
 
-            <ButtonComponent
+            <Button
               variant="secondary"
               size="sm"
               type="button"

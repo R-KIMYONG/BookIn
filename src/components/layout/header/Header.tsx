@@ -1,7 +1,7 @@
 import HeaderLogo from './HeaderLogo';
 import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/shared/lib/supabase/server';
 import HeaderCategoriesServer from './HeaderCategoriesSever';
 
 const Header = async () => {

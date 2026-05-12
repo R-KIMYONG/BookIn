@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { FiX, FiPlus } from 'react-icons/fi';
 import { HiHashtag } from 'react-icons/hi';
-import ButtonComponent from '../common/ui/ButtonComponent';
+import Button from '../common/ui/Button';
 import { toast } from 'react-toastify';
 import TagColorPopover from './TagColorPopover';
 
@@ -136,7 +136,7 @@ const BookmarkTagPicker = ({
             const isOpen = openTagName === t.name;
             return (
               <div key={t.id ?? t.name} className="relative inline-block">
-                <ButtonComponent
+                <Button
                   type="button"
                   variant="secondary"
                   size="xs"
@@ -160,7 +160,7 @@ const BookmarkTagPicker = ({
                       />
                     </div>
                   </div>
-                </ButtonComponent>
+                </Button>
                 <TagColorPopover
                   open={openTagName === t.name}
                   onClose={() => setOpenTagName(null)}
@@ -208,7 +208,7 @@ const BookmarkTagPicker = ({
                        focus:border-[#af5858] focus:ring-2 focus:ring-[#af5858]/15 disabled:bg-gray-50 disabled:text-gray-400 placeholder:text-[11px]"
           />
         </div>
-        <ButtonComponent
+        <Button
           type="button"
           onClick={() => {
             addTag(input);
@@ -221,7 +221,7 @@ const BookmarkTagPicker = ({
             <FiPlus className="h-3 w-3" />
             <p>추가</p>
           </div>
-        </ButtonComponent>
+        </Button>
       </div>
       <div className="space-y-2">
         <p className="text-[11px] text-gray-500">추천 태그</p>
@@ -229,7 +229,7 @@ const BookmarkTagPicker = ({
           {presets.map((tag) => {
             const active = selected.some((t) => t.name === tag);
             return (
-              <ButtonComponent
+              <Button
                 key={tag}
                 type="button"
                 onClick={() => togglePreset(tag)}
@@ -241,7 +241,7 @@ const BookmarkTagPicker = ({
                   <HiHashtag className="h-3 w-3" />
                   <p className="text-[11px]">{tag}</p>
                 </div>
-              </ButtonComponent>
+              </Button>
             );
           })}
         </div>

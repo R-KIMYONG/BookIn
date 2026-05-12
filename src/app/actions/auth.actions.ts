@@ -1,13 +1,13 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/shared/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { clearTempSessionCookies, setTempSessionCookies } from '../lib/auth/sessionCookies';
-import { isValidEmail } from '../lib/validation/isEmail';
-import { isValidPassword } from '../lib/validation/isPassword';
-import { AUTH_CODE } from '../lib/auth/authActionFeedback';
-import { createRedirectUrl } from '../lib/navigation/createRedirectUrl';
+import { clearTempSessionCookies, setTempSessionCookies } from '../../shared/lib/auth/sessionCookies';
+import { isValidEmail } from '../../shared/utils/validation/isEmail';
+import { isValidPassword } from '../../shared/utils/validation/isPassword';
+import { AUTH_CODE } from '../../shared/lib/auth/authActionFeedback';
+import { createRedirectUrl } from '../../shared/utils/navigation/createRedirectUrl';
 
 export const logout = async (formData: FormData) => {
   const supabase = await createClient();
@@ -34,6 +34,7 @@ export const login = async (formData: FormData) => {
   if (!email || !password) {
     // 여기서 redirect로 에러 페이지 보내도 되고,
     // login 페이지에서 query param으로 처리해도 됨.
+    console.log(AUTH_CODE.login.EMPTY);
     redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.EMPTY }));
   }
   const { error } = await supabase.auth.signInWithPassword({ email, password });

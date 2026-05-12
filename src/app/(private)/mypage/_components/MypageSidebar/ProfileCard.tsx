@@ -1,5 +1,5 @@
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { MypageUserInfo } from '@/types/userInfo.type';
+import Button from '@/components/common/ui/Button';
+import { MypageUserInfo } from '@/shared/domain/user/types';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -36,14 +36,14 @@ const ProfileCard = ({ userInfo }: { userInfo: MypageUserInfo }) => {
           </div>
         </div>
 
-        <ButtonComponent
+        <Button
           size="xs"
           variant="ghost"
           onClick={() => router.push('/mypage/settings')}
           className="!min-w-0 !rounded-full !p-2 !bg-gray-100 hover:!bg-gray-200"
         >
           <RiSettings5Fill className="text-gray-700 text-lg" />
-        </ButtonComponent>
+        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-import { hashToken } from '@/app/lib/crypto/hashToken';
-import { createClient } from '@/utils/supabase/server';
+import { hashToken } from '@/shared/lib/crypto/hashToken';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (request: NextRequest) => {

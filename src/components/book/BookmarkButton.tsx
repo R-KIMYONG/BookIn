@@ -1,28 +1,29 @@
-import { BookmarkCache, useBookmark } from '@/hooks/bookmark/useBookmark';
-import { BookmarkMemoScope, useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
-import useUser from '@/hooks/useUser';
+import { useBookmark } from '@/hooks/bookmark/useBookmark';
+import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
+import useUser from '@/hooks/auth/useUser';
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import ButtonComponent from '../common/ui/ButtonComponent';
+import Button from '../common/ui/Button';
 import { FiEdit3 } from 'react-icons/fi';
+import { BookmarkCache, BookmarkMemoScope } from '@/shared/domain/bookmark/types';
+import { BookInfo } from '@/shared/types/bookInfo';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 
-const BookmarkButton = ({
-  style,
-  bookInfo,
-  scope,
-}: {
+type BookmarkButtonProps = {
   style?: string;
-  bookInfo: { isbn13: string; title: string; cover: string; author: string };
+  bookInfo: BookInfo;
   scope: BookmarkMemoScope;
-}) => {
+};
+
+const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
   const { toggle, isLoading } = useBookmark(bookInfo);
   const { open } = useBookmarkMemoUrlState();
   const lockRef = useRef(false);
   const { data: user } = useUser();
 
-  const queryKey = ['bookmark', bookInfo.isbn13];
+  const queryKey = bookmarkKeys.detail(bookInfo.isbn13);
   const fallback: BookmarkCache = {
     isbn13: bookInfo.isbn13,
     bookmarked: false,
@@ -65,7 +66,7 @@ const BookmarkButton = ({
                 <p className="text-xs text-gray-500 truncate">메모를 남기면 나중에 찾기 쉬워요.</p>
               </div>
 
-              <ButtonComponent
+              <Button
                 className="underline font-semibold"
                 onClick={(e) => {
                   e.preventDefault();
@@ -90,7 +91,7 @@ const BookmarkButton = ({
     });
   };
   return (
-    <ButtonComponent
+    <Button
       onClick={handleClick}
       variant="ghost"
       size="sm"
@@ -103,7 +104,7 @@ const BookmarkButton = ({
       ) : (
         <FaRegBookmark className="text-gray-300 hover:text-yellow-300 transition duration-200 w-4 h-4" />
       )}
-    </ButtonComponent>
+    </Button>
   );
 };
 

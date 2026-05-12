@@ -1,4 +1,4 @@
-import { MypageUserInfo } from '@/types/userInfo.type';
+import { MypageUserInfo } from '@/shared/domain/user/types';
 import ProfileCard from './ProfileCard';
 import SidebarTabs from './SidebarTabs';
 

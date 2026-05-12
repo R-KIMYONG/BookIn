@@ -1,9 +1,9 @@
 'use client';
-import { MypageUserInfo } from '@/types/userInfo.type';
+import { MypageUserInfo } from '@/shared/domain/user/types';
 import { ReactElement } from 'react';
 import MypageSidebar from './MypageSidebar/MypageSidebar';
 import MyBooksSection from './MyBookSection/MyBooksSection';
-import { useMypageQueryState } from '@/hooks/useMypageQueryState';
+import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 
 const Mypage = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement => {
   const { query } = useMypageQueryState();
@@ -27,10 +27,7 @@ const Mypage = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement => {
           </section>
 
           {/* 본문(내 활동 책) */}
-          <section className="overflow-hidden shadow-sm">
-            {/* {query.section === 'myBooks' && <MyBooksSection userInfo={userInfo} />} */}
-            {renderSection()}
-          </section>
+          <section className="overflow-hidden shadow-sm">{renderSection()}</section>
         </div>
       </div>
     </div>

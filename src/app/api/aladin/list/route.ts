@@ -1,4 +1,4 @@
-import { QT_LIST, QueryType } from '@/types/useListUrlState.type';
+import { QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
 import { NextRequest, NextResponse } from 'next/server';
 
 type SearchTarget = 'Book' | 'Foreign' | 'eBook';
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   const rawQueryType = (searchParams.get('QueryType') ?? 'Bestseller').trim();
-  const queryType = QT_LIST.includes(rawQueryType as QueryType) ? (rawQueryType as QueryType) : 'Bestseller';
+  const queryType = QUERY_TYPE_LIST.includes(rawQueryType as QueryType) ? (rawQueryType as QueryType) : 'Bestseller';
 
   const rawTarget = (searchParams.get('target') ?? 'Book').trim() as SearchTarget;
   const target: SearchTarget = ALLOWED_TARGETS.includes(rawTarget) ? rawTarget : 'Book';

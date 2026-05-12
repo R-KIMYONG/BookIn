@@ -1,24 +1,24 @@
 'use client';
 
-import useCountdown from '@/hooks/useCountdown';
+import useCountdown from '@/hooks/common/useCountdown';
 import React from 'react';
 
 type CountdownStatusProps = {
   expireAt: number | null;
 
-  /** 상단 표시 텍스트 (ex: "인증 대기중: test@email.com") */
+  //상단 표시 텍스트 (ex: "인증 대기중: test@email.com")
   label?: string;
 
-  /** 만료 시 표시 텍스트 */
+  //만료 시 표시 텍스트
   expiredText?: string;
 
-  /** countdown 표시 여부 */
+  // countdown 표시 여부
   showTime?: boolean;
 
-  /** 만료 상태 콜백 */
+  //만료 상태 콜백
   onExpiredChange?: (expired: boolean) => void;
 
-  /** 활성 여부 (기본: expireAt 존재 여부) */
+  //활성 여부 (기본: expireAt 존재 여부)
   enabled?: boolean;
 
   className?: string;

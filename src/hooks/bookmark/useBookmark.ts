@@ -1,100 +1,61 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useUser from '../useUser';
-export type BookmarkCache = {
-  isbn13: string;
-  bookmarked: boolean;
-  memoExists: boolean;
-};
-export const useBookmark = (bookInfo: { isbn13: string; title: string; cover: string; author: string }) => {
+import useUser from '../auth/useUser';
+import { BookmarkCache } from '@/shared/domain/bookmark/types';
+import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
+import { toggleBookmark } from '@/shared/lib/bookmark/toggleBookmark';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
+import { BookInfo } from '@/shared/types/bookInfo';
+
+export const useBookmark = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
   const isbn13 = bookInfo?.isbn13.trim();
-  const queryKey = ['bookmark', isbn13 ?? ''] as const;
   const { data: user } = useUser();
 
+  if (!isbn13) {
+    throw new Error('isbn13 is required');
+  }
+
   const mutation = useMutation({
-    mutationFn: async (bookmarked: boolean) => {
-      const requestId = crypto.randomUUID?.() ?? String(Date.now());
-
-      const isbn13 = bookInfo?.isbn13?.trim();
-
-      const title = bookInfo?.title ?? '(no-title)';
-
-      if (!isbn13) {
-        console.error('[bookmark][invalid-bookInfo]', {
-          requestId,
-          reason: 'missing isbn13',
-          title,
-          bookInfo,
-        });
-
-        throw new Error('bookInfo.isbn13 is required');
-      }
-      const method = bookmarked ? 'DELETE' : 'POST';
-      const res = await fetch('/api/bookmark', {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookInfo),
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-        console.error('[bookmark][api-failed]', {
-          requestId,
-          method,
-          isbn13,
-          status: res.status,
-          result,
-        });
-        throw new Error(result?.message ?? '북마크 실패');
-      }
-
-      return {
-        isbn13,
-        bookmarked: !!result.bookmarked,
-        memoExists: !!result.memoExists,
-      };
-    },
+    mutationFn: (bookmarked) => toggleBookmark(bookInfo, bookmarked),
 
     // optimistic update
     onMutate: async (bookmarked: boolean) => {
       const isbn13 = bookInfo?.isbn13?.trim();
       if (!isbn13) return;
-      await queryClient.cancelQueries({ queryKey: queryKey });
+      await queryClient.cancelQueries({ queryKey: bookmarkKeys.detail(isbn13) });
 
-      const prev = queryClient.getQueryData<BookmarkCache>(queryKey) ?? {
-        isbn13: bookInfo.isbn13,
+      const prev = queryClient.getQueryData<BookmarkCache>(bookmarkKeys.detail(isbn13)) ?? {
+        isbn13: isbn13,
         bookmarked: false,
         memoExists: false,
       };
       const nextBookmarked = !bookmarked;
       const next: BookmarkCache = {
-        isbn13: bookInfo.isbn13,
+        isbn13: isbn13,
         bookmarked: nextBookmarked,
         memoExists: nextBookmarked ? prev.memoExists : false,
       };
-      queryClient.setQueryData(queryKey, next);
+      queryClient.setQueryData(bookmarkKeys.detail(isbn13), next);
 
       return { prev };
     },
     onSuccess: (fresh: BookmarkCache) => {
-      queryClient.setQueryData(queryKey, fresh);
+      queryClient.setQueryData(bookmarkKeys.detail(isbn13), fresh);
 
-      queryClient.invalidateQueries({ queryKey: ['bookmarkFetch'] });
+      queryClient.invalidateQueries({ queryKey: bookmarkKeys.all });
     },
     onError: (_err, _vars, context) => {
       console.error('[bookmark][mutation-error]', { _err, context });
       if (context?.prev) {
-        queryClient.setQueryData(queryKey, context.prev);
+        queryClient.setQueryData(bookmarkKeys.detail(isbn13), context.prev);
       }
     },
     onSettled: () => {
       if (!user?.id) return;
-      queryClient.invalidateQueries({ queryKey: ['myBooks'] });
-      queryClient.removeQueries({ queryKey: ['bookmarkMemo', user.id, isbn13] });
-      queryClient.invalidateQueries({ queryKey: ['detailBookmarkTags', user.id, isbn13] });
-      queryClient.invalidateQueries({ queryKey: queryKey });
+      queryClient.invalidateQueries({ queryKey: myBooksKeys.all });
+      queryClient.removeQueries({ queryKey: bookmarkKeys.memo(user.id, isbn13) });
+      queryClient.invalidateQueries({ queryKey: bookmarkKeys.tags.detail(user.id, isbn13) });
+      queryClient.invalidateQueries({ queryKey: bookmarkKeys.detail(isbn13) });
     },
   });
 

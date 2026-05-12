@@ -1,11 +1,11 @@
 import useUrlParams from './useUrlParams';
 
-type Options = {
-  paramKey?: string; 
+type useClientPaginationProps = {
+  paramKey?: string;
   defaultPage?: number;
 };
 
-export const useClientPagination = (options?: Options) => {
+export const useClientPagination = (options?: useClientPaginationProps) => {
   const paramKey = options?.paramKey ?? 'page';
   const defaultPage = options?.defaultPage ?? 1;
 
@@ -16,10 +16,7 @@ export const useClientPagination = (options?: Options) => {
   const setPage = (nextPage: number) => {
     if (nextPage < 1) return;
 
-    setParams(
-      { [paramKey]: nextPage },
-      { scroll: false, replace: false }
-    );
+    setParams({ [paramKey]: nextPage }, { scroll: false, replace: false });
   };
 
   return { page, setPage };

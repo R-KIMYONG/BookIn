@@ -1,4 +1,4 @@
-import { getGenres } from '@/app/lib/category/getGenres';
+import { getGenres } from '@/shared/domain/category/getGenres';
 import CategoryClient from './_components/CategoryClient';
 const CategoryPage = async ({ params }: { params: Promise<{ categoryId: string }> }) => {
   const resolvedParams = await params;

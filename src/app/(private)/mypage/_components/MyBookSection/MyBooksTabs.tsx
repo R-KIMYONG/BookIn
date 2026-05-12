@@ -1,8 +1,7 @@
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { MyBooksTabType } from '@/types/useMypageUrlState.type';
+import Button from '@/components/common/ui/Button';
+import { MyBooksTabType } from '@/shared/domain/mypage/tab';
 
 const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: MyBooksTabType) => void }) => {
-
   const myBooksTabs: { label: string; value: MyBooksTabType }[] = [
     { label: '좋아요', value: 'like' },
     { label: '북마크', value: 'bookmark' },
@@ -13,7 +12,7 @@ const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: M
       {myBooksTabs.map((t) => {
         const isActive = tab === t.value;
         return (
-          <ButtonComponent
+          <Button
             key={t.value}
             role="tab"
             aria-selected={isActive}
@@ -25,7 +24,7 @@ const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: M
             variant={isActive ? 'primary' : 'secondary'}
           >
             {t.label}
-          </ButtonComponent>
+          </Button>
         );
       })}
     </div>

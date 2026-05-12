@@ -1,6 +1,6 @@
 'use client';
 import { FiX } from 'react-icons/fi';
-import ButtonComponent from '../common/ui/ButtonComponent';
+import Button from '../common/ui/Button';
 import { COLOR_TOKENS } from './BookmarkTagPicker';
 import { useEffect, useRef } from 'react';
 import { HiHashtag } from 'react-icons/hi';
@@ -81,7 +81,7 @@ const TagColorPopover = ({ open, onClose, value, onSelect, tagName, className }:
             const active = value === color.key;
             return (
               <div key={color.key + index} onClick={(e) => e.stopPropagation()}>
-                <ButtonComponent
+                <Button
                   type="button"
                   onClick={() => {
                     onSelect(color.key);

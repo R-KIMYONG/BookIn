@@ -1,10 +1,10 @@
-import { COMMENTS_PAGE_SIZE } from '@/constants/pagination';
+import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
 import BooksGridContainer from './lists/BooksGridContainer';
 
 const MyBooksSectionSkeleton = () => {
   return (
     <BooksGridContainer>
-      {Array.from({ length: COMMENTS_PAGE_SIZE }).map((_, i) => (
+      {Array.from({ length: DEFAULT_PAGE_SIZE }).map((_, i) => (
         <li key={i}>
           <div className="h-60 relative overflow-hidden rounded-md bg-gray-200 animate-pulse">
             {/* 이미지 영역 */}

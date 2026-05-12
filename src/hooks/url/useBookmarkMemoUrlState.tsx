@@ -1,7 +1,7 @@
+import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
 import useUrlParams from './useUrlParams';
 
 type BookmarkModalType = 'bookmarkMemo' | null;
-export type BookmarkMemoScope = 'mypage' | 'detail' | 'home';
 
 const MODAL_KEY = 'bookmarkModal';
 

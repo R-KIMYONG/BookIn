@@ -1,15 +1,20 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
-import { isValidEmail } from '@/app/lib/validation/isEmail';
+import { createClient } from '@/shared/lib/supabase/client';
+import Button from '@/components/common/ui/Button';
+import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import { toast } from 'react-toastify';
 import CountdownStatus from '@/app/(private)/mypage/settings/_components/CountdownStatus';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import toastMutationPromise from '@/app/lib/toast/toastMutationPromise';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { RESEND_COOLDOWN_MS, RESET_PASSWORD_EXPIRES_MS } from '@/constants/auth';
+import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+import { usePathname, useRouter } from 'next/navigation';
+import { RESEND_COOLDOWN_MS, RESET_PASSWORD_EXPIRES_MS } from '@/shared/constants/auth';
+import { SECOND } from '@/shared/constants/time';
+import { requestPasswordReset } from '@/shared/lib/auth/requestPasswordReset';
+import { authKeys } from '@/shared/domain/auth/queryKeys';
+import { AuthResetPasswordRequest } from '@/shared/domain/auth/types';
+import useUrlParams from '@/hooks/url/useUrlParams';
 
 type PasswordResetState = {
   pendingEmail: string | null;
@@ -18,7 +23,7 @@ type PasswordResetState = {
 const ForgotPasswordPage = () => {
   const supabase = createClient();
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
+  const { getParams } = useUrlParams();
   const pathName = usePathname();
   const router = useRouter();
   const [now, setNow] = useState(Date.now());
@@ -29,28 +34,13 @@ const ForgotPasswordPage = () => {
   }, []);
 
   const [inputEmail, setInputEmail] = useState<string>('');
-  const email = searchParams.get('email') ?? '';
+  const email = getParams('email') ?? '';
 
   const resetPasswordMutation = useMutation({
-    mutationFn: async (userEmail: string) => {
-      const res = await fetch('/api/auth/password-reset', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: userEmail }),
-      });
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result?.message ?? '요청 실패');
-      }
-
-      return result;
-    },
+    mutationFn: requestPasswordReset,
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: ['passwordReset', variables],
+        queryKey: authKeys.passwordReset(variables),
       });
       if (email !== variables) {
         const params = new URLSearchParams({ email: variables });
@@ -60,9 +50,9 @@ const ForgotPasswordPage = () => {
   });
 
   const { data } = useQuery<PasswordResetState>({
-    queryKey: ['passwordReset', email],
+    queryKey: authKeys.passwordReset(email),
     enabled: !!email,
-    staleTime: 1000 * 30,
+    staleTime: 30 * SECOND,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('users')
@@ -80,7 +70,7 @@ const ForgotPasswordPage = () => {
 
   const isExpired = !!data?.expireAt && now >= data.expireAt;
 
-  const state: 'idle' | 'pending' | 'expired' = !data?.pendingEmail ? 'idle' : isExpired ? 'expired' : 'pending';
+  const state: AuthResetPasswordRequest = !data?.pendingEmail ? 'idle' : isExpired ? 'expired' : 'pending';
 
   const requestTime = data?.expireAt ? data.expireAt - RESET_PASSWORD_EXPIRES_MS : null;
 
@@ -128,9 +118,7 @@ const ForgotPasswordPage = () => {
     return (
       <Wrapper>
         <h1 className="text-lg font-bold mb-2">비밀번호 찾기</h1>
-
         <p className="text-xs text-gray-500 mb-5">가입한 이메일을 입력하면 비밀번호 재설정 링크를 보내드립니다.</p>
-
         <form
           onSubmit={(e: React.SubmitEvent<HTMLFormElement>) => {
             e.preventDefault();
@@ -138,7 +126,6 @@ const ForgotPasswordPage = () => {
           }}
         >
           <Input value={inputEmail} onChange={setInputEmail} disabled={resetPasswordMutation.isPending} />
-
           <SubmitButton loading={resetPasswordMutation.isPending} />
         </form>
       </Wrapper>
@@ -153,7 +140,7 @@ const ForgotPasswordPage = () => {
         </p>
 
         <div className="mt-4 flex justify-end">
-          <ButtonComponent label="다시 요청" onClick={handleRetry} disabled={!canRetry} />
+          <Button label="다시 요청" onClick={handleRetry} disabled={!canRetry} />
         </div>
       </Wrapper>
     );
@@ -174,11 +161,7 @@ const ForgotPasswordPage = () => {
       </div>
 
       <div className="mt-4 flex justify-end">
-        <ButtonComponent
-          label={canRetry ? '재요청' : `재요청 (${remainSec}s)`}
-          onClick={handleRetry}
-          disabled={!canRetry}
-        />
+        <Button label={canRetry ? '재요청' : `재요청 (${remainSec}s)`} onClick={handleRetry} disabled={!canRetry} />
       </div>
     </Wrapper>
   );
@@ -214,5 +197,5 @@ const Input = ({
 );
 
 const SubmitButton = ({ loading }: { loading: boolean }) => (
-  <ButtonComponent type="submit" label={loading ? '전송 중...' : '재설정 메일 보내기'} />
+  <Button type="submit" label={loading ? '전송 중...' : '재설정 메일 보내기'} />
 );

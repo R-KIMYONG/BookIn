@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 const toSlug = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-');

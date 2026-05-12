@@ -1,5 +1,5 @@
-import { QueryType } from '@/types/useListUrlState.type';
-import ButtonComponent from '../ui/ButtonComponent';
+import { QueryType } from '@/shared/domain/aladin/constants';
+import Button from '../ui/Button';
 
 type QueryTypeTabsProps = {
   value: QueryType;
@@ -24,7 +24,7 @@ const QueryTypeTabs = ({ value, onChange, disable, target }: QueryTypeTabsProps)
         {tabs.map((t) => {
           const active = t.key === value;
           return (
-            <ButtonComponent
+            <Button
               key={t.key}
               size="xs"
               variant={active ? 'primary' : 'secondary'}

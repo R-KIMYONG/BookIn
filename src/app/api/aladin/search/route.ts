@@ -1,7 +1,6 @@
+import { SEARCH_QT_LIST, SearchQueryType } from '@/shared/constants/search';
 import { NextRequest, NextResponse } from 'next/server';
 
-type SearchQueryType = 'Keyword' | 'Title' | 'Author' | 'Publisher';
-const ALLOWED_SEARCH_QUERY: SearchQueryType[] = ['Keyword', 'Title', 'Author', 'Publisher'];
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
@@ -11,7 +10,7 @@ export async function GET(request: NextRequest) {
   const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
 
   const rawSearchQueryType = (searchParams.get('QueryType') ?? 'Keyword').trim() as SearchQueryType;
-  const searchQueryType = ALLOWED_SEARCH_QUERY.includes(rawSearchQueryType) ? rawSearchQueryType : 'Keyword';
+  const searchQueryType = SEARCH_QT_LIST.includes(rawSearchQueryType) ? rawSearchQueryType : 'Keyword';
 
   if (!keyword) return NextResponse.json({ items: [], total: 0 }, { status: 200 });
 

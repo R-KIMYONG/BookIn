@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { colorClass, Tag } from './BookmarkTagPicker';
 import { HiHashtag } from 'react-icons/hi';
-import { BookmarkMemoScope } from '@/hooks/url/useBookmarkMemoUrlState';
-import ButtonComponent from '../common/ui/ButtonComponent';
+import Button from '../common/ui/Button';
 import { FiPlus } from 'react-icons/fi';
+import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
 
 const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => void; scope: BookmarkMemoScope }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -46,7 +46,7 @@ const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => 
       </div>
 
       {!isDetail && isOverflow && onMore && (
-        <ButtonComponent
+        <Button
           type="button"
           onClick={onMore}
           size="xs"

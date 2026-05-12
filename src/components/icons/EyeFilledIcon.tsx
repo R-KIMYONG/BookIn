@@ -1,4 +1,4 @@
-import { IconProps } from '@/types/icons.type';
+import { IconProps } from '@/shared/types/ui';
 
 export const EyeFilledIcon = ({ size = 20, className }: IconProps) => (
   <svg

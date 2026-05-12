@@ -1,6 +1,6 @@
 'use client';
 
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import { useRouter } from 'next/navigation';
 
 type SettingsErrorPageProps = {
@@ -19,8 +19,8 @@ const SettingsErrorPage = ({ error, reset }: SettingsErrorPageProps) => {
       <p className="mt-1 text-xs text-gray-400">잠시 후 다시 시도하거나 마이페이지로 돌아가 주세요.</p>
 
       <div className="mt-6 flex justify-center gap-2">
-        <ButtonComponent label="다시 시도" variant="primary" size="sm" onClick={reset} />
-        <ButtonComponent label="마이페이지로" variant="secondary" size="sm" onClick={() => router.push('/mypage')} />
+        <Button label="다시 시도" variant="primary" size="sm" onClick={reset} />
+        <Button label="마이페이지로" variant="secondary" size="sm" onClick={() => router.push('/mypage')} />
       </div>
     </div>
   );

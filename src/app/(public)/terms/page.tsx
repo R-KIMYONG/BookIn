@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
-import { TermsConsentItem, TermsState } from '@/types/terms.type';
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import { TermsState } from '@/shared/domain/terms/types';
+import Button from '@/components/common/ui/Button';
+import { TERMS_ITEMS } from '@/shared/constants/terms';
 
 const TermsPage = () => {
   const router = useRouter();
@@ -26,27 +27,6 @@ const TermsPage = () => {
       [key]: value,
     }));
   };
-
-  const TERMS_ITEMS: TermsConsentItem[] = [
-    {
-      id: 'isOver14',
-      title: '만 14세 이상입니다.',
-      required: true,
-      href: null,
-    },
-    {
-      id: 'agreedToTerms',
-      title: '서비스 이용약관',
-      required: true,
-      href: '/terms_of_use',
-    },
-    {
-      id: 'agreedToMarketing',
-      title: '마케팅 수신 동의',
-      required: false,
-      href: '/marketing',
-    },
-  ];
 
   const handleAllChange = (checked: boolean) => {
     setTerms((prev) => ({
@@ -159,7 +139,7 @@ const TermsPage = () => {
 
             {/* 버튼 */}
             <div className="mt-6 flex gap-3">
-              <ButtonComponent
+              <Button
                 type="button"
                 variant="outline"
                 size="md"
@@ -168,7 +148,7 @@ const TermsPage = () => {
                 label="이전"
               />
 
-              <ButtonComponent
+              <Button
                 type="submit"
                 variant="primary"
                 size="md"

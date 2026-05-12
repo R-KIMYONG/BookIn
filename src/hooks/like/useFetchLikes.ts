@@ -1,54 +1,30 @@
+import { MINUTE } from '@/shared/constants/time';
+import { likeKeys } from '@/shared/domain/like/queryKeys';
+import { LikeCache, LikeResponseUserType } from '@/shared/domain/like/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
-type ResponseType = {
-  isbn13: string;
-  liked_count: number;
-  liked: boolean;
-};
-const STALE = 1000 * 60 * 3;
-export const useFetchLikes = (isbnList: string[]) => {
+export const useFetchLikes = (isbnList: string[], userId?: string | null) => {
   const queryClient = useQueryClient();
-  const stableKey = ['likedFetch', [...isbnList].sort().join(',')]; //isbn 순서 다르면 다른 키로 인식방지위해 정렬해서 서버로 넘김
-  const { data } = useQuery<ResponseType[]>({
-    queryKey: stableKey,
+  return useQuery<LikeResponseUserType[]>({
+    queryKey: likeKeys.userBatch(userId ?? 'guest', isbnList),
     queryFn: async () => {
       const ids = isbnList.join(',');
-      const res = await fetch(`/api/like?bookIds=${ids}`);
+      const res = await fetch(`/api/like/user?bookIds=${ids}`);
       if (!res.ok) throw new Error('like fetch 실패');
       const data = await res.json();
+
+      data.forEach((server: LikeResponseUserType) => {
+        queryClient.setQueryData(likeKeys.detail(server.isbn13), (old: LikeCache | undefined) => {
+          return {
+            isbn13: server.isbn13,
+            liked: server.liked,
+            liked_count: old?.liked_count ?? 0,
+          };
+        });
+      });
       return data;
     },
     enabled: isbnList.length > 0,
-    staleTime: STALE,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchInterval: (query) => {
-      const last = query.state.dataUpdatedAt;
-      if (!last) return 60_000;
-      const age = Date.now() - last;
-      return age >= STALE ? 60_000 : false;
-    },
+    staleTime: 3 * MINUTE,
   });
-  useEffect(() => {
-    if (!data) return;
-
-    data.forEach((server) => {
-      queryClient.setQueryData(['like', server.isbn13], (old: ResponseType | undefined) => {
-        if (!old) return server;
-        if (old.liked !== server.liked) return old;
-
-        const nextCount = old.liked
-          ? Math.max(old.liked_count, server.liked_count) // liked=true면 서버가 더 크면 따라감
-          : Math.min(old.liked_count, server.liked_count); // liked=false면 서버가 더 작으면 따라감
-
-        return {
-          ...old,
-          liked_count: nextCount,
-        };
-      });
-    });
-  }, [data, queryClient]);
-
-  return data;
 };

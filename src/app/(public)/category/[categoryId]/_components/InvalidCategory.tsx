@@ -1,4 +1,4 @@
-import ButtonComponent from '@/components/common/ui/ButtonComponent';
+import Button from '@/components/common/ui/Button';
 import Link from 'next/link';
 
 const InvalidCategory = () => {
@@ -9,7 +9,7 @@ const InvalidCategory = () => {
         <p className="text-sm text-gray-500 mt-2">URL의 categoryId가 유효하지 않아요.</p>
 
         <Link href="/">
-          <ButtonComponent size="sm" variant="primary" label="홈으로" />
+          <Button size="sm" variant="primary" label="홈으로" />
         </Link>
       </div>
     </section>

@@ -1,10 +1,11 @@
 'use client';
 
-import Dropdown, { DropdownItem } from '@/components/common/ui/Dropdown';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle } from 'react-icons/fa';
 import HeaderLogoutForm from './HeaderLogoutForm';
-import TempSessionController from './TempSessionController';
+import { DropdownItem } from '@/components/common/ui/Dropdown/types';
+import Dropdown from '@/components/common/ui/Dropdown';
+import TempSessionController from '../session/TempSessionController';
 
 type UserMenuProps = {
   isLoggedIn: boolean;
