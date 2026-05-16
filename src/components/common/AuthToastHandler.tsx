@@ -2,48 +2,62 @@
 
 import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { toast } from 'react-toastify';
-import { AUTH_CODE, AUTH_FEEDBACK_TEXT } from '@/shared/lib/auth/authActionFeedback';
-import { useQueryClient } from '@tanstack/react-query';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE, ResultCode } from '@/shared/lib/message/resultCode';
+
+export const SOCIAL_PROVIDER_LABEL = {
+  google: 'Google',
+  github: 'GitHub',
+  kakao: 'Kakao',
+} as const;
+
+const getProviderLabel = (provider?: string | null) => {
+  if (!provider) return undefined;
+
+  if (provider.includes('google')) return 'Google';
+
+  if (provider.includes('github')) return 'GitHub';
+
+  if (provider.includes('kakao')) return 'Kakao';
+
+  return undefined;
+};
 
 const AuthToastHandler = () => {
   const searchParams = useSearchParams();
+
   const pathname = usePathname();
+
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    const error = params.get('error');
-    const message = params.get('message');
+    const toast = params.get('toast');
 
-    if (!error && !message) return;
+    const provider = params.get('provider');
 
-    const code = error ?? message;
-    if (!code) return;
-
-    const text = AUTH_FEEDBACK_TEXT[code as keyof typeof AUTH_FEEDBACK_TEXT] ?? AUTH_FEEDBACK_TEXT.unknown;
-
-    if (error) {
-      toast.error(text, { position: 'top-right' });
-    } else {
-      toast.success(text, { position: 'top-right' });
+    if (!toast || !Object.values(RESULT_CODE).includes(toast as ResultCode)) {
+      return;
     }
 
-    if (message === AUTH_CODE.logout.SUCCESS) {
-      queryClient.removeQueries({ queryKey: ['user'] });
-      queryClient.removeQueries({ queryKey: ['userInfo'] });
-      queryClient.removeQueries({ queryKey: ['pendingEmail'] });
-    }
-    params.delete('error');
-    params.delete('message');
+    showToast(toast as ResultCode, {
+      variables: {
+        providerLabel: getProviderLabel(provider),
+      },
+    });
+
+    params.delete('toast');
+    params.delete('provider');
 
     const nextQuery = params.toString();
+
     const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
 
-    router.replace(nextUrl, { scroll: false });
-  }, [searchParams, pathname, router, queryClient]);
+    router.replace(nextUrl, {
+      scroll: false,
+    });
+  }, [searchParams, pathname, router]);
 
   return null;
 };

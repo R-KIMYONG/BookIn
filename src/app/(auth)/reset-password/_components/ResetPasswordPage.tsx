@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PasswordFields from '@/components/form/PasswordFields';
 import Button from '@/components/common/ui/Button';
-import { toast } from 'react-toastify';
 import { isValidPassword } from '@/shared/utils/validation/isPassword';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import useUrlParams from '@/hooks/url/useUrlParams';
 import { useResetPassword } from '@/hooks/auth/useResetPassword';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 const ResetPasswordPage = () => {
   const router = useRouter();
@@ -41,29 +42,25 @@ const ResetPasswordPage = () => {
     const { newPassword, confirmPassword } = passwordForm;
 
     if (!newPassword.trim()) {
-      toast.error('비밀번호를 입력해주세요.');
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_PASSWORD);
       return;
     }
 
     if (!confirmPassword.trim()) {
-      toast.error('비밀번호 확인을 입력해주세요.');
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_CONFIRM_PASSWORD);
       return;
     }
 
     if (!isValidPassword(newPassword)) {
-      toast.error('비밀번호는 8~12자리, 영문/숫자/특수문자를 포함해야 합니다.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error('비밀번호가 일치하지 않습니다.');
+      showToast(RESULT_CODE.VALIDATION_INVALID_PASSWORD);
       return;
     }
 
     try {
-      await toastMutationPromise(confirmMutation.mutateAsync(newPassword), { pending: '비밀번호 재설중...' });
+      await toastMutationPromise(confirmMutation.mutateAsync(newPassword), { pending: '비밀번호 재설정중...' });
     } catch (error) {
       console.error(error);
+      showToast(RESULT_CODE.COMMON_SERVER_ERROR);
     }
   };
 
@@ -75,6 +72,7 @@ const ResetPasswordPage = () => {
       setIsCancelModalOpen(false);
     } catch (error) {
       console.error(error);
+      showToast(RESULT_CODE.COMMON_SERVER_ERROR);
     }
   };
 
@@ -128,7 +126,7 @@ const ResetPasswordPage = () => {
             <h1 className="text-lg font-bold text-gray-900 mb-2">비밀번호 재설정</h1>
 
             <p className="text-xs text-gray-500 mb-6">새로운 비밀번호를 입력해주세요.</p>
-            {passwordMissMatch && <p className="text-xs text-red-500 text-center">비밀번호 일치하지 않습니다.</p>}
+            {passwordMissMatch && <p className="text-xs text-red-500 text-center">비밀번호가 일치하지 않습니다.</p>}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -160,8 +158,10 @@ const ResetPasswordPage = () => {
                   type="submit"
                   variant="primary"
                   size="sm"
-                  label={confirmMutation.isPending ? '변경 중...' : '비밀번호 재설정'}
-                  disabled={!isValid || confirmMutation.isPending}
+                  label="비밀번호 재설정"
+                  isLoading={confirmMutation.isPending}
+                  loadingText="변경중..."
+                  disabled={!isValid}
                 />
               </div>
             </form>

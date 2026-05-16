@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { CookieOptions } from '@supabase/ssr';
+import { SESSION_EXPIRES_AT, SESSION_MODE } from '@/shared/domain/auth/constants';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -37,8 +38,8 @@ export async function updateSession(request: NextRequest) {
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
   const isAuthPage = authPages.some((p) => pathname.startsWith(p));
 
-  const mode = request.cookies.get('bookin_session_mode')?.value;
-  const expiresStr = request.cookies.get('bookin_session_expires_at')?.value;
+  const mode = request.cookies.get(SESSION_MODE)?.value;
+  const expiresStr = request.cookies.get(SESSION_EXPIRES_AT)?.value;
 
   if (mode === 'temp' && expiresStr) {
     const expiresAt = Number(expiresStr);
@@ -54,12 +55,12 @@ export async function updateSession(request: NextRequest) {
         url.searchParams.set('redirectTo', pathname);
 
         const response = NextResponse.redirect(url);
-        response.cookies.delete('bookin_session_mode');
-        response.cookies.delete('bookin_session_expires_at');
+        response.cookies.delete(SESSION_MODE);
+        response.cookies.delete(SESSION_EXPIRES_AT);
         return response;
       }
-      supabaseResponse.cookies.delete('bookin_session_mode');
-      supabaseResponse.cookies.delete('bookin_session_expires_at');
+      supabaseResponse.cookies.delete(SESSION_MODE);
+      supabaseResponse.cookies.delete(SESSION_EXPIRES_AT);
       return supabaseResponse;
     }
   }

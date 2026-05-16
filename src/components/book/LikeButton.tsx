@@ -1,13 +1,14 @@
 import { useLike } from '@/hooks/like/useLike';
-import useUser from '@/hooks/auth/useUser';
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { toast } from 'react-toastify';
 import Button from '../common/ui/Button';
 import { LikeCache } from '@/shared/domain/like/types';
 import { BookInfo } from '@/shared/types/bookInfo';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
+import { useAuth } from '@/shared/context/AuthContext';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 type LikeButtonProps = {
   style?: string;
@@ -17,7 +18,7 @@ type LikeButtonProps = {
 const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
   const { toggle, isLoading } = useLike(bookInfo);
   const lockRef = useRef(false);
-  const { data: user } = useUser();
+  const { user } = useAuth();
   const handleClick = (e: React.MouseEvent) => {
     if (lockRef.current || isLoading) return;
 
@@ -25,9 +26,7 @@ const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
     e.stopPropagation();
 
     if (!user) {
-      toast.warning('로그인 이후 좋아요할 수 있습니다.', {
-        toastId: 'login-warning',
-      });
+      showToast(RESULT_CODE.AUTH_REQUIRED_LOGIN);
       return;
     }
     lockRef.current = true;

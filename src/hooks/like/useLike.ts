@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useUser from '../auth/useUser';
 import { LikeCache } from '@/shared/domain/like/types';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
 import { BookInfo } from '@/shared/types/bookInfo';
 import { toggleLike } from '@/shared/lib/like/toggleLike';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
+import { useAuth } from '@/shared/context/AuthContext';
 export const useLike = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
   const queryKey = likeKeys.detail(bookInfo.isbn13);
 
-  const { data: user } = useUser();
+  const { user } = useAuth();
 
   const mutation = useMutation({
     mutationFn: () => toggleLike({ bookInfo }),

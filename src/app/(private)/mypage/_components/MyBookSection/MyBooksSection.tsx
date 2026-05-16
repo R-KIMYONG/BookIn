@@ -23,7 +23,6 @@ const MyBooksSection = ({ userInfo }: { userInfo: MypageUserInfo }) => {
   const { query, setQuery } = useMypageQueryState();
   const { tab, sort, filter, page, search, searchField, tagId } = query;
   const [localSearch, setLocalSearch] = useState(search);
-
   const { data: userTags } = useUserTags(userInfo.id);
 
   const debouncedSearch = useDebounce(localSearch, 500);
@@ -62,9 +61,9 @@ const MyBooksSection = ({ userInfo }: { userInfo: MypageUserInfo }) => {
     return result?.data.map((item) => item.isbn13) ?? [];
   }, [result?.data]);
 
-  useFetchLikes(tab === 'like' ? isbnList : []);
+  useFetchLikes({ isbnList: tab === 'like' ? isbnList : [], userId: userInfo.id });
   useFetchLikeCount(tab === 'like' ? isbnList : []);
-  useFetchBookmark(tab === 'bookmark' ? isbnList : []);
+  useFetchBookmark({ isbnList: tab === 'bookmark' ? isbnList : [], userId: userInfo.id });
 
   const tagNameMap = useMemo(() => {
     const map = new Map<string, string>();

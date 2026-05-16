@@ -2,10 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import TagArea from '@/components/bookmark/TagArea';
-import { Tag } from '@/components/bookmark/BookmarkTagPicker';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { MINUTE } from '@/shared/constants/time';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
+import { Tag } from '@/shared/domain/tag/types';
 
 type DetailBookmarkRes = { tags: Tag[] };
 const DetailBookmarkTags = ({ isbn13, userId }: { isbn13: string; userId: string | null }) => {

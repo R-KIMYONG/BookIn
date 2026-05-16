@@ -1,6 +1,5 @@
 'use client';
 
-import { Tag } from '@/components/bookmark/BookmarkTagPicker';
 import Button from '@/components/common/ui/Button';
 import Dropdown from '@/components/common/ui/Dropdown';
 import { DropdownItem } from '@/components/common/ui/Dropdown/types';
@@ -8,6 +7,7 @@ import { FILTER_OPTIONS, MyBooksFilter } from '@/shared/domain/mybooks/filter';
 import { SEARCH_SCOPE, SearchField } from '@/shared/domain/mybooks/search';
 import { MyBooksSort, SORT_OPTIONS } from '@/shared/domain/mybooks/sort';
 import { MyBooksTabType } from '@/shared/domain/mypage/tab';
+import { Tag } from '@/shared/domain/tag/types';
 import { FiArrowDown, FiChevronDown, FiEdit3, FiSearch, FiX } from 'react-icons/fi';
 import { HiHashtag } from 'react-icons/hi';
 
