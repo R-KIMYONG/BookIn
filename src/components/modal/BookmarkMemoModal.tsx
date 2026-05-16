@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Button from '@/components/common/ui/Button';
-import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import type { Editor } from '@tiptap/react';
-import BookmarkTagPicker, { Tag } from '../bookmark/BookmarkTagPicker';
 import BookmarkMemoModalSkeleton from '../bookmark/BookmarkMemoModalSkeleton';
+import { Tag } from '@/shared/domain/tag/types';
+import BookmarkTagPicker from '../bookmark/BookmarkTagPicker';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 const TiptapEditor = dynamic(() => import('@/app/(public)/(detailMainPage)/[id]/_components/TiptapEditor'), {
   ssr: false,
@@ -120,7 +122,7 @@ const BookmarkMemoModal = ({
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error('메모 저장에 실패했습니다.');
+      showToast(RESULT_CODE.BOOKMARK_MEMO_SAVE_FAILED);
     }
   };
 
@@ -130,7 +132,7 @@ const BookmarkMemoModal = ({
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error('메모 삭제에 실패했습니다.');
+      showToast(RESULT_CODE.BOOKMARK_MEMO_DELETE_FAILED);
     }
   };
 

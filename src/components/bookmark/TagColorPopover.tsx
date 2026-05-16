@@ -1,9 +1,9 @@
 'use client';
 import { FiX } from 'react-icons/fi';
 import Button from '../common/ui/Button';
-import { COLOR_TOKENS } from './BookmarkTagPicker';
 import { useEffect, useRef } from 'react';
 import { HiHashtag } from 'react-icons/hi';
+import { COLOR_TOKENS } from '@/shared/domain/tag/constants';
 
 type TagColorPopoverProps = {
   open: boolean;

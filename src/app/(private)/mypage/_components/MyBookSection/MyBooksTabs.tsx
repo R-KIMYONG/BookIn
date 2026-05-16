@@ -1,7 +1,9 @@
 import Button from '@/components/common/ui/Button';
 import { MyBooksTabType } from '@/shared/domain/mypage/tab';
+import { useQueryClient } from '@tanstack/react-query';
 
 const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: MyBooksTabType) => void }) => {
+  const queryClient = useQueryClient();
   const myBooksTabs: { label: string; value: MyBooksTabType }[] = [
     { label: '좋아요', value: 'like' },
     { label: '북마크', value: 'bookmark' },
@@ -18,6 +20,7 @@ const MyBooksTabs = ({ tab, onChange }: { tab: MyBooksTabType; onChange: (tab: M
             aria-selected={isActive}
             onClick={() => {
               if (tab !== t.value) {
+                queryClient.invalidateQueries({ queryKey: [tab] });
                 onChange(t.value);
               }
             }}

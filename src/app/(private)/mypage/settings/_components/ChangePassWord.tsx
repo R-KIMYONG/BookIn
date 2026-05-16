@@ -1,11 +1,12 @@
 import React, { ReactElement, useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
 import Button from '@/components/common/ui/Button';
 import PasswordFields from '@/components/form/PasswordFields';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isValidPassword } from '@/shared/utils/validation/isPassword';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
   const { query, setQuery } = useMypageQueryState();
@@ -76,20 +77,16 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
   });
   const handleSaveNewPassWord = useCallback(async () => {
     if (passwordForm.newPassword.trim() === '') {
-      toast.error('비밀번호를 입력해주세요.');
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_PASSWORD);
       return;
     }
 
     if (passwordForm.confirmPassword.trim() === '') {
-      toast.error('비밀번호 확인 비어있습니다.');
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_CONFIRM_PASSWORD);
       return;
     }
     if (!isValidPassword(passwordForm.newPassword)) {
-      toast.error('비밀번호는 8~12자리 이어야 하며, 알파벳, 숫자 및 특수문자를 포함해야 합니다.');
-      return;
-    }
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error('비밀번호가 일치하지 않습니다.');
+      showToast(RESULT_CODE.VALIDATION_INVALID_PASSWORD);
       return;
     }
 
@@ -116,7 +113,7 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
   });
   const handleCheckPrevPassWord = async () => {
     if (passwordForm.prevPassword.trim() === '') {
-      toast.error('현재 비밀번호를 입력해주세요.');
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_PREV_PASSWORD);
       return;
     }
 

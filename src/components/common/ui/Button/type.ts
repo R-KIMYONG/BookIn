@@ -18,10 +18,10 @@ export type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
-  loadingText?: React.ReactNode;
+  loadingText?: string;
 };
 
-type SocialProvider = 'google' | 'github' | 'kakao';
+export type SocialProvider = 'google' | 'github' | 'kakao';
 
 export type SocialConfig = {
   name: SocialProvider;

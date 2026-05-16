@@ -1,24 +1,11 @@
-'use client';
-
-import Button from '@/components/common/ui/Button';
-import { createClient } from '@/shared/lib/supabase/client';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
 import { SiKakaotalk } from 'react-icons/si';
 import { SocialConfig } from '@/components/common/ui/Button/type';
+import { signInWithOAuth } from '@/app/actions/auth.actions';
+import FormSubmitButton from './FormSubmitButton';
 
 const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
-  const supabase = createClient();
-  const signIn = async (provider: 'google' | 'github' | 'kakao') => {
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        // 로그인 성공 후 돌아올 곳 (원하는 라우팅 정책에 맞게)
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${redirectTo}`,
-      },
-    });
-  };
-
   const socialProviders: SocialConfig[] = [
     {
       name: 'google',
@@ -40,16 +27,19 @@ const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
   return (
     <div className="flex justify-center gap-4 mt-2">
       {socialProviders.map((provider) => (
-        <Button
-          key={provider.name}
-          variant="ghost"
-          size="md"
-          onClick={() => signIn(provider.name)}
-          className="!w-11 !h-11 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md hover:bg-gray-50 transition"
-          aria-label={provider.label}
-        >
-          {provider.icon}
-        </Button>
+        <form action={signInWithOAuth} key={provider.name}>
+          <input type="hidden" name="next" value={redirectTo} />
+          <input type="hidden" name="provider" value={provider.name} />
+          <FormSubmitButton
+            variant="ghost"
+            size="md"
+            ariaLabel={provider.label}
+            className="!w-11 !h-11 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md hover:bg-gray-50 transition"
+            loadingText=""
+          >
+            {provider.icon}
+          </FormSubmitButton>
+        </form>
       ))}
     </div>
   );

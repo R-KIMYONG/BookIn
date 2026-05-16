@@ -1,13 +1,14 @@
 import { MINUTE } from '@/shared/constants/time';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { BookmarkCache } from '@/shared/domain/bookmark/types';
+import { UserBookBetchProps } from '@/shared/types/query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const useFetchBookmark = (isbnList: string[]) => {
+export const useFetchBookmark = ({ isbnList, userId }: UserBookBetchProps) => {
   const queryClient = useQueryClient();
 
   return useQuery<BookmarkCache[]>({
-    queryKey: bookmarkKeys.batch(isbnList),
+    queryKey: bookmarkKeys.batch(isbnList, userId ?? 'guest'),
     queryFn: async () => {
       const ids = isbnList.join(',');
       const res = await fetch(`/api/bookmark?bookIds=${ids}`);

@@ -5,7 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
 import { RiCameraLine } from 'react-icons/ri';
-import { toast } from 'react-toastify';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userId: string }) => {
   const avatarImgRef = useRef<HTMLInputElement>(null);
@@ -39,24 +40,16 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
       const maxFileSize = 5 * 1024 * 1024;
 
       if (!files || !files[0]) {
-        toast.error('아바타 업로드를 취소하셨습니다.', {
-          position: 'top-right',
-        });
+        showToast(RESULT_CODE.COMMON_FILE_UPLOAD_CANCELLED);
         return;
       }
       const file = files[0];
       if (!isImageExtension(file)) {
-        console.error('지원하지 않는 파일 형식입니다. JPG, JPEG, PNG, GIF 파일만 업로드 가능합니다.');
-        toast.error('지원하지 않는 파일 형식입니다. JPG, JPEG, PNG, GIF 파일만 업로드 가능합니다.', {
-          position: 'top-right',
-        });
+        showToast(RESULT_CODE.VALIDATION_INVALID_IMAGE_FILE);
         return;
       }
       if (file.size > maxFileSize) {
-        console.error('파일 용량이 초과되었습니다. 5MB 이하의 파일만 업로드 가능합니다.');
-        toast.error('파일 용량이 초과되었습니다. 5MB 이하의 파일만 업로드 가능합니다.', {
-          position: 'top-right',
-        });
+        showToast(RESULT_CODE.VALIDATION_IMAGE_FILE_TOO_LARGE);
         return;
       }
       try {
@@ -75,16 +68,15 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
 
       <Button
         type="button"
-        label={updateAvatarImgMutation.isPending ? '업로드 중...' : '프로필 변경'}
+        label="프로필 변경"
+        loadingText="업로드 중..."
         variant="outline"
         size="xs"
         className="!rounded-full  !px-4 !py-2  text-gray-700 transition hover:border-[#AF5858] hover:text-[#AF5858]"
         onClick={() => avatarImgRef.current?.click()}
         disabled={updateAvatarImgMutation.isPending}
         leftIcon={<RiCameraLine />}
-      >
-        프로필 이미지 변경
-      </Button>
+      />
 
       <input
         ref={avatarImgRef}

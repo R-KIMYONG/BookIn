@@ -129,7 +129,7 @@ const MainDetail = async ({
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 {rating > 0 && <span>평점 {rating}</span>}
                 {salesPoint > 0 && <span>판매량 {salesPoint.toLocaleString()}</span>}
-                <DetailActionsContainer bookInfo={bookInfo} />
+                <DetailActionsContainer bookInfo={bookInfo} userId={userId} />
               </div>
               <div>
                 <DetailBookmarkTags isbn13={bookInfo?.isbn13} userId={userId} />

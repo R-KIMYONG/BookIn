@@ -1,31 +1,24 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useContext } from 'react';
-import { UserContext } from './provider';
+import { useEffect } from 'react';
+import { createClient } from '@/shared/lib/supabase/client';
+import { useAuth } from '@/shared/context/AuthContext';
 
+const supabase = createClient();
 export const AuthListener = () => {
-  const user = useContext(UserContext);
-  const queryClient = useQueryClient();
-
-  const prevUserId = useRef<string | null>(null);
+  const { setUser } = useAuth();
 
   useEffect(() => {
-    const currentId = user?.id ?? null;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
-    if (prevUserId.current !== currentId) {
-      if (!currentId) {
-        // 로그아웃
-        queryClient.clear();
-      } else {
-        // 로그인
-        queryClient.invalidateQueries();
-      }
-    }
-
-    prevUserId.current = currentId;
-  }, [user, queryClient]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [setUser]);
 
   return null;
 };

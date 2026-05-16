@@ -14,8 +14,10 @@ import { FiEdit3 } from 'react-icons/fi';
 
 const DetailActionsContainer = ({
   bookInfo,
+  userId,
 }: {
   bookInfo: { title: string; cover: string; author: string; isbn13: string; isbn: string };
+  userId: string | null;
 }) => {
   const { open } = useBookmarkMemoUrlState();
   const bookKey = useMemo(() => {
@@ -39,8 +41,8 @@ const DetailActionsContainer = ({
   const bookmarked = data?.bookmarked ?? false;
   const ids = useMemo(() => (bookKey ? [bookKey] : []), [bookKey]);
 
-  useFetchLikes(ids);
-  useFetchBookmark(ids);
+  useFetchLikes({ isbnList: ids, userId: userId });
+  useFetchBookmark({ isbnList: ids, userId: userId });
   useFetchLikeCount(ids);
 
   const normalized = useMemo(

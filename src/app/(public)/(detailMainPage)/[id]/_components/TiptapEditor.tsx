@@ -2,11 +2,12 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import Placeholder from '@tiptap/extension-placeholder';
-import { toast } from 'react-toastify';
 import type { Editor } from '@tiptap/react';
 import type { EditorView } from 'prosemirror-view';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 type TiptapEditorProps = {
   value: string;
   placeholder?: string;
@@ -25,14 +26,9 @@ const TiptapEditor = ({
   maxLength,
   onSubmitShortcut,
 }: TiptapEditorProps) => {
-  const valueRef = useRef(value);
   const getLengthFromEditor = (editor: Editor) => editor.getText().replace(/\n/g, '').length;
 
   const getLengthFromView = (view: EditorView) => view.state.doc.textContent.replace(/\n/g, '').length;
-
-  useEffect(() => {
-    valueRef.current = value;
-  }, [value]);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -67,7 +63,7 @@ const TiptapEditor = ({
           event.preventDefault();
 
           if (length === 0) {
-            toast.error('내용을 입력해주세요', { toastId: 'empty' });
+            showToast(RESULT_CODE.COMMENT_REQUIRED_CONTENT, { toastId: 'empty' });
             return true;
           }
 
@@ -85,7 +81,10 @@ const TiptapEditor = ({
 
         // 줄 제한
         if (event.key === 'Enter' && lines >= maxLines) {
-          toast.error(`최대 ${maxLines}줄까지 입력 가능합니다`, {
+          showToast(RESULT_CODE.COMMENT_MAX_LINE_EXCEEDED, {
+            variables: {
+              maxLines,
+            },
             toastId: 'line-limit',
           });
           event.preventDefault();
@@ -105,9 +104,14 @@ const TiptapEditor = ({
         const replacedLength = to - from;
         const nextLength = current - replacedLength + text.length;
         if (nextLength > maxLength) {
-          if (!toast.isActive('typing-limit')) {
-            toast.error(`최대 ${maxLength}자까지 입력 가능합니다`, { toastId: 'typing-limit' });
-          }
+          showToast(RESULT_CODE.COMMENT_MAX_LENGTH_EXCEEDED, {
+            variables: {
+              maxLength,
+            },
+            toastId: 'typing-limit',
+            preventDuplicate: true,
+          });
+
           return true;
         }
 
@@ -121,7 +125,7 @@ const TiptapEditor = ({
         const pasteText = event.clipboardData?.getData('text') || '';
 
         if (currentLines + pasteLines - 1 > maxLines || currentLength + pasteText.length > maxLength) {
-          toast.error('입력 제한을 초과하여 붙여넣을 수 없습니다', { toastId: 'paste' });
+          showToast(RESULT_CODE.COMMENT_PASTE_LIMIT_EXCEEDED, { toastId: 'paste' });
           event.preventDefault();
           return true;
         }
@@ -134,12 +138,16 @@ const TiptapEditor = ({
     onUpdate: ({ editor }) => {
       const length = getLengthFromEditor(editor);
       if (length > maxLength) {
-        toast.error(`최대 ${maxLength}자까지 입력 가능합니다`, { toastId: 'limit' });
+        showToast(RESULT_CODE.COMMENT_MAX_LENGTH_EXCEEDED, {
+          variables: {
+            maxLength,
+          },
+          toastId: 'limit',
+        });
         return;
       }
 
       const html = editor.getHTML();
-      valueRef.current = html;
 
       onChange(html, length);
     },

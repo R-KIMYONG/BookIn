@@ -17,6 +17,7 @@ import { Genre } from '@/shared/domain/category/types';
 import { MINUTE } from '@/shared/constants/time';
 import { useFetchBookmark } from '@/hooks/bookmark/useFetchBookmark';
 import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
+import { useAuth } from '@/shared/context/AuthContext';
 
 export type CategoryPageProps = {
   params: { categoryId: string };
@@ -28,6 +29,7 @@ export type CategoryPageProps = {
 const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: CategoryPageProps) => {
   const categoryIdNum = Number(params.categoryId);
   const router = useRouter();
+  const { user } = useAuth();
   const isValidNum = Number.isFinite(categoryIdNum) && categoryIdNum > 0; //[방어코드] URL에 입력된 categoryNum이 진짜 숫자인지 0보다 큰지를 체크
 
   const { isValidCategory, groupLabel, genreData, defaultTarget } = useMemo(() => {
@@ -97,8 +99,8 @@ const CategoryClient = ({ params, koreanGenres, foreignGenres, ebookGenres }: Ca
   };
   const isbnList = (data?.item ?? []).map((item) => item.isbn13);
 
-  useFetchLikes(isbnList);
-  useFetchBookmark(isbnList);
+  useFetchLikes({ isbnList: isbnList, userId: user?.id });
+  useFetchBookmark({ isbnList: isbnList, userId: user?.id });
   useFetchLikeCount(isbnList);
 
   if (!isValidCategory) {

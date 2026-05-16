@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import cn from '@/shared/utils/cn';
 import Button from './ui/Button';
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdChevronLeft, MdChevronRight } from 'react-icons/md';
-import { toast } from 'react-toastify';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 type AppPaginationProps = {
   page: number;
@@ -98,7 +99,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
             const pageNumber = Number(pageInputValue);
             if (pageNumber < 1 || pageNumber > totalPages) {
               setError(true);
-              toast.error(`1 ~ ${totalPages} 사이의 페이지를 입력하세요`);
+              showToast(RESULT_CODE.PAGINATION_PAGE_OUT_OF_RANGE, { variables: { totalPages } });
               return;
             }
             setError(false);

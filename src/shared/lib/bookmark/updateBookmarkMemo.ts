@@ -1,4 +1,4 @@
-import { Tag } from '@/components/bookmark/BookmarkTagPicker';
+import { Tag } from '@/shared/domain/tag/types';
 
 export const updateBookmarkMemo = async ({
   isbn13,

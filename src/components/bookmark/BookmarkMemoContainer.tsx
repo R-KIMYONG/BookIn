@@ -1,17 +1,18 @@
 'use client';
 
-import useUser from '@/hooks/auth/useUser';
 import BookmarkMemoModal from '@/components/modal/BookmarkMemoModal';
-import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { useBookmarkMemo } from '@/hooks/bookmark/useBookmarkMemo';
 import { useUpdateBookmarkMemo } from '@/hooks/bookmark/useUpdateBookmarkMemo';
+import { useAuth } from '@/shared/context/AuthContext';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 const BookmarkMemoContainer = () => {
   const { isOpen, isbn, close } = useBookmarkMemoUrlState();
-  const { data: user, isLoading: userLoading } = useUser();
+  const { user } = useAuth();
   const bookKey = (isbn ?? '').trim();
   const userId = user?.id ?? '';
 
@@ -22,13 +23,11 @@ const BookmarkMemoContainer = () => {
   useEffect(() => {
     if (!isOpen) return;
 
-    if (userLoading) return;
-
     if (!userId) {
-      toast.warning('로그인이 필요합니다.', { toastId: 'bookmark-memo-login' });
+      showToast(RESULT_CODE.AUTH_REQUIRED_LOGIN, { toastId: 'bookmark-memo-login' });
       close();
     }
-  }, [isOpen, userLoading, userId, close]);
+  }, [isOpen, userId, close]);
   if (!isOpen || !bookKey) return null;
   const initialMemoHtml = bookmarkData?.memo ?? null;
   const initialTags = bookmarkData?.tags ?? [];

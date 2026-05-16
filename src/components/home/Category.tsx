@@ -18,6 +18,7 @@ import { useFetchBookmark } from '@/hooks/bookmark/useFetchBookmark';
 import { MINUTE } from '@/shared/constants/time';
 import { normalizeBook } from '@/shared/lib/book/normalizeBook';
 import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
+import { useAuth } from '@/shared/context/AuthContext';
 
 type PagedResult<T> = {
   items: T[];
@@ -34,6 +35,7 @@ const emptyPaged = <T,>(itemsPerPage = 20): PagedResult<T> => ({
 const Category = () => {
   const { queryType, page, searchKeyWord, searchQueryType, setHomeUrl } = useHomeListUrlState();
   const isSearching = Boolean(searchKeyWord?.trim());
+  const { user } = useAuth();
 
   const {
     data: listData,
@@ -120,10 +122,10 @@ const Category = () => {
   const isbnList = useMemo(() => {
     return list.map((item) => item.isbn13).filter(Boolean);
   }, [list]);
-  useFetchLikes(isbnList);
-  useFetchBookmark(isbnList);
+  useFetchLikes({ isbnList, userId: user?.id });
+  useFetchBookmark({ isbnList, userId: user?.id });
   useFetchLikeCount(isbnList);
-  
+
   const totalResults = isSearching ? (searchData?.totalResults ?? 0) : (listData?.totalResults ?? 0);
   //패칭해온 총결과
   const perPage = isSearching ? (searchData?.itemsPerPage ?? 20) : (listData?.itemsPerPage ?? 20);

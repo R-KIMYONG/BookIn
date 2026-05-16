@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import { TermsState } from '@/shared/domain/terms/types';
 import Button from '@/components/common/ui/Button';
 import { TERMS_ITEMS } from '@/shared/constants/terms';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import SwitchToggle from './_components/SwitchToggle';
 
 const TermsPage = () => {
   const router = useRouter();
@@ -40,11 +42,10 @@ const TermsPage = () => {
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!terms.isOver14 || !terms.agreedToTerms) {
-      return toast.error('필수 약관에 모두 동의해 주세요!');
+    if (!canProceed) {
+      showToast(RESULT_CODE.TERMS_REQUIRED_AGREEMENT);
+      return;
     }
-
-    toast.success('약관 동의 완료!');
     router.push('/signup'); // 회원가입 페이지로 이동
   };
   return (
@@ -66,21 +67,7 @@ const TermsPage = () => {
                   <p className="text-sm font-semibold text-gray-900">모두 동의</p>
                   <p className="mt-0.5 text-[11px] text-gray-500">필수 및 선택 항목을 한 번에 설정합니다.</p>
                 </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={isAllChecked}
-                  onClick={() => handleAllChange(!isAllChecked)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                    isAllChecked ? 'bg-[#af5858]' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                      isAllChecked ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
+                <SwitchToggle checked={isAllChecked} onChange={() => handleAllChange(!isAllChecked)} />
               </div>
             </div>
 
@@ -116,19 +103,7 @@ const TermsPage = () => {
                         <p className="mt-1 text-[11px] text-gray-500">가입 연령 요건을 확인합니다.</p>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleSingleChange(item.id, !checked)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                        checked ? 'bg-[#af5858]' : 'bg-gray-300'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                          checked ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
+                    <SwitchToggle checked={checked} onChange={() => handleSingleChange(item.id, !checked)} />
                   </div>
                 );
               })}

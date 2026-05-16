@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/shared/lib/supabase/client';
-import { Tag } from '@/components/bookmark/BookmarkTagPicker';
 import { MINUTE } from '@/shared/constants/time';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
+import { Tag } from '@/shared/domain/tag/types';
 
 export const useUserTags = (userId: string) => {
   const supabase = createClient();

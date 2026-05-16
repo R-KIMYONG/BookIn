@@ -6,10 +6,10 @@ import { toast } from 'react-toastify';
 import { logoutExpiredSession, resetTempSession } from '@/app/actions/session.actions';
 import { useSessionModal } from '@/stores/useSessionModal';
 import useCountdown from '@/hooks/common/useCountdown';
-import { TEMP_SESSION_SOON_TOAST_ID } from '@/components/layout/session/TempSessionBadge';
-import { STORAGE_KEY } from '@/components/session/SessionModalContainer';
 import { createClient } from '@/shared/lib/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { SESSION_STORAGE_KEY } from '@/shared/domain/auth/constants';
+import { TEMP_SESSION_SOON_TOAST_ID } from '@/shared/domain/session/constants';
 
 type useTempSessionManagerProps = {
   isLoggedIn: boolean;
@@ -68,7 +68,7 @@ export const useTempSessionManager = ({ isLoggedIn, tempSessionExpiresAt }: useT
     hasHandledExpire.current = true;
 
     const handleExpire = async () => {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ redirectTo: pathname }));
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ redirectTo: pathname }));
       openExpired(pathname);
 
       const supabase = createClient();
