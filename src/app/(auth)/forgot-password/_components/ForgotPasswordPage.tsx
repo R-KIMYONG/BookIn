@@ -4,7 +4,6 @@ import { ReactNode, useEffect, useState } from 'react';
 import { createClient } from '@/shared/lib/supabase/client';
 import Button from '@/components/common/ui/Button';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
-import { toast } from 'react-toastify';
 import CountdownStatus from '@/app/(private)/mypage/settings/_components/CountdownStatus';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
@@ -15,6 +14,8 @@ import { requestPasswordReset } from '@/shared/lib/auth/requestPasswordReset';
 import { authKeys } from '@/shared/domain/auth/queryKeys';
 import { AuthResetPasswordRequest } from '@/shared/domain/auth/types';
 import useUrlParams from '@/hooks/url/useUrlParams';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 type PasswordResetState = {
   pendingEmail: string | null;
@@ -85,12 +86,12 @@ const ForgotPasswordPage = () => {
     const trimmed = inputEmail.trim();
 
     if (!trimmed) {
-      toast.warning('이메일을 입력해주세요.');
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_EMAIL);
       return;
     }
 
     if (!isValidEmail(trimmed)) {
-      toast.warning('올바른 이메일 형식이 아닙니다.');
+      showToast(RESULT_CODE.VALIDATION_INVALID_EMAIL);
       return;
     }
 
@@ -98,7 +99,7 @@ const ForgotPasswordPage = () => {
       await toastMutationPromise(resetPasswordMutation.mutateAsync(trimmed), { pending: '비밀번호 변경요청중...' });
     } catch (error) {
       console.error(error);
-      toast.error('요청 중 오류가 발생했습니다.');
+      showToast(RESULT_CODE.COMMON_UNKNOWN_ERROR);
     }
   };
 
@@ -197,5 +198,5 @@ const Input = ({
 );
 
 const SubmitButton = ({ loading }: { loading: boolean }) => (
-  <Button type="submit" label={loading ? '전송 중...' : '재설정 메일 보내기'} />
+  <Button type="submit" label="재설정 메일 보내기" isLoading={loading} loadingText="전송중..." />
 );

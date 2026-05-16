@@ -2,6 +2,7 @@
 
 import Button from '@/components/common/ui/Button';
 import useCountdown from '@/hooks/common/useCountdown';
+import { SESSION_EXPIRES_AT } from '@/shared/domain/auth/constants';
 import { getCookie } from '@/shared/lib/cookie';
 import { useEffect } from 'react';
 type SessionModalProps = {
@@ -13,7 +14,7 @@ type SessionModalProps = {
   showGoLoginButton?: boolean;
 };
 const SessionModal = ({ isOpen, isExpired, onClose, onExtend, onGoLogin, showGoLoginButton }: SessionModalProps) => {
-  const expiresAt = Number(getCookie('bookin_session_expires_at'));
+  const expiresAt = Number(getCookie(SESSION_EXPIRES_AT));
 
   const { remainingSec, countDownText } = useCountdown(expiresAt, {
     enabled: !isExpired && expiresAt > Date.now(),

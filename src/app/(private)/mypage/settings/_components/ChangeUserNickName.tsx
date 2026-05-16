@@ -6,6 +6,8 @@ import { MAX_LENGTH_NICKNME } from '@/shared/constants/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): ReactElement => {
   const [draftNickname, setDraftNickname] = useState<string>(nickname);
@@ -42,16 +44,12 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
     const nextNickname = draftNickname.trim();
 
     if (nextNickname === nickname) {
-      toast.info('현재 사용 중인 닉네임입니다.', {
-        position: 'top-right',
-      });
+      showToast(RESULT_CODE.AUTH_NICKNAME_SAME_AS_CURRENT);
       return;
     }
 
     if (nextNickname === '') {
-      toast.warning('빈칸으로 변경할 수 없습니다.', {
-        position: 'top-right',
-      });
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_NICKNAME);
       return;
     }
 
@@ -90,10 +88,11 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
       <div className="flex justify-end">
         <Button
           type="submit"
-          label={changeNickNameMutation.isPending ? '저장중...' : '저장'}
+          label="저장"
+          isLoading={changeNickNameMutation.isPending}
           variant="primary"
+          loadingText="저장중..."
           size="sm"
-          disabled={changeNickNameMutation.isPending}
         />
       </div>
     </form>

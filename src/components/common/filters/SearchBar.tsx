@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 import { FiChevronDown, FiSearch, FiX } from 'react-icons/fi';
 import Button from '../ui/Button';
 import { SearchQueryType } from '@/shared/constants/search';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 type SearchBarProps = {
   value: string;
@@ -46,7 +47,7 @@ const SearchBar = ({
 
           const keyword = (formData.get('keyword') as string | null)?.trim() ?? '';
           if (!keyword) {
-            toast.warn('검색어를 입력해주세요');
+            showToast(RESULT_CODE.VALIDATION_REQUIRED_SEARCHKEYWORD);
             return;
           }
           onSubmit(keyword);

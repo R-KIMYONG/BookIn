@@ -1,24 +1,32 @@
 import { NextResponse } from 'next/server';
-// The client you created from the Server-Side Auth instructions
 import { createClient } from '@/shared/lib/supabase/server';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { createRedirectUrl } from '@/shared/utils/navigation/createRedirectUrl';
 
-export async function GET(request: Request) {
+export const GET = async (request: Request) => {
   const { searchParams, origin } = new URL(request.url);
-  // console.log('리퀘오류', request.url);
-  const code = searchParams.get('code');
-  // console.log('오류', code);
 
-  // if "next" is in param, use it as the redirect URL
+  const code = searchParams.get('code');
+
   const next = searchParams.get('next') ?? '/';
+
+  const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/';
 
   const supabase = await createClient();
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      const providers = data.session?.user?.app_metadata?.providers ?? [];
+      const redirectUrl = createRedirectUrl(safeNext, {
+        toast: RESULT_CODE.AUTH_SOCIAL_LOGIN_SUCCESS,
+        provider: providers.join(','),
+      });
+      return NextResponse.redirect(`${origin}${redirectUrl}`);
     }
   }
+  const redirectUrl = createRedirectUrl('/login', {
+    toast: RESULT_CODE.AUTH_SOCIAL_LOGIN_FAILED,
+  });
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
-}
+  return NextResponse.redirect(`${origin}${redirectUrl}`);
+};

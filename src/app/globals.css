@@ -50,3 +50,17 @@ header > nav > header {
 .tiptap-editor p:first-child {
   min-height: 1.5em;
 }
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

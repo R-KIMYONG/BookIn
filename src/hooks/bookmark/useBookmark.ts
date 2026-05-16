@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useUser from '../auth/useUser';
 import { BookmarkCache } from '@/shared/domain/bookmark/types';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
 import { toggleBookmark } from '@/shared/lib/bookmark/toggleBookmark';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { BookInfo } from '@/shared/types/bookInfo';
+import { useAuth } from '@/shared/context/AuthContext';
 
 export const useBookmark = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
   const isbn13 = bookInfo?.isbn13.trim();
-  const { data: user } = useUser();
+  const { user } = useAuth();
 
   if (!isbn13) {
     throw new Error('isbn13 is required');

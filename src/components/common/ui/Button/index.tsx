@@ -3,7 +3,7 @@ import cn from '@/shared/utils/cn';
 import React, { forwardRef } from 'react';
 
 const base =
-  'inline-flex items-center justify-center gap-2 font-semibold rounded-md box-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+  'inline-flex items-center justify-center gap-2 font-semibold rounded-xl box-border transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed';
 
 const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary: 'bg-[#af5858] text-white hover:bg-[#8f4646]',
@@ -21,13 +21,13 @@ const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
   md: 'text-sm px-4 py-2 h-10',
 };
 
-const ButtonSpinner = ({ size = 14 }: { size?: number }) => {
+export const ButtonSpinner = () => {
   return (
-    <span
-      className="inline-block animate-spin rounded-full border-1 border-current/70 border-t-transparent"
-      style={{ width: size, height: size }}
-      aria-hidden="true"
-    />
+    <span className="inline-flex items-center gap-1">
+      <span className="h-1.5 w-1.5 rounded-full bg-current animate-[blink_1.4s_infinite]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-current animate-[blink_1.4s_0.2s_infinite]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-current animate-[blink_1.4s_0.4s_infinite]" />
+    </span>
   );
 };
 
@@ -52,6 +52,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const isDisabled = disabled || isLoading;
     const buttonContent = children ?? label;
+    const hasLoadingText = loadingText.trim() !== '';
     return (
       <button
         ref={ref}
@@ -62,16 +63,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading ? (
-          <span className="text-center flex items-center">
+          <span className={cn('flex items-center justify-center', hasLoadingText && 'gap-2')}>
             <ButtonSpinner />
-            <span className="leading-none">{loadingText}</span>
+            {hasLoadingText && <span className="leading-none">{loadingText}</span>}
           </span>
         ) : (
           <>
             {leftIcon ? <span className="pointer-events-none">{leftIcon}</span> : null}
-            <span className="leading-none">
-              {buttonContent != null && <span className="leading-none">{buttonContent}</span>}
-            </span>
+
+            {buttonContent != null && <span className="leading-none">{buttonContent}</span>}
+
             {rightIcon ? <span className="pointer-events-none">{rightIcon}</span> : null}
           </>
         )}

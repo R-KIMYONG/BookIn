@@ -1,6 +1,5 @@
 'use client';
 
-import { toast } from 'react-toastify';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import dynamic from 'next/dynamic';
 import Button from '@/components/common/ui/Button';
@@ -11,6 +10,9 @@ import type { Editor } from '@tiptap/react';
 import { MAX_LENGTH, MAX_LINES } from '@/shared/constants/comment';
 import { TargetValue } from './Comment/types';
 import { SubmitItem } from '@/shared/domain/comment/types';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { options } from 'sanitize-html';
 
 const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
   ssr: false,
@@ -45,7 +47,11 @@ const CommentForm = ({
   const formRef = useRef<HTMLFormElement | null>(null);
   const handleContentChange = (html: string, textLength: number) => {
     if (textLength > MAX_LENGTH) {
-      toast.error('200자 이상은 작성 불가능합니다');
+      showToast(RESULT_CODE.COMMENT_MAX_LENGTH_EXCEEDED, {
+        variables: {
+          maxLength: MAX_LENGTH,
+        },
+      });
       return;
     }
     setTargetValue((prev) => ({ ...prev, content: html }));
@@ -59,7 +65,7 @@ const CommentForm = ({
     const cleanContent: string = sanitizeHtmlClient(targetValue.content || '');
 
     if (!userId) {
-      toast.error('로그인 후 댓글을 작성할 수 있습니다.');
+      showToast(RESULT_CODE.AUTH_REQUIRED_LOGIN);
       return;
     }
 
@@ -83,7 +89,8 @@ const CommentForm = ({
 
       handleCancelEdit();
     } catch (error) {
-      toast.error('댓글 등록 실패');
+      console.error(error);
+      showToast(RESULT_CODE.COMMENT_CREATE_FAILED);
     }
   };
 
@@ -145,14 +152,7 @@ const CommentForm = ({
 
           {/* 버튼 - 옆으로 이동 */}
           <div className="flex items-end gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              type="submit"
-              label={isEdit ? '수정' : '등록'}
-              // className="h-8 px-3 text-xs"
-              disabled={isDisabled}
-            />
+            <Button variant="primary" size="sm" type="submit" label={isEdit ? '수정' : '등록'} disabled={isDisabled} />
 
             <Button
               variant="secondary"
@@ -160,7 +160,6 @@ const CommentForm = ({
               type="button"
               label="취소"
               onClick={handleCancelEdit}
-              // className="text-[11px] text-gray-400 hover:text-gray-600"
               disabled={isDisabled}
             />
           </div>

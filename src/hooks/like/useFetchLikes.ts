@@ -1,9 +1,10 @@
 import { MINUTE } from '@/shared/constants/time';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { LikeCache, LikeResponseUserType } from '@/shared/domain/like/types';
+import { UserBookBetchProps } from '@/shared/types/query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const useFetchLikes = (isbnList: string[], userId?: string | null) => {
+export const useFetchLikes = ({ isbnList, userId }: UserBookBetchProps) => {
   const queryClient = useQueryClient();
   return useQuery<LikeResponseUserType[]>({
     queryKey: likeKeys.userBatch(userId ?? 'guest', isbnList),

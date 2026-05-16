@@ -3,6 +3,7 @@ import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/shared/lib/supabase/server';
 import HeaderCategoriesServer from './HeaderCategoriesSever';
+import { SESSION_EXPIRES_AT } from '@/shared/domain/auth/constants';
 
 const Header = async () => {
   const cookieStore = await cookies();
@@ -12,7 +13,7 @@ const Header = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const tempExpiresAtStr = cookieStore.get('bookin_session_expires_at')?.value ?? null;
+  const tempExpiresAtStr = cookieStore.get(SESSION_EXPIRES_AT)?.value ?? null;
   const tempSessionExpiresAt = tempExpiresAtStr ? Number(tempExpiresAtStr) : null;
 
   const isLoggedIn = !!user;

@@ -7,5 +7,5 @@ export const bookmarkKeys = {
     detail: (userId: string | null, isbn: string) => ['bookmarkTags', 'detail', userId, isbn] as const,
   },
   list: ['bookmarkFetch'] as const,
-  batch: (isbnList: string[]) => ['bookmark', 'batch', [...isbnList].sort().join(',')] as const,
+  batch: (isbnList: string[], userId: string) => ['bookmark', 'user', userId, [...isbnList].sort().join(',')] as const,
 };

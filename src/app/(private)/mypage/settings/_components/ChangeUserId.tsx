@@ -3,11 +3,12 @@
 import Button from '@/components/common/ui/Button';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 import CountdownStatus from './CountdownStatus';
 import { createClient } from '@/shared/lib/supabase/client';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 type PendingEmailData = {
   pendingEmail: string;
@@ -87,23 +88,17 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     const newEmail = draftEmail.trim();
 
     if (newEmail === email) {
-      toast.info('현재 사용 중인 이메일입니다.', {
-        position: 'top-right',
-      });
+      showToast(RESULT_CODE.AUTH_EMAIL_SAME_AS_CURRENT);
       return;
     }
 
     if (!newEmail) {
-      toast.warning('빈칸으로 변경할 수 없습니다.', {
-        position: 'top-right',
-      });
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_EMAIL);
       return;
     }
 
     if (!isValidEmail(newEmail)) {
-      toast.warning('이메일 형식이 아닙니다.', {
-        position: 'top-right',
-      });
+      showToast(RESULT_CODE.VALIDATION_INVALID_EMAIL);
       return;
     }
 
@@ -238,9 +233,10 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
         <Button
           type="submit"
           size="sm"
-          label={changeUserEmailMutation.isPending ? '요청중...' : '이메일 변경'}
+          label="이메일 변경"
+          isLoading={changeUserEmailMutation.isPending}
+          loadingText="요청중..."
           variant="primary"
-          disabled={changeUserEmailMutation.isPending}
         />
       </div>
     </form>

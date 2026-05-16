@@ -1,6 +1,6 @@
-import { BookmarkMemoView, SaveInput } from '@/components/bookmark/BookmarMemoContainer.type';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
+import { BookmarkMemoView, SaveInput } from '@/shared/domain/tag/types';
 import { updateBookmarkMemo } from '@/shared/lib/bookmark/updateBookmarkMemo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';

@@ -11,5 +11,5 @@ export type LikeResponseUserType = {
 
 export type LikeResponseCountType = {
   isbn13: string;
-  like_count: number;
+  liked_count: number;
 };

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { colorClass, Tag } from './BookmarkTagPicker';
 import { HiHashtag } from 'react-icons/hi';
 import Button from '../common/ui/Button';
 import { FiPlus } from 'react-icons/fi';
 import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
+import { Tag } from '@/shared/domain/tag/types';
+import { getTagColorClass } from '@/shared/domain/tag/getTagColorClass';
 
 const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => void; scope: BookmarkMemoScope }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -36,7 +37,7 @@ const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => 
           {tagNames.map((tag) => (
             <span
               key={tag.id ?? tag.name}
-              className={`inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[11px] text-gray-700 ring-1 ring-gray-200 cursor-default ${colorClass(tag.color)}`}
+              className={`inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[11px] text-gray-700 ring-1 ring-gray-200 cursor-default ${getTagColorClass(tag.color)}`}
             >
               <HiHashtag className="h-3 w-3" />
               <p className="text-[11px] font-semibold text-gray-700">{tag.name}</p>
