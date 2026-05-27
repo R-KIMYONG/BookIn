@@ -7,8 +7,10 @@ const config: Config = {
     extend: {
       colors: {
         main: '#AF5858',
-
         appBg: '#ffffff',
+      },
+      fontFamily: {
+        sans: ['var(--font-noto-kr)', 'var(--font-noto-jp)', 'var(--font-noto-sc)', 'system-ui', 'sans-serif'],
       },
     },
   },
