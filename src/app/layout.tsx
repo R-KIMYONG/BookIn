@@ -3,12 +3,11 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layout/header/Header';
 import Footer from '@/components/layout/Footer';
-
 import 'react-toastify/dist/ReactToastify.css';
-import GlobalOverlays from './GlobalOverlays';
 import { createClient } from '@/shared/lib/supabase/server';
 import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from '@/shared/providers/QueryProvider';
+import GlobalOverlays from './GlobalOverlays';
 
 const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {

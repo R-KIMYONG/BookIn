@@ -42,7 +42,7 @@ export const logoutExpiredSession = async ({
   clearTempSessionCookies();
   revalidatePath('/', 'layout');
 
-  if (shouldRedirectToLogin && redirectTo) {
-    redirect(createRedirectUrl('/login', { redirectTo }));
-  }
+  return {
+    redirectTo: shouldRedirectToLogin && redirectTo ? createRedirectUrl('/login', { redirectTo }) : null,
+  };
 };

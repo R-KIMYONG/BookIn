@@ -1,9 +1,10 @@
+'use client';
 import Button from '@/components/common/ui/Button';
 import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 import { MypageSectionType } from '@/shared/domain/mypage/section';
 
-const SidebarTabs = () => {
-  const { query, setQuery } = useMypageQueryState();
+const SidebarTabs = ({ section }: { section: MypageSectionType }) => {
+  const { setQuery } = useMypageQueryState();
   const profileTabs: { label: string; sectionType: MypageSectionType }[] = [
     { label: '내 활동 책', sectionType: 'myBooks' },
     { label: '내 취향 추천', sectionType: 'recommend' },
@@ -14,7 +15,7 @@ const SidebarTabs = () => {
       <nav>
         <ul className="flex flex-wrap gap-2">
           {profileTabs.map((tab) => {
-            const isActive = query.section === tab.sectionType;
+            const isActive = section === tab.sectionType;
 
             return (
               <li key={tab.sectionType}>
@@ -23,7 +24,7 @@ const SidebarTabs = () => {
                   fullWidth={true}
                   variant={isActive ? 'primary' : 'secondary'}
                   onClick={() => {
-                    if (query.section !== tab.sectionType) {
+                    if (section !== tab.sectionType) {
                       setQuery({ section: tab.sectionType, page: 1 });
                     }
                   }}

@@ -1,8 +1,29 @@
 import { sanitizeHtmlServer } from '@/shared/utils/security/sanitizeHtml.server';
 import { Tables } from '@/shared/types/supabase';
 import { createClient } from '@/shared/lib/supabase/server';
-
 import { NextRequest, NextResponse } from 'next/server';
+import { fetchComments } from '@/shared/lib/comment/fetchComments';
+
+export const GET = async (request: NextRequest) => {
+  try {
+    const supabase = await createClient();
+
+    const { searchParams } = new URL(request.url);
+
+    const bookId = searchParams.get('bookId');
+
+    const page = Number(searchParams.get('page') ?? 1);
+
+    if (!bookId) return NextResponse.json({ message: 'bookId가 필요합니다.' }, { status: 400 });
+
+    const result = await fetchComments(supabase, bookId, page);
+
+    return NextResponse.json(result, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: '댓글 조회 실패' }, { status: 500 });
+  }
+};
 
 export const POST = async (request: NextRequest) => {
   const supabase = await createClient();

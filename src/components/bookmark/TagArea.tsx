@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { HiHashtag } from 'react-icons/hi';
 import Button from '../common/ui/Button';
-import { FiPlus } from 'react-icons/fi';
 import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
 import { Tag } from '@/shared/domain/tag/types';
 import { getTagColorClass } from '@/shared/domain/tag/getTagColorClass';
+import { Hash, Plus } from 'lucide-react';
 
 const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => void; scope: BookmarkMemoScope }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -39,7 +38,7 @@ const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => 
               key={tag.id ?? tag.name}
               className={`inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[11px] text-gray-700 ring-1 ring-gray-200 cursor-default ${getTagColorClass(tag.color)}`}
             >
-              <HiHashtag className="h-3 w-3" />
+              <Hash className="h-3 w-3" strokeWidth={3} />
               <p className="text-[11px] font-semibold text-gray-700">{tag.name}</p>
             </span>
           ))}
@@ -52,8 +51,8 @@ const TagArea = ({ tagNames, onMore, scope }: { tagNames: Tag[]; onMore?: () => 
           onClick={onMore}
           size="xs"
           variant="ghost"
-          className="absolute -bottom-0 lg:-bottom-7 left-0 text-[10px] text-gray-500 hover:!bg-gray-50"
-          leftIcon={<FiPlus className="h-3 w-3 " />}
+          className="absolute -bottom-0 lg:-bottom-4 left-0 text-[10px] hover:!bg-transparent"
+          leftIcon={<Plus className="h-3 w-3" strokeWidth={2} />}
           label="더보기"
         />
       )}

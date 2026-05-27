@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Button from '@/components/common/ui/Button';
-import useCurrentUrl from '@/hooks/common/useCurrentUrl';
 import { ButtonVariant } from '@/components/common/ui/Button/type';
+import useCurrentUrl from '@/hooks/common/useCurrentUrl';
 
 type LoginLinkProps = {
   btnVariant?: ButtonVariant;

@@ -4,20 +4,19 @@ import Button from '@/components/common/ui/Button';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useMemo, useState } from 'react';
 import CountdownStatus from './CountdownStatus';
-import { createClient } from '@/shared/lib/supabase/client';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { userKeys } from '@/shared/domain/user/queryKeys';
 
 type PendingEmailData = {
   pendingEmail: string;
   emailExpireAt: number | null;
 };
 
-const ChangeUserId = ({ email, userId }: { email: string; userId: string }): ReactElement => {
+const ChangeUserId = ({ email }: { email: string }): ReactElement => {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   const [draftEmail, setDraftEmail] = useState<string>(''); // input에 수정중인 상태
 
@@ -28,17 +27,15 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
     refetch,
   } = useQuery<PendingEmailData>({
     //조회이니까 컴포넌트에서 직접 supabase로 요청
-    queryKey: ['pendingEmail', userId],
+    queryKey: userKeys.pendingEmail(),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('pending_email,pending_email_expires_at')
-        .eq('id', userId)
-        .maybeSingle();
-      if (error) throw error;
-      const pendingEmail = data?.pending_email ?? '';
-      const emailExpireAt = data?.pending_email_expires_at ? new Date(data.pending_email_expires_at).getTime() : null;
-      return { pendingEmail, emailExpireAt };
+      const res = await fetch('/api/user/pending-email');
+
+      if (!res.ok) {
+        throw new Error('인증 상태 조회 실패');
+      }
+
+      return res.json();
     },
   });
   const now = Date.now();
@@ -71,13 +68,10 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
       return result;
     },
-    onSuccess: (result) => {
-      if (result?.user) {
-        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
-      }
-      queryClient.invalidateQueries({ queryKey: ['pendingEmail', userId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
+
+      queryClient.invalidateQueries({ queryKey: userKeys.pendingEmail() });
       setDraftEmail('');
     },
   });
@@ -123,13 +117,10 @@ const ChangeUserId = ({ email, userId }: { email: string; userId: string }): Rea
 
       return result;
     },
-    onSuccess: (result) => {
-      if (result?.user) {
-        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
-      }
-      queryClient.invalidateQueries({ queryKey: ['pendingEmail', userId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
+
+      queryClient.invalidateQueries({ queryKey: userKeys.pendingEmail() });
     },
   });
 

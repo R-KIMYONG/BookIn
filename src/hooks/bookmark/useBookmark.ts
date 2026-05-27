@@ -5,12 +5,13 @@ import { toggleBookmark } from '@/shared/lib/bookmark/toggleBookmark';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { BookInfo } from '@/shared/types/bookInfo';
 import { useAuth } from '@/shared/context/AuthContext';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
 export const useBookmark = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
   const isbn13 = bookInfo?.isbn13.trim();
   const { user } = useAuth();
-
   if (!isbn13) {
     throw new Error('isbn13 is required');
   }
@@ -60,8 +61,15 @@ export const useBookmark = (bookInfo: BookInfo) => {
   });
 
   return {
-    toggle: (bookmarked: boolean, options?: Parameters<typeof mutation.mutate>[1]) =>
-      mutation.mutate(bookmarked, options),
+    toggle: (bookmarked: boolean, options?: Parameters<typeof mutation.mutate>[1]) => {
+      if (!user) {
+        showToast(RESULT_CODE.AUTH_REQUIRED_LOGIN, {
+          toastId: 'login-required',
+        });
+        return;
+      }
+      mutation.mutate(bookmarked, options);
+    },
     isLoading: mutation.isPending,
   };
 };

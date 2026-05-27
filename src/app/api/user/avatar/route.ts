@@ -53,6 +53,15 @@ export const PATCH = async (req: NextRequest) => {
     await supabase.storage.from('avatars').remove([upload.path]);
     return NextResponse.json({ message: updateError.message }, { status: 500 });
   }
+  const { error: metadataError } = await supabase.auth.updateUser({
+    data: {
+      avatar: avatarUrl,
+    },
+  });
+
+  if (metadataError) {
+    console.error('auth metadata avatar update error', metadataError);
+  }
 
   return NextResponse.json({ message: '아바타 이미지 업데이트 완료', avatarUrl }, { status: 200 });
 };

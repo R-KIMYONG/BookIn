@@ -1,9 +1,9 @@
 'use client';
-import { FiX } from 'react-icons/fi';
+
 import Button from '../common/ui/Button';
 import { useEffect, useRef } from 'react';
-import { HiHashtag } from 'react-icons/hi';
 import { COLOR_TOKENS } from '@/shared/domain/tag/constants';
+import { Hash, X } from 'lucide-react';
 
 type TagColorPopoverProps = {
   open: boolean;
@@ -61,7 +61,7 @@ const TagColorPopover = ({ open, onClose, value, onSelect, tagName, className }:
         <div className="flex items-center justify-between px-1 pb-2">
           <div className="flex gap-1">
             <div className="flex items-center">
-              <HiHashtag className="h-3 w-3" />
+              <Hash className="h-3 w-3" strokeWidth={3}/>
               <p className="text-[11px] font-semibold text-gray-700">{tagName}</p>
             </div>
             <p className="text-[11px] font-semibold text-gray-700"> 색상</p>
@@ -72,7 +72,7 @@ const TagColorPopover = ({ open, onClose, value, onSelect, tagName, className }:
             className="rounded-md p-1 text-gray-500 hover:bg-gray-100"
             aria-label="닫기"
           >
-            <FiX className="h-4 w-4" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 

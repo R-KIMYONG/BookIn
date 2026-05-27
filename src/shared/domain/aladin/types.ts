@@ -40,3 +40,9 @@ export type AladinItem = {
   link: string;
   mileage: number;
 };
+
+export type PagedResult<T> = {
+  items: T[];
+  totalResults: number;
+  itemsPerPage: number;
+};

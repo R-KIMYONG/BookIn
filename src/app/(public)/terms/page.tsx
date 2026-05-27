@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import { TermsState } from '@/shared/domain/terms/types';
 import Button from '@/components/common/ui/Button';

@@ -5,7 +5,6 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   const keyword = searchParams.get('SearchKeyWord')?.trim() ?? '';
-
   const rawPage = Number(searchParams.get('page') ?? '1');
   const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
 

@@ -5,11 +5,11 @@ import Button from '@/components/common/ui/Button';
 import { MAX_LENGTH_NICKNME } from '@/shared/constants/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { ReactElement, useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { userKeys } from '@/shared/domain/user/queryKeys';
 
-const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: string }): ReactElement => {
+const ChangeUserNickName = ({ nickname }: { nickname: string }): ReactElement => {
   const [draftNickname, setDraftNickname] = useState<string>(nickname);
   const queryClient = useQueryClient();
 
@@ -31,12 +31,8 @@ const ChangeUserNickName = ({ nickname, userId }: { nickname: string; userId: st
 
       return result;
     },
-    onSuccess: (result) => {
-      if (result?.user) {
-        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
     },
   });
 

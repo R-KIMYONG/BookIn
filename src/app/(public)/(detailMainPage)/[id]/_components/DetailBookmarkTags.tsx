@@ -25,7 +25,6 @@ const DetailBookmarkTags = ({ isbn13, userId }: { isbn13: string; userId: string
     enabled: enabled,
     staleTime: 3 * MINUTE,
   });
-
   if (!enabled) return null;
 
   if (isPending) return null;

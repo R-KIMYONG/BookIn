@@ -1,24 +1,25 @@
 'use client';
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import { useState } from 'react';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import Button from '@/components/common/ui/Button';
 import AppPagination from '@/components/common/AppPagination';
-import ConfirmModal from '@/components/modal/ConfirmModal';
 import { useCommentMutation } from '@/hooks/comment/useCommentMutation';
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
-import { getCommentsClient } from '@/shared/lib/comment/getCommentsClient';
 import { useClientPagination } from '@/hooks/url/useClientPagination';
-import { Tables } from '@/shared/types/supabase';
 import { MINUTE } from '@/shared/constants/time';
 import { commentKeys } from '@/shared/domain/comment/queryKeys';
-
+import { formatDateTime } from '@/shared/lib/date/formatDateTime';
+import { getCommentList } from '@/shared/lib/comment/getCommentList';
+import { CommentListResult, CommentWithUser } from '@/shared/domain/comment/types';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
+const ConfirmModal = dynamic(() => import('@/components/modal/ConfirmModal'), { ssr: false });
 type CommentListProps = {
   isEdit: boolean;
   userId: string | null;
-  handleStartEdit: (comment: Tables<'comments'>) => void;
+  handleStartEdit: (comment: CommentWithUser) => void;
   handleCancelEdit: () => void;
   editingId: string | null;
   bookId: string;
@@ -40,22 +41,20 @@ const CommentList = ({
   const onOpen = () => setIsOpen(true);
   const onClose = () => setIsOpen(false);
   const [targetDeleteId, setTargetDeleteId] = useState<string | null>(null);
-
   const {
     data: comments,
     isPending,
     isFetching,
     isError,
     error,
-  } = useQuery({
+  } = useQuery<CommentListResult>({
     queryKey: commentKeys.list(bookId, page),
-    queryFn: () => getCommentsClient({ bookId, page }),
+    queryFn: async () => getCommentList({ bookId, page }),
     enabled: !!bookId,
-    staleTime: 1 * MINUTE,
+    staleTime: 5 * MINUTE,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
-
   const handleDelete = async (id: string) => {
     try {
       await toastMutationPromise(remove.mutateAsync(id), { pending: '댓글 삭제중...' });
@@ -70,6 +69,7 @@ const CommentList = ({
     setTargetDeleteId(null);
     onClose();
   };
+  const totalPages = Math.max(1, Math.ceil((comments?.total ?? 0) / DEFAULT_PAGE_SIZE));
 
   if (isPending)
     return (
@@ -87,7 +87,6 @@ const CommentList = ({
     );
   }
 
-  const totalPages = Math.max(1, Math.ceil((comments.total ?? 0) / DEFAULT_PAGE_SIZE));
   return (
     <div className="flex flex-col gap-4">
       <div className="mt-6 flex items-end justify-between">
@@ -108,47 +107,73 @@ const CommentList = ({
           <ul className="divide-y divide-gray-200">
             {comments.data.map((comment) => {
               const { id, content, users, created_at, user_id } = comment;
-              const date = dayjs(created_at).locale('ko').format('YYYY-MM-DD HH:mm');
+              const date = formatDateTime(created_at);
               const isMine = userId === user_id;
 
               return (
-                <li key={id} className="py-5">
-                  {/* 헤더: 제목 + 날짜 */}
-                  <div className="flex justify-between items-center text-xs text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-900">{users?.nickname}</span>
-                      <span>·</span>
-                      <span>{date}</span>
+                <li key={id} className="py-6 transition-colors">
+                  <div className="flex gap-4">
+                    {/* 아바타 파트 */}
+                    <div className="shrink-0">
+                      <Image
+                        src={users?.avatar || '/images/noImg.png'}
+                        alt={`${users?.nickname ?? '유저'} 프로필`}
+                        width={35}
+                        height={35}
+                        className="rounded-full object-cover border border-gray-200 bg-gray-100 "
+                      />
                     </div>
 
-                    {isMine ? (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="xs"
-                          label={isEdit && id === editingId ? '취소' : '수정'}
-                          onClick={() => (isEdit && editingId === id ? handleCancelEdit() : handleStartEdit(comment))}
-                        />
-                        <Button
-                          variant="danger"
-                          size="xs"
-                          label="삭제"
-                          onClick={() => {
-                            setTargetDeleteId(id);
-                            onOpen();
-                          }}
-                        />
+                    {/* 댓글 파트 */}
+                    <div className="flex-1 min-w-0">
+                      {/* header */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{users?.nickname}</p>
+                          <p className="mt-0.5 text-xs text-gray-500">{date}</p>
+                        </div>
+
+                        {isMine ? (
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              label={isEdit && id === editingId ? '취소' : '수정'}
+                              onClick={() =>
+                                isEdit && editingId === id ? handleCancelEdit() : handleStartEdit(comment)
+                              }
+                            />
+                            <Button
+                              variant="danger"
+                              size="xs"
+                              label="삭제"
+                              onClick={() => {
+                                setTargetDeleteId(id);
+                                onOpen();
+                              }}
+                            />
+                          </div>
+                        ) : null}
                       </div>
-                    ) : null}
+
+                      {/* 내용 */}
+                      <div
+                        className="mt-3 text-sm leading-7 text-gray-800 break-words prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{
+                          __html: content || '',
+                        }}
+                      />
+
+                      {/* 편집중 */}
+                      {isEdit && editingId === id && (
+                        <div className="mt-3">
+                          <span className="inline-flex items-center rounded-full bg-[#AF5858]/10 px-2.5 py-1 text-[11px] font-semibold text-[#AF5858]">
+                            수정 중
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-
-                  <div
-                    className="mt-2 text-sm leading-7 text-gray-800 break-words
-                     prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: content || '' }}
-                  />
-
-                  {isEdit && editingId === id && <p className="mt-2 text-xs text-[#AF5858] font-semibold">수정 중…</p>}
                 </li>
               );
             })}

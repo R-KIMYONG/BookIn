@@ -1,13 +1,10 @@
-import { useEffect } from 'react';
 import useUrlParams from './useUrlParams';
 import { DEFAULT_QT, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
 import { DEFAULT_SEARCH_QT, SEARCH_QT_LIST, SearchQueryType } from '@/shared/constants/search';
 import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
 
 const useCategoryUrlState = (args: { categoryId: number; defaultTarget: TargetTypes }) => {
-  const { getParams, getInt, setParams, getAllParams } = useUrlParams();
-
-  // const params = getAllParams();
+  const { getParams, getInt, setParams } = useUrlParams();
 
   const page = getInt('page', 1);
   const searchKeyWord = (getParams('search') ?? '').trim(); //검색키워드 추출
@@ -23,11 +20,6 @@ const useCategoryUrlState = (args: { categoryId: number; defaultTarget: TargetTy
     ? (sqParam as SearchQueryType)
     : DEFAULT_SEARCH_QT;
 
-  useEffect(() => {
-    if (!target) {
-      setParams({ target: args.defaultTarget, page: page || 1 }, { replace: true, scroll: false });
-    }
-  }, [target, args.defaultTarget, args.categoryId, page, setParams]);
 
   const effectiveTarget: TargetTypes = target || args.defaultTarget;
 

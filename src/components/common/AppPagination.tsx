@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cn from '@/shared/utils/cn';
 import Button from './ui/Button';
-import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight, MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 type AppPaginationProps = {
   page: number;
@@ -27,6 +27,12 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
   const [error, setError] = useState<boolean>(false);
   const safePage = clamp(page, 1, totalPages);
   const visibleCount = 3;
+
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      onChange(totalPages);
+    }
+  }, [page, totalPages, onChange]);
 
   const blockStart = Math.max(1, Math.min(safePage - Math.floor(visibleCount / 2), totalPages - (visibleCount - 1)));
   const blockEnd = Math.min(totalPages, blockStart + (visibleCount - 1));
@@ -53,10 +59,10 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
         <div className="px-4 flex items-center gap-2">
           <div className="flex items-center gap-1 shrink-0">
             <Button variant="secondary" size="sm" onClick={prev10} disabled={disabled || !canPrev}>
-              <MdKeyboardDoubleArrowLeft />
+              <ChevronsLeft className="w-4 h-4" />
             </Button>
             <Button variant="secondary" size="sm" onClick={prev} disabled={disabled || !canPrev}>
-              <MdChevronLeft />
+              <ChevronLeft className="w-4 h-4" />
             </Button>
           </div>
           <div className="flex flex-nowrap">
@@ -66,7 +72,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
                   key={pageNum}
                   variant="ghost"
                   className={cn(
-                    'h-9 w-9 shrink-0 !rounded-md !text-sm !px-2',
+                    'h-8 w-8 shrink-0 !rounded-md !text-sm !px-2',
                     pageNum === safePage
                       ? '!bg-black !text-white !shadow-sm'
                       : '!bg-white !hover:bg-gray-100 !active:scale-[0.98]'
@@ -81,10 +87,10 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <Button variant="secondary" size="sm" onClick={next} disabled={disabled || !canNext}>
-              <MdChevronRight />
+              <ChevronRight className="w-4 h-4" />
             </Button>
             <Button variant="secondary" size="sm" onClick={next10} disabled={disabled || !canNext}>
-              <MdKeyboardDoubleArrowRight />
+              <ChevronsRight className="w-4 h-4" />
             </Button>
           </div>
         </div>

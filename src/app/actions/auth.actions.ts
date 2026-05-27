@@ -4,8 +4,6 @@ import { createClient } from '@/shared/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { clearTempSessionCookies, setTempSessionCookies } from '../../shared/lib/auth/sessionCookies';
-import { AUTH_CODE } from '../../shared/lib/auth/authActionFeedback';
-import { createRedirectUrl } from '../../shared/utils/navigation/createRedirectUrl';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { ActionResult } from '@/shared/lib/message/actionResult';
 import { User } from '@supabase/supabase-js';
@@ -49,7 +47,6 @@ export const login = async (formData: FormData): Promise<ActionResult<{ user: Us
       code: RESULT_CODE.AUTH_LOGIN_FAILED,
     };
   }
-  console.log(data);
   if (remember) {
     clearTempSessionCookies();
   } else {
@@ -169,7 +166,7 @@ export const signup = async (formData: FormData): Promise<ActionResult<{ user: U
     email,
     password,
     options: {
-      data: { nickname },
+      data: { nickname, avatar: '' },
     },
   });
 
@@ -206,7 +203,10 @@ export const deleteAccount = async () => {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    redirect(createRedirectUrl('/login', { error: AUTH_CODE.login.UNAUTHORIZED }));
+    return {
+      ok: false,
+      code: RESULT_CODE.AUTH_REQUIRED_LOGIN,
+    };
   }
 
   const userId = user.id;
@@ -216,18 +216,12 @@ export const deleteAccount = async () => {
     `${userId}/avatar.jpeg`,
     `${userId}/avatar.png`,
     `${userId}/avatar.gif`,
+    `${userId}/avatar.webp`,
   ];
   const { error: avatarError } = await supabase.storage.from('avatars').remove(possibleFiles);
 
   if (avatarError) {
     console.error(avatarError);
-  }
-
-  const { error: publicError } = await supabase.from('users').delete().eq('id', userId);
-
-  if (publicError) {
-    console.error(publicError);
-    redirect(createRedirectUrl('/mypage', { error: AUTH_CODE.delete.USER_FAILED }));
   }
 
   const { error: rpcError } = await supabase.rpc('delete_user', {
@@ -236,14 +230,15 @@ export const deleteAccount = async () => {
 
   if (rpcError) {
     console.error(rpcError);
-    redirect(createRedirectUrl('/mypage', { error: AUTH_CODE.delete.AUTH_FAILED }));
-  }
-  const { error: signOutError } = await supabase.auth.signOut();
-  if (signOutError) {
-    console.error(signOutError);
+    return {
+      ok: false,
+      code: RESULT_CODE.AUTH_DELETE_FAILED,
+    };
   }
   clearTempSessionCookies();
   revalidatePath('/', 'layout');
-  revalidatePath('/mypage', 'page');
-  redirect(createRedirectUrl('/', { message: AUTH_CODE.delete.SUCCESS }));
+  return {
+    ok: true,
+    code: RESULT_CODE.AUTH_DELETE_SUCCESS,
+  };
 };

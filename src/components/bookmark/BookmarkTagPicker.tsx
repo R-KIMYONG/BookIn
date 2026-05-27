@@ -1,8 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { FiX, FiPlus } from 'react-icons/fi';
-import { HiHashtag } from 'react-icons/hi';
 import Button from '../common/ui/Button';
 import TagColorPopover from './TagColorPopover';
 import { DEFAULT_PRESETS } from '@/shared/domain/tag/constants';
@@ -10,6 +8,7 @@ import { BookmarkTagPickerProps } from '@/shared/domain/tag/types';
 import { getTagColorClass } from '@/shared/domain/tag/getTagColorClass';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { Hash, Plus, X } from 'lucide-react';
 
 const toSlug = (s: string) => s.trim().toLowerCase().replace(/\s+/g, '-');
 
@@ -127,11 +126,11 @@ const BookmarkTagPicker = ({
                 >
                   <div className="flex gap-1">
                     <div className="flex">
-                      <HiHashtag className="h-3 w-3" />
+                      <Hash className="h-3 w-3" strokeWidth={3} />
                       <p className="text-[11px]">{t.name}</p>
                     </div>
                     <div>
-                      <FiX
+                      <X
                         className="h-3 w-3 cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -197,7 +196,7 @@ const BookmarkTagPicker = ({
           disabled={!canAddMore}
           variant="primary"
           size="sm"
-          leftIcon={<FiPlus className="h-3 w-3" />}
+          leftIcon={<Plus className="h-3 w-3" strokeWidth={3} />}
           label="추가"
           className="!gap-1"
         />
@@ -215,7 +214,7 @@ const BookmarkTagPicker = ({
                 size="xs"
                 variant={active ? 'primary' : 'secondary'}
                 disabled={active || !canAddMore}
-                leftIcon={<HiHashtag className="h-3 w-3" />}
+                leftIcon={<Hash className="h-3 w-3" strokeWidth={3} />}
                 label={tag}
                 className="!gap-0"
               />

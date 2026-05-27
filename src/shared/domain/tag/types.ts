@@ -18,3 +18,5 @@ export type BookmarkMemoView = {
 };
 
 export type SaveInput = { memo: string | null; tags: Tag[] };
+
+export const TAG_DEFAULT = 'all';
