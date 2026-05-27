@@ -1,20 +1,22 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { FaUserCircle } from 'react-icons/fa';
 import HeaderLogoutForm from './HeaderLogoutForm';
 import { DropdownItem } from '@/components/common/ui/Dropdown/types';
 import Dropdown from '@/components/common/ui/Dropdown';
 import TempSessionController from '../session/TempSessionController';
+import { CircleUser } from 'lucide-react';
 
 type UserMenuProps = {
   isLoggedIn: boolean;
   tempSessionExpiresAt: number | null;
 };
 
+type UserMenuAction = 'mypage' | 'login' | 'signup';
+
 const UserMenu = ({ isLoggedIn, tempSessionExpiresAt }: UserMenuProps) => {
   const router = useRouter();
-  const items: DropdownItem<string>[] = isLoggedIn
+  const items: DropdownItem<UserMenuAction>[] = isLoggedIn
     ? [
         {
           type: 'custom',
@@ -36,7 +38,7 @@ const UserMenu = ({ isLoggedIn, tempSessionExpiresAt }: UserMenuProps) => {
       ];
   return (
     <Dropdown
-      trigger={<FaUserCircle size={24} className="text-white" />}
+      trigger={<CircleUser className="h-6 w-6 text-white" />}
       items={items}
       align="right"
       onSelect={(value) => {

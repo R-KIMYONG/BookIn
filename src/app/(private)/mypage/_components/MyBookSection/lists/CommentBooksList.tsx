@@ -1,28 +1,28 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import dayjs from 'dayjs';
 import { CommentBook } from '@/shared/domain/mybooks/types';
 import BooksGridContainer from './BooksGridContainer';
+import { formatDateTime } from '@/shared/lib/date/formatDateTime';
 const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
   return (
     <BooksGridContainer>
       {data.map((book, index) => {
-        const isAboveFold = index < 5;
-        const date = dayjs(book.last_commented_at).locale('ko').format('YYYY-MM-DD HH:mm');
-
+        const date = formatDateTime(book.last_commented_at);
+        const isAboveFold = index < 6;
         return (
           <li key={book.book_id}>
             <Link href={`/${book.isbn13}`}>
-              <div className="h-60 relative overflow-hidden rounded-md">
+              <div className="h-60 relative overflow-hidden rounded-md group">
                 <Image
-                  src={book.cover}
+                  src={book.cover?.trim() ? book.cover : '/images/noImg.png'}
                   alt={book.title}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 44vw, 200px"
+                  unoptimized
                   priority={isAboveFold}
                 />
-                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 z-0 bg-black/40 transition-colors duration-300 group-hover:bg-black/30" />
               </div>
             </Link>
             <div className="mt-2 h-14 px-2 text-xs">

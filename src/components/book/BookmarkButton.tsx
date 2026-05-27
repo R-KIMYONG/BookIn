@@ -1,16 +1,12 @@
 import { useBookmark } from '@/hooks/bookmark/useBookmark';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
-import { useQuery } from '@tanstack/react-query';
-import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import Button from '../common/ui/Button';
-import { BookmarkCache, BookmarkMemoScope } from '@/shared/domain/bookmark/types';
+import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
 import { BookInfo } from '@/shared/types/bookInfo';
-import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { useAuth } from '@/shared/context/AuthContext';
-import { showToast } from '@/shared/lib/message/showToast';
-import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import BookmarkSavedToast from '../bookmark/BookmarkSavedToast';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useBookmarkCache } from '@/hooks/bookmark/useBookmarkCache';
 
 type BookmarkButtonProps = {
   style?: string;
@@ -21,30 +17,14 @@ type BookmarkButtonProps = {
 const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
   const { toggle, isLoading } = useBookmark(bookInfo);
   const { open } = useBookmarkMemoUrlState();
-  const { user } = useAuth();
 
-  const queryKey = bookmarkKeys.detail(bookInfo.isbn13);
-  const fallback: BookmarkCache = {
-    isbn13: bookInfo.isbn13,
-    bookmarked: false,
-    memoExists: false,
-  };
-  const { data } = useQuery<BookmarkCache>({
-    queryKey: queryKey,
-    queryFn: async () => fallback,
-    enabled: false,
-  });
+  const { data } = useBookmarkCache(bookInfo.isbn13);
   const bookmarked = data?.bookmarked ?? false;
   const handleClick = (e: React.MouseEvent) => {
     if (isLoading) return;
 
     e.preventDefault();
     e.stopPropagation();
-
-    if (!user) {
-      showToast(RESULT_CODE.AUTH_REQUIRED_LOGIN, { toastId: 'login-warning' });
-      return;
-    }
 
     toggle(bookmarked, {
       onSuccess: (result) => {
@@ -78,9 +58,9 @@ const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
       disabled={isLoading}
     >
       {bookmarked ? (
-        <FaBookmark className="text-yellow-400 transition-colors duration-200 w-4 h-4" />
+        <BookmarkCheck className="w-4 h-4 text-yellow-400" />
       ) : (
-        <FaRegBookmark className="text-gray-300 hover:text-yellow-300 transition-colors duration-200 w-4 h-4" />
+        <Bookmark className="w-4 h-4 text-gray-300 transition-colors duration-200 hover:text-yellow-300" />
       )}
     </Button>
   );

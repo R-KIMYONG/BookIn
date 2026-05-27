@@ -5,14 +5,13 @@ import dynamic from 'next/dynamic';
 import Button from '@/components/common/ui/Button';
 import { useCommentMutation } from '@/hooks/comment/useCommentMutation';
 import { sanitizeHtmlClient } from '@/shared/utils/security/sanitizeHtml.client';
-import { useCallback, useRef, useState, Dispatch, SetStateAction } from 'react';
+import { useCallback, useRef, useState, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import type { Editor } from '@tiptap/react';
 import { MAX_LENGTH, MAX_LINES } from '@/shared/constants/comment';
 import { TargetValue } from './Comment/types';
 import { SubmitItem } from '@/shared/domain/comment/types';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
-import { options } from 'sanitize-html';
 
 const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
   ssr: false,
@@ -45,8 +44,8 @@ const CommentForm = ({
   const { add, update } = useCommentMutation(bookId, userId);
   const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const handleContentChange = (html: string, textLength: number) => {
-    if (textLength > MAX_LENGTH) {
+  const handleContentChange = (html: string, length: number) => {
+    if (length > MAX_LENGTH) {
       showToast(RESULT_CODE.COMMENT_MAX_LENGTH_EXCEEDED, {
         variables: {
           maxLength: MAX_LENGTH,
@@ -86,7 +85,6 @@ const CommentForm = ({
   const handleCreate = async (newComment: SubmitItem) => {
     try {
       await add.mutateAsync(newComment);
-
       handleCancelEdit();
     } catch (error) {
       console.error(error);
@@ -107,13 +105,14 @@ const CommentForm = ({
       console.error(error);
     }
   };
-  const getTextLength = (html: string) => {
-    const div = document.createElement('div');
-    div.innerHTML = html;
 
+  const textLength = useMemo(() => {
+    if (!targetValue.content) return 0;
+    const div = document.createElement('div');
+    div.innerHTML = targetValue.content;
     return (div.textContent || '').replace(/\n/g, '').length;
-  };
-  const textLength = getTextLength(targetValue.content ?? '');
+  }, [targetValue.content]);
+
   const isDisabled = textLength === 0 || update.isPending;
   const lineCount = editorInstance ? editorInstance.state.doc.content.childCount : 1;
   return (
@@ -160,7 +159,7 @@ const CommentForm = ({
               type="button"
               label="취소"
               onClick={handleCancelEdit}
-              disabled={isDisabled}
+              disabled={update.isPending}
             />
           </div>
           <details className="mt-2 text-xs text-gray-400">

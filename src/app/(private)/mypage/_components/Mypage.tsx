@@ -1,17 +1,16 @@
-'use client';
-import { MypageUserInfo } from '@/shared/domain/user/types';
-import { ReactElement } from 'react';
 import MypageSidebar from './MypageSidebar/MypageSidebar';
-import MyBooksSection from './MyBookSection/MyBooksSection';
-import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
+import { MypageSectionType } from '@/shared/domain/mypage/section';
+import MyBooksContainer from './MyBooksContainer';
 
-const Mypage = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement => {
-  const { query } = useMypageQueryState();
+type MypageProps = {
+  section: MypageSectionType;
+};
 
+const Mypage = ({ section }: MypageProps) => {
   const renderSection = () => {
-    switch (query.section) {
+    switch (section) {
       case 'myBooks':
-        return <MyBooksSection userInfo={userInfo} />;
+        return <MyBooksContainer />;
       case 'recommend':
         return <div className="mx-auto w-1/2 text-center py-10">서비스 준비중...</div>;
     }
@@ -23,9 +22,8 @@ const Mypage = ({ userInfo }: { userInfo: MypageUserInfo }): ReactElement => {
         <div className="flex flex-col gap-4">
           {/* 상단 프로필 섹션 */}
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <MypageSidebar userInfo={userInfo} />
+            <MypageSidebar section={section} />
           </section>
-
           {/* 본문(내 활동 책) */}
           <section className="overflow-hidden shadow-sm">{renderSection()}</section>
         </div>

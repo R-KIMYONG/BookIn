@@ -5,11 +5,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { logoutExpiredSession, resetTempSession } from '@/app/actions/session.actions';
 import { useSessionModal } from '@/stores/useSessionModal';
-import useCountdown from '@/hooks/common/useCountdown';
-import { createClient } from '@/shared/lib/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { SESSION_STORAGE_KEY } from '@/shared/domain/auth/constants';
 import { TEMP_SESSION_SOON_TOAST_ID } from '@/shared/domain/session/constants';
+import useCountdown from '../common/useCountdown';
+import { useAuth } from '@/shared/context/AuthContext';
 
 type useTempSessionManagerProps = {
   isLoggedIn: boolean;
@@ -20,6 +20,7 @@ export const useTempSessionManager = ({ isLoggedIn, tempSessionExpiresAt }: useT
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { setUser } = useAuth();
 
   const isProtectedPage = pathname.startsWith('/mypage');
   const isTempSession = isLoggedIn && tempSessionExpiresAt !== null;
@@ -63,26 +64,32 @@ export const useTempSessionManager = ({ isLoggedIn, tempSessionExpiresAt }: useT
 
   // 만료 상태
   useEffect(() => {
-    if (!isExpired || hasHandledExpire.current) return;
+    if (!isExpired) return;
+
+    if (hasHandledExpire.current) return;
 
     hasHandledExpire.current = true;
 
     const handleExpire = async () => {
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ redirectTo: pathname }));
       openExpired(pathname);
-
-      const supabase = createClient();
-      await supabase.auth.signOut();
-      queryClient.clear();
-      await logoutExpiredSession({
+      const result = await logoutExpiredSession({
         redirectTo: pathname,
         shouldRedirectToLogin: isProtectedPage,
       });
+      setUser(null);
+      queryClient.clear();
+
+      if (result.redirectTo) {
+        router.replace(result.redirectTo);
+
+        return;
+      }
       router.refresh();
     };
 
     handleExpire();
-  }, [isExpired, isProtectedPage, pathname, openExpired, router, queryClient]);
+  }, [isExpired, isProtectedPage, pathname, openExpired, router, queryClient, setUser]);
 
   return {
     isTempSession,

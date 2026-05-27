@@ -4,12 +4,31 @@ import { ReactElement, useState } from 'react';
 import Button from '@/components/common/ui/Button';
 import ConfirmModal from '@/components/modal/ConfirmModal';
 import { deleteAccount } from '@/app/actions/auth.actions';
+import { showToast } from '@/shared/lib/message/showToast';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/shared/context/AuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AccountDeletion = (): ReactElement => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { setUser } = useAuth();
   const onOpen = () => setIsOpen(true);
   const onClose = () => setIsOpen(false);
+
+  const handleDeleteAccount = async () => {
+    const result = await deleteAccount();
+
+    showToast(result.code);
+
+    if (!result.ok) {
+      return;
+    }
+    setUser(null);
+    queryClient.clear();
+    router.replace('/');
+  };
 
   return (
     <>
@@ -20,7 +39,7 @@ const AccountDeletion = (): ReactElement => {
         confirmColor="danger"
         confirmLabel="확인"
         cancelLabel="취소"
-        formAction={deleteAccount}
+        formAction={handleDeleteAccount}
         onClose={onClose}
       />
 

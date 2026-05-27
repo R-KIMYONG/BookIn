@@ -4,11 +4,12 @@ import Button from '@/components/common/ui/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useCallback, useRef } from 'react';
-import { RiCameraLine } from 'react-icons/ri';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { CameraIcon } from 'lucide-react';
+import { userKeys } from '@/shared/domain/user/queryKeys';
 
-const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userId: string }) => {
+const AvatarUploadSection = ({ userAvatar }: { userAvatar: string }) => {
   const avatarImgRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -25,7 +26,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
     },
     onSettled: () => {
       if (avatarImgRef.current) {
@@ -63,7 +64,14 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
-        <Image src={userAvatar || '/images/noImg.png'} alt="avatarImg" className="object-cover" priority fill />
+        <Image
+          src={userAvatar || '/images/noImg.png'}
+          alt="avatarImg"
+          className="object-cover"
+          priority
+          fill
+          unoptimized
+        />
       </div>
 
       <Button
@@ -75,7 +83,7 @@ const AvatarUploadSection = ({ userAvatar, userId }: { userAvatar: string; userI
         className="!rounded-full  !px-4 !py-2  text-gray-700 transition hover:border-[#AF5858] hover:text-[#AF5858]"
         onClick={() => avatarImgRef.current?.click()}
         disabled={updateAvatarImgMutation.isPending}
-        leftIcon={<RiCameraLine />}
+        leftIcon={<CameraIcon className="w-4 h-4" />}
       />
 
       <input

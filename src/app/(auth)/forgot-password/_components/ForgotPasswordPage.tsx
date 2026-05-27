@@ -1,14 +1,12 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { createClient } from '@/shared/lib/supabase/client';
 import Button from '@/components/common/ui/Button';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import CountdownStatus from '@/app/(private)/mypage/settings/_components/CountdownStatus';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import { usePathname, useRouter } from 'next/navigation';
-import { RESEND_COOLDOWN_MS, RESET_PASSWORD_EXPIRES_MS } from '@/shared/constants/auth';
 import { SECOND } from '@/shared/constants/time';
 import { requestPasswordReset } from '@/shared/lib/auth/requestPasswordReset';
 import { authKeys } from '@/shared/domain/auth/queryKeys';
@@ -16,23 +14,18 @@ import { AuthResetPasswordRequest } from '@/shared/domain/auth/types';
 import useUrlParams from '@/hooks/url/useUrlParams';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import RetryButton from './RetryButton';
+import useNow from '@/hooks/common/useNow';
 
 type PasswordResetState = {
   pendingEmail: string | null;
   expireAt: number | null;
 };
 const ForgotPasswordPage = () => {
-  const supabase = createClient();
   const queryClient = useQueryClient();
   const { getParams } = useUrlParams();
   const pathName = usePathname();
   const router = useRouter();
-  const [now, setNow] = useState(Date.now());
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const [inputEmail, setInputEmail] = useState<string>('');
   const email = getParams('email') ?? '';
@@ -55,30 +48,18 @@ const ForgotPasswordPage = () => {
     enabled: !!email,
     staleTime: 30 * SECOND,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('password_reset_email, password_reset_expires_at')
-        .eq('email', email)
-        .maybeSingle();
+      const res = await fetch(`/api/auth/password-reset-status?email=${email}`);
 
-      if (error) throw error;
-      return {
-        pendingEmail: data?.password_reset_email ?? null,
-        expireAt: data?.password_reset_expires_at ? new Date(data.password_reset_expires_at).getTime() : null,
-      };
+      if (!res.ok) {
+        throw new Error('조회 실패');
+      }
+
+      return res.json();
     },
   });
+  const now = useNow({ enabled: true, interval: 1000, stopAt: data?.expireAt ?? null });
 
-  const isExpired = !!data?.expireAt && now >= data.expireAt;
-
-  const state: AuthResetPasswordRequest = !data?.pendingEmail ? 'idle' : isExpired ? 'expired' : 'pending';
-
-  const requestTime = data?.expireAt ? data.expireAt - RESET_PASSWORD_EXPIRES_MS : null;
-
-  const remainMs = requestTime ? Math.max(0, RESEND_COOLDOWN_MS - (now - requestTime)) : 0;
-
-  const remainSec = Math.ceil(remainMs / 1000);
-  const canRetry = remainMs === 0;
+  const state: AuthResetPasswordRequest = !data?.pendingEmail ? 'idle' : 'pending';
 
   const displayEmail = data?.pendingEmail || email || inputEmail;
 
@@ -115,6 +96,16 @@ const ForgotPasswordPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (!data?.expireAt) return;
+    if (now === null) return;
+
+    if (now >= data.expireAt) {
+      queryClient.invalidateQueries({
+        queryKey: authKeys.passwordReset(email),
+      });
+    }
+  }, [now, data?.expireAt, queryClient, email]);
   if (state === 'idle') {
     return (
       <Wrapper>
@@ -129,20 +120,6 @@ const ForgotPasswordPage = () => {
           <Input value={inputEmail} onChange={setInputEmail} disabled={resetPasswordMutation.isPending} />
           <SubmitButton loading={resetPasswordMutation.isPending} />
         </form>
-      </Wrapper>
-    );
-  }
-
-  if (state === 'expired') {
-    return (
-      <Wrapper>
-        <p className="text-sm text-gray-700">
-          <b>{displayEmail}</b> 의 재설정 링크가 만료되었습니다.
-        </p>
-
-        <div className="mt-4 flex justify-end">
-          <Button label="다시 요청" onClick={handleRetry} disabled={!canRetry} />
-        </div>
       </Wrapper>
     );
   }
@@ -162,7 +139,7 @@ const ForgotPasswordPage = () => {
       </div>
 
       <div className="mt-4 flex justify-end">
-        <Button label={canRetry ? '재요청' : `재요청 (${remainSec}s)`} onClick={handleRetry} disabled={!canRetry} />
+        <RetryButton expireAt={data?.expireAt ?? null} onRetry={handleRetry} />
       </div>
     </Wrapper>
   );

@@ -1,5 +1,4 @@
-export type AuthResetPasswordRequest = 'idle' | 'pending' | 'expired';
+export type AuthResetPasswordRequest = 'idle' | 'pending';
 export type ValidateResetTokenResponse = {
-  valid: boolean;
+  valide: boolean;
 };
-

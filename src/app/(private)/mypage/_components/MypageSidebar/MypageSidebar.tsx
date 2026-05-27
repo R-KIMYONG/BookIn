@@ -1,12 +1,12 @@
-import { MypageUserInfo } from '@/shared/domain/user/types';
+import { MypageSectionType } from '@/shared/domain/mypage/section';
 import ProfileCard from './ProfileCard';
 import SidebarTabs from './SidebarTabs';
 
-const MypageSidebar = ({ userInfo }: { userInfo: MypageUserInfo }) => {
+const MypageSidebar = ({ section }: { section: MypageSectionType }) => {
   return (
     <>
-      <ProfileCard userInfo={userInfo} />
-      <SidebarTabs />
+      <ProfileCard />
+      <SidebarTabs section={section}/>
     </>
   );
 };

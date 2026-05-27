@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@/shared/lib/supabase/client';
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
 import { MyBooksQueryResult } from '@/shared/domain/mybooks/types';
 import { MyBooksTabType } from '@/shared/domain/mypage/tab';
@@ -8,11 +7,11 @@ import { FILTER_DEFAULT, MyBooksFilter } from '@/shared/domain/mybooks/filter';
 import { SearchField } from '@/shared/domain/mybooks/search';
 import { MINUTE } from '@/shared/constants/time';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
-import { fetchMyBooks } from '@/hooks/mybooks/fetchMyBooks';
+import { fetchMyBooksClient } from '@/hooks/mybooks/fetchMyBooksClient';
+import { normalizeMyBooksKey } from '@/shared/domain/mybooks/normalizeMyBooksKey';
 
 export const useMyBooks = (
   tab: MyBooksTabType,
-  userId: string,
   page: number,
   sort?: MyBooksSort,
   memoFilter?: MyBooksFilter,
@@ -20,24 +19,21 @@ export const useMyBooks = (
   searchField?: SearchField,
   tagId?: string
 ) => {
-  const supabase = createClient();
-
   const query = useQuery<MyBooksQueryResult>({
-    queryKey: myBooksKeys.list({
-      tab,
-      userId,
-      page,
-      sort: sort ?? SORT_DEFAULT,
-      filter: tab === 'bookmark' ? memoFilter : undefined,
-      search,
-      searchField,
-      tagId,
-    }),
-    queryFn: () =>
-      fetchMyBooks({
+    queryKey: myBooksKeys.list(
+      normalizeMyBooksKey({
         tab,
-        supabase,
-        userId,
+        page,
+        sort: sort ?? SORT_DEFAULT,
+        filter: tab === 'bookmark' ? memoFilter : undefined,
+        search,
+        searchField,
+        tagId: tab === 'bookmark' ? tagId : undefined,
+      })
+    ),
+    queryFn: () =>
+      fetchMyBooksClient({
+        tab,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
         sort: sort ?? SORT_DEFAULT,
@@ -46,8 +42,7 @@ export const useMyBooks = (
         searchField,
         tagId,
       }),
-    enabled: !!userId,
-    staleTime: 3 * MINUTE, //3분
+    staleTime: 5 * MINUTE, //3분
   });
   return {
     ...query,

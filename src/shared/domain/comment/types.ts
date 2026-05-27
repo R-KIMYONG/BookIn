@@ -1,9 +1,7 @@
 import { Tables } from '@/shared/types/supabase';
 
 export type CommentWithUser = Tables<'comments'> & {
-  users?: {
-    nickname: string;
-  } | null;
+  users: Pick<Tables<'users'>, 'nickname' | 'avatar'> | null;
 };
 
 export type CommentListResult = {

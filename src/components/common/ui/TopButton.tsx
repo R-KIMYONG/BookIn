@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TbArrowBigUpLinesFilled } from 'react-icons/tb';
 import Button from './Button';
+import { ArrowUp } from 'lucide-react';
 
 const TopButton = () => {
   const [visible, setVisible] = useState(false);
@@ -29,7 +29,7 @@ const TopButton = () => {
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
-      <TbArrowBigUpLinesFilled className="text-xl" />
+      <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
     </Button>
   );
 };

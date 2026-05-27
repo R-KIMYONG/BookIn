@@ -7,7 +7,6 @@ import { showToast } from '@/shared/lib/message/showToast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/shared/context/AuthContext';
 
-
 const HeaderLogoutForm = () => {
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -17,8 +16,7 @@ const HeaderLogoutForm = () => {
     const result = await logout(formData);
 
     if (result.ok) {
-      queryClient.removeQueries({ queryKey: ['userInfo'] });
-      queryClient.removeQueries({ queryKey: ['pendingEmail'] });
+      queryClient.clear();
       router.replace(result.data.redirectTo);
       setUser(null);
     }

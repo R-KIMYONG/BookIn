@@ -5,10 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import CommentList from '../CommentList';
 import dynamic from 'next/dynamic';
 import Button from '@/components/common/ui/Button';
-import useCurrentUrl from '@/hooks/common/useCurrentUrl';
 import { CommentWithUser } from '@/shared/domain/comment/types';
 import { Mode } from 'fs';
 import { TargetValue } from './types';
+import useCurrentUrl from '@/hooks/common/useCurrentUrl';
 const CommentForm = dynamic(() => import('../CommentForm'), {
   ssr: false,
 });

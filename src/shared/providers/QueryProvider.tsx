@@ -10,7 +10,6 @@ import { AuthListener } from '@/app/AuthListener';
 
 type QueryProviderProps = {
   children: React.ReactNode;
-
   initialUser: User | null;
 };
 
