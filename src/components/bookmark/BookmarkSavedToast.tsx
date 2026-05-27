@@ -1,5 +1,5 @@
-import { FiEdit3 } from 'react-icons/fi';
 import Button from '../common/ui/Button';
+import { PencilLine } from 'lucide-react';
 
 type BookmarkSavedToastProps = {
   onMemoClick: () => void;
@@ -18,7 +18,7 @@ const BookmarkSavedToast = ({ onMemoClick }: BookmarkSavedToastProps) => {
         className="underline font-semibold !gap-1"
         variant="secondary"
         size="xs"
-        leftIcon={<FiEdit3 className="h-3.5 w-3.5" />}
+        leftIcon={<PencilLine className="h-3.5 w-3.5" />}
         label="메모"
         onClick={onMemoClick}
       />

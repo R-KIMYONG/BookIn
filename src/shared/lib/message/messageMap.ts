@@ -88,6 +88,15 @@ export const MESSAGE_MAP: ToastMessageMap = {
     message: '소셜 로그인에 실패되었습니다.',
   },
 
+  [RESULT_CODE.AUTH_DELETE_FAILED]: {
+    type: 'error',
+    message: '회원탈퇴 실패했습니다.',
+  },
+  [RESULT_CODE.AUTH_DELETE_SUCCESS]: {
+    type: 'success',
+    message: '회원탈퇴 성공했습니다.',
+  },
+
   //==========validation==========
   [RESULT_CODE.VALIDATION_INVALID_EMAIL]: {
     type: 'warning',

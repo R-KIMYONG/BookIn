@@ -1,4 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { MypageModalType } from '../mypage/modal';
 import { MypageSectionType } from '../mypage/section';
 import { MyBooksTabType } from '../mypage/tab';
@@ -101,8 +100,6 @@ export type MyBooksQueryResult =
 
 export type FetchMyBooksParams = {
   tab: MyBooksTabType;
-  supabase: SupabaseClient;
-  userId: string;
   page: number;
   pageSize: number;
   sort: MyBooksSort;
@@ -111,3 +108,5 @@ export type FetchMyBooksParams = {
   searchField?: SearchField;
   tagId?: string;
 };
+
+export type MyBooksFetcherMap = (params: FetchMyBooksParams) => Promise<Omit<MyBooksQueryResult, 'tab'>>;

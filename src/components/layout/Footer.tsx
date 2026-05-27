@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { FiGithub } from 'react-icons/fi';
-import { SiNotion } from 'react-icons/si';
+import GithubIcon from '../icons/sociaLoginIcon/GithubIcon';
+import NotionIcon from '../icons/NotionIcon';
 
 const Footer = () => {
   const year = new Date().getFullYear();
@@ -48,7 +48,7 @@ const Footer = () => {
               aria-label="GitHub"
               title="GitHub"
             >
-              <FiGithub size={18} className="text-gray-700" />
+              <GithubIcon className="w-5 h-5" />
             </Link>
 
             <Link
@@ -59,7 +59,7 @@ const Footer = () => {
               aria-label="Notion"
               title="Notion"
             >
-              <SiNotion size={18} className="text-gray-700" />
+              <NotionIcon className="w-5 h-5" />
             </Link>
           </div>
         </div>

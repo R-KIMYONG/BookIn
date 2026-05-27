@@ -1,22 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PasswordFields from '@/components/form/PasswordFields';
 import Button from '@/components/common/ui/Button';
 import { isValidPassword } from '@/shared/utils/validation/isPassword';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import ConfirmModal from '@/components/modal/ConfirmModal';
-import useUrlParams from '@/hooks/url/useUrlParams';
 import { useResetPassword } from '@/hooks/auth/useResetPassword';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
-const ResetPasswordPage = () => {
+const ResetPasswordPage = ({ token }: { token: string }) => {
   const router = useRouter();
-  const { getParams } = useUrlParams();
-
-  const token = getParams('token') ?? '';
 
   const [passwordForm, setPasswordForm] = useState<{ newPassword: string; confirmPassword: string }>({
     newPassword: '',
@@ -82,14 +78,6 @@ const ResetPasswordPage = () => {
     isValidPassword(passwordForm.newPassword) &&
     passwordForm.newPassword === passwordForm.confirmPassword;
 
-  useEffect(() => {
-    if (!token) {
-      router.replace('/login');
-    }
-  }, [token, router]);
-
-  if (!token) return null;
-
   if (validateQuery.isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -106,7 +94,7 @@ const ResetPasswordPage = () => {
     );
   }
 
-  if (!validateQuery.data?.valid) {
+  if (!validateQuery.data?.valide) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
         <p className="text-sm text-gray-600">링크가 만료되었거나 유효하지 않습니다.</p>

@@ -1,4 +1,4 @@
-import { Id, toast, ToastOptions } from 'react-toastify';
+import { Id, ToastOptions } from 'react-toastify';
 import { MESSAGE_MAP } from './messageMap';
 import { ResultCode } from './resultCode';
 type ShowToastOptions = {
@@ -9,7 +9,8 @@ type ShowToastOptions = {
   toastOptions?: ToastOptions;
 };
 
-export const showToast = (code: ResultCode, options?: ShowToastOptions) => {
+export const showToast = async (code: ResultCode, options?: ShowToastOptions) => {
+  const { toast } = await import('react-toastify');
   const messageData = MESSAGE_MAP[code];
 
   if (!messageData) return;

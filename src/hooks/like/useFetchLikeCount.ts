@@ -28,7 +28,7 @@ export const useFetchLikeCount = (isbnList: string[]) => {
     },
 
     enabled: isbnList.length > 0,
-    staleTime: 3 * MINUTE,
+    staleTime: 5 * MINUTE,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchInterval: (query) => {
@@ -39,3 +39,11 @@ export const useFetchLikeCount = (isbnList: string[]) => {
     },
   });
 };
+
+// 1. useFetchLikeCount → useSyncLikeCounts
+
+// 2. countBatch queryKey 제거
+
+// 3. return data 제거 또는 null 반환
+
+// 4. gcTime: 0 추가

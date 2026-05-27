@@ -19,11 +19,10 @@ export const useUpdateBookmarkMemo = (userId: string, bookKey: string) => {
       toast.dismiss(`bookmark-memo-suggest-${bookKey}`);
       if (userId) {
         queryClient.invalidateQueries({ queryKey: myBooksKeys.all });
-        queryClient.invalidateQueries({ queryKey: bookmarkKeys.tags.user(userId) });
+        queryClient.invalidateQueries({ queryKey: bookmarkKeys.tags.user() });
       }
       queryClient.invalidateQueries({ queryKey: bookmarkKeys.memo(userId, bookKey) });
       queryClient.invalidateQueries({ queryKey: bookmarkKeys.tags.detail(userId, bookKey) });
-      queryClient.invalidateQueries({ queryKey: bookmarkKeys.list });
     },
   });
 };

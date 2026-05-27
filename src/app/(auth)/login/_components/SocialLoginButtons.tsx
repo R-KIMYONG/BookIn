@@ -1,26 +1,26 @@
-import { FcGoogle } from 'react-icons/fc';
-import { FaGithub } from 'react-icons/fa';
-import { SiKakaotalk } from 'react-icons/si';
 import { SocialConfig } from '@/components/common/ui/Button/type';
 import { signInWithOAuth } from '@/app/actions/auth.actions';
 import FormSubmitButton from './FormSubmitButton';
+import { GoogleIcon } from '@/components/icons/sociaLoginIcon/GoogleIcon';
+import GithubIcon from '@/components/icons/sociaLoginIcon/GithubIcon';
+import KakaoIcon from '@/components/icons/sociaLoginIcon/KakaoIcon';
 
 const SocialLoginButtons = ({ redirectTo }: { redirectTo: string }) => {
   const socialProviders: SocialConfig[] = [
     {
       name: 'google',
       label: 'Google 로그인',
-      icon: <FcGoogle size={22} />,
+      icon: <GoogleIcon className="w-7 h-7" />,
     },
     {
       name: 'github',
       label: 'GitHub 로그인',
-      icon: <FaGithub size={20} />,
+      icon: <GithubIcon className="w-7 h-7" />,
     },
     {
       name: 'kakao',
       label: 'Kakao 로그인',
-      icon: <SiKakaotalk size={20} />,
+      icon: <KakaoIcon className="w-7 h-7" />,
     },
   ];
 

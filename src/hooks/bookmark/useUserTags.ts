@@ -1,31 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@/shared/lib/supabase/client';
 import { MINUTE } from '@/shared/constants/time';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { Tag } from '@/shared/domain/tag/types';
 
-export const useUserTags = (userId: string) => {
-  const supabase = createClient();
+export const useUserTags = () => {
+  return useQuery<Tag[]>({
+    queryKey: bookmarkKeys.tags.user(),
 
-  return useQuery({
-    queryKey: bookmarkKeys.tags.user(userId),
-    enabled: !!userId,
     queryFn: async () => {
-      if (!userId) throw new Error('userId required');
-      const { data, error } = await supabase
-        .from('bookmark_tag_links')
-        .select('bookmark_tags(id,name,slug,color),bookmarks!inner(user_id)')
-        .eq('bookmarks.user_id', userId);
-      if (error) throw error;
-      const map = new Map<string, Tag>();
+      const response = await fetch('/api/user/tags');
 
-      data?.forEach((row) => {
-        const tag = row.bookmark_tags;
-        if (!tag) return;
-        map.set(tag.id, tag);
-      });
+      if (!response.ok) {
+        throw new Error('태그 조회 실패');
+      }
 
-      return Array.from(map.values());
+      const data = await response.json();
+
+      return data;
     },
     staleTime: 5 * MINUTE,
   });

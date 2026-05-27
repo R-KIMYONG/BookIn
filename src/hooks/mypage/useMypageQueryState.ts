@@ -1,3 +1,4 @@
+'use client';
 import useUrlParams from '@/hooks/url/useUrlParams';
 import { SEARCH_FIELD_DEFAULT } from '@/shared/domain/mybooks/search';
 import { SORT_DEFAULT } from '@/shared/domain/mybooks/sort';
@@ -6,6 +7,7 @@ import { MYBOOKS_DEFAULT_TAB } from '@/shared/domain/mypage/tab';
 import { useCallback, useMemo } from 'react';
 import { buildParams } from './buildParams';
 import { parseQueryFromParams } from './parseQueryFromParams';
+
 
 export const useMypageQueryState = () => {
   const { setParams, getAllParams } = useUrlParams();

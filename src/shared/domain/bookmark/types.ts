@@ -4,3 +4,5 @@ export type BookmarkCache = {
   memoExists: boolean;
 };
 export type BookmarkMemoScope = 'mypage' | 'detail' | 'home';
+
+export type BookmarkInfo = { bookmarked: boolean; memoExists: boolean };

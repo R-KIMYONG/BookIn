@@ -1,10 +1,10 @@
 import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
 import { getAladinItemList } from '@/shared/lib/aladin/getAladinItemList';
 
-import { MAX_RESULTS, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
+import { MAX_PAGE, MAX_RESULTS, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
 
   const rawTarget = (searchParams.get('target') ?? 'Book').trim();
@@ -13,8 +13,6 @@ export async function GET(request: NextRequest) {
   const queryType = QUERY_TYPE_LIST.includes(rawQt as QueryType) ? (rawQt as QueryType) : 'Bestseller';
 
   const categoryId = (searchParams.get('CategoryId') ?? '').trim() || undefined;
-
-  const MAX_PAGE = 50; //알라딘 정책상 한페이지20개라면 최대 50페이지까지인 하드 제한 걸려있기때문에 50을두고 찾음
 
   const first = await getAladinItemList({ target, queryType, categoryId, page: 1 }); //여기서 이미 첫페이지 요청해서 탐색했으니 아래에서 startPage는 1로 일단 두고 for문은 2부터 시작하면 요청한번 줄어든다.
 
@@ -69,4 +67,4 @@ export async function GET(request: NextRequest) {
     else endPage = mid;
   }
   return NextResponse.json({ lastPage: startPage }, { status: 200 });
-}
+};

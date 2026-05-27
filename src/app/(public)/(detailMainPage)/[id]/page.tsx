@@ -9,6 +9,13 @@ import DetailBookmarkTags from './_components/DetailBookmarkTags';
 import { getCheapest } from '@/shared/domain/detail/getCheapest';
 import { getDiscountRate } from '@/shared/domain/detail/getDiscountRate';
 import { upsertBook } from '@/shared/lib/book/upsertBook';
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
+import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
+import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
+import { likeKeys } from '@/shared/domain/like/queryKeys';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
+import { getBookmarkTagsByIsbn } from '@/shared/lib/server/entities/getBookmarkTagsByIsbn';
 
 const MainDetail = async ({
   params,
@@ -21,7 +28,6 @@ const MainDetail = async ({
   const { id } = await params;
   const { commentPage } = await searchParams;
   const page = Math.max(1, Number(commentPage ?? 1) || 1);
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -29,7 +35,6 @@ const MainDetail = async ({
   const data = await getAladinDetail(id);
   const item: AladinItem = data?.item?.[0];
   if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
-
   const bookId = await upsertBook({
     supabase,
     bookInfo: { title: item.title, author: item.author, cover: item.cover, isbn13: item.isbn13 },
@@ -88,8 +93,34 @@ const MainDetail = async ({
     isbn: item.isbn,
   };
 
+  const queryClient = new QueryClient();
+  const isbn = item.isbn13;
+
+  const [likes, likeCounts, bookmarks] = await Promise.all([
+    getLikesByIsbnList([isbn]),
+    getLikeCountsByIsbnList([isbn]),
+    getBookmarksByIsbnList([isbn]),
+  ]);
+
+  queryClient.setQueryData(likeKeys.detail(isbn), {
+    isbn13: isbn,
+    liked: likes[isbn] ?? false,
+    liked_count: likeCounts[isbn] ?? 0,
+  });
+
+  queryClient.setQueryData(bookmarkKeys.detail(isbn), {
+    isbn13: isbn,
+    bookmarked: bookmarks[isbn]?.bookmarked ?? false,
+    memoExists: bookmarks[isbn]?.memoExists ?? false,
+  });
+
+  if (userId) {
+    const bookmarkTags = await getBookmarkTagsByIsbn(isbn);
+    queryClient.setQueryData(bookmarkKeys.tags.detail(userId, isbn), { tags: bookmarkTags });
+  }
+
   return (
-    <>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
         <div className="rounded-2xl bg-white shadow">
           <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[260px_1fr]">
@@ -129,7 +160,7 @@ const MainDetail = async ({
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 {rating > 0 && <span>평점 {rating}</span>}
                 {salesPoint > 0 && <span>판매량 {salesPoint.toLocaleString()}</span>}
-                <DetailActionsContainer bookInfo={bookInfo} userId={userId} />
+                <DetailActionsContainer bookInfo={bookInfo} />
               </div>
               <div>
                 <DetailBookmarkTags isbn13={bookInfo?.isbn13} userId={userId} />
@@ -199,7 +230,7 @@ const MainDetail = async ({
           <CommentSection bookId={bookId} page={page} userId={userId} />
         </div>
       </div>
-    </>
+    </HydrationBoundary>
   );
 };
 

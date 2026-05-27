@@ -7,8 +7,9 @@ import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { userKeys } from '@/shared/domain/user/queryKeys';
 
-const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
+const ChangePassWord = (): ReactElement => {
   const { query, setQuery } = useMypageQueryState();
   const isOpen = query.modal === 'changePassword';
   const queryClient = useQueryClient();
@@ -66,12 +67,8 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
       if (!res.ok) throw new Error(result.message ?? '비밀번호 변경 실패');
       return result;
     },
-    onSuccess: (result) => {
-      if (result?.user) {
-        queryClient.setQueriesData({ queryKey: ['userInfo', userId] }, result.user);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
       handleClose();
     },
   });
@@ -149,8 +146,16 @@ const ChangePassWord = ({ userId }: { userId: string }): ReactElement => {
                     checkPrevPW === 'success' ? 'translate-x-full' : ''
                   }`}
                 />
-                <div className="relative z-10 flex w-1/2 justify-center text-xs font-semibold">1. 현재 비밀번호</div>
-                <div className="relative z-10 flex w-1/2 justify-center text-xs font-semibold">2. 새 비밀번호</div>
+                <div
+                  className={`relative z-10 flex w-1/2 justify-center text-xs font-semibold ${checkPrevPW !== 'success' && 'text-white'}`}
+                >
+                  1. 현재 비밀번호
+                </div>
+                <div
+                  className={`relative z-10 flex w-1/2 justify-center text-xs font-semibold ${checkPrevPW === 'success' && 'text-white'}`}
+                >
+                  2. 새 비밀번호
+                </div>
               </div>
             </div>
 

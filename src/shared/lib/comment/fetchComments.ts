@@ -1,9 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
 import { CommentListResult } from '../../domain/comment/types';
+import { Database } from '@/shared/types/supabase';
 
 export const fetchComments = async (
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   bookId: string,
   page: number
 ): Promise<CommentListResult> => {
@@ -13,7 +14,7 @@ export const fetchComments = async (
   const [{ data, error }, { data: stats, error: statsError }] = await Promise.all([
     supabase
       .from('comments')
-      .select('*, users(nickname)')
+      .select('*, users(nickname,avatar)')
       .eq('book_id', bookId)
       .order('created_at', { ascending: false })
       .range(from, to),

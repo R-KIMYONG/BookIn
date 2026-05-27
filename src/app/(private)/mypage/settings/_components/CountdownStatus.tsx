@@ -1,7 +1,7 @@
 'use client';
 
 import useCountdown from '@/hooks/common/useCountdown';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 type CountdownStatusProps = {
   expireAt: number | null;
@@ -31,11 +31,15 @@ const CountdownStatus = ({
   showTime = true,
   enabled,
   className,
+  onExpiredChange,
 }: CountdownStatusProps) => {
   const { countDownText, isExpired } = useCountdown(expireAt, {
     enabled: enabled ?? !!expireAt,
     stopOnExpire: true,
   });
+  useEffect(() => {
+    onExpiredChange?.(isExpired);
+  }, [isExpired, onExpiredChange]);
 
   if (!expireAt) return null;
 

@@ -14,8 +14,6 @@ export const FILTER_LIST = Object.values(FILTER);
 
 export const FILTER_OPTIONS = [
   { value: FILTER.ALL, label: '전체' },
-
   { value: FILTER.MEMO, label: '메모 있음' },
-
   { value: FILTER.NO_MEMO, label: '메모 없음' },
 ];

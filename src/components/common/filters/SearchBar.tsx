@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiChevronDown, FiSearch, FiX } from 'react-icons/fi';
 import Button from '../ui/Button';
 import { SearchQueryType } from '@/shared/constants/search';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { ChevronDown, Search, X } from 'lucide-react';
+import Dropdown from '../ui/Dropdown';
+import { SEARCH_TYPE_ITEMS, SEARCH_TYPE_LABEL } from '@/shared/domain/search/contants';
 
 type SearchBarProps = {
   value: string;
@@ -38,6 +40,7 @@ const SearchBar = ({
     Author: '검색할 저자를 입력하세요',
     Publisher: '검색할 출판사를 입력하세요',
   };
+  const currentLabel = SEARCH_TYPE_LABEL[searchQueryType];
   return (
     <div className="w-full flex justify-start items-center gap-2">
       <form
@@ -55,20 +58,19 @@ const SearchBar = ({
         ref={formRef}
         className="flex w-full gap-1 rounded-2xl border border-gray-200 px-1 h-10"
       >
-        <div className="relative shrink-0 flex items-center ">
-          <select
-            value={searchQueryType}
-            onChange={(e) => onChangeSearchQueryType(e.target.value as SearchQueryType)}
-            className="h-6 w-auto min-w-0 appearance-none text-[11px] text-gray-700 border-r border-gray-200 pr-4 focus:outline-none text-center bg-white"
-          >
-            <option value="Keyword">제목or저자</option>
-            <option value="Title">제목</option>
-            <option value="Author">저자</option>
-            <option value="Publisher">출판사</option>
-          </select>
-          <FiChevronDown
-            size={14}
-            className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-gray-400"
+        <div className="relative shrink-0 flex items-center border-r border-gray-200 ">
+          <Dropdown
+            align="left"
+            variant="ghost"
+            trigger={
+              <div className="flex items-center gap-1 text-[11px] text-gray-700">
+                <span>{currentLabel}</span>
+
+                <ChevronDown className="h-3 w-3 text-gray-400" />
+              </div>
+            }
+            items={SEARCH_TYPE_ITEMS}
+            onSelect={(value) => onChangeSearchQueryType(value)}
           />
         </div>
 
@@ -81,17 +83,10 @@ const SearchBar = ({
             maxLength={10}
             placeholder={searchQtOptionMap[searchQueryType]}
             onChange={(e) => setKeyword(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-0"
+            className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-0 pl-2"
           />
-          <Button
-            type="submit"
-            variant="primary"
-            size="xs"
-            isLoading={isSearching}
-            loadingText=""
-            className="!w-8 !h-8 !min-w-8 !p-0 flex items-center justify-center"
-          >
-            <FiSearch size={16} />
+          <Button type="submit" variant="primary" size="xs" isLoading={isSearching} loadingText="">
+            <Search className="w-4 h-4 " />
           </Button>
           <Button
             className="!w-8 !h-8 !min-w-8 !p-0 flex items-center justify-center"
@@ -104,7 +99,7 @@ const SearchBar = ({
               formRef.current?.reset();
             }}
           >
-            <FiX size={16} />
+            <X className="w-4 h-4" />
           </Button>
         </div>
       </form>

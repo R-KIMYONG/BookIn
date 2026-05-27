@@ -5,12 +5,13 @@ import { BookInfo } from '@/shared/types/bookInfo';
 import { toggleLike } from '@/shared/lib/like/toggleLike';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { useAuth } from '@/shared/context/AuthContext';
+import { showToast } from '@/shared/lib/message/showToast';
+import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 export const useLike = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
   const queryKey = likeKeys.detail(bookInfo.isbn13);
 
   const { user } = useAuth();
-
   const mutation = useMutation({
     mutationFn: () => toggleLike({ bookInfo }),
 
@@ -55,7 +56,16 @@ export const useLike = (bookInfo: BookInfo) => {
   });
 
   return {
-    toggle: (options?: Parameters<typeof mutation.mutate>[1]) => mutation.mutate(undefined, options),
+    toggle: (options?: Parameters<typeof mutation.mutate>[1]) => {
+      if (!user) {
+        showToast(RESULT_CODE.AUTH_REQUIRED_LOGIN, {
+          toastId: 'login-required',
+        });
+        return;
+      }
+
+      mutation.mutate(undefined, options);
+    },
     isLoading: mutation.isPending,
   };
 };

@@ -25,6 +25,7 @@ const ConfirmModal = ({
   isLoading = false,
   formAction,
 }: ConfirmModalProps) => {
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
 
