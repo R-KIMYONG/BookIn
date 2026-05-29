@@ -1,214 +1,292 @@
-# 프로젝트 명 : 책 In
+# 📚 책 In (BookIn)
 
-## [book-in-two.vercel.app](<book-in-two.vercel.app/](https://book-in-two.vercel.app/)>)
+> 도서 정보 탐색과 사용자 의견 공유를 한 곳에서 — 알라딘 OpenAPI 기반 도서 커뮤니티
+
+🔗 **Live**: [book-in-two.vercel.app](https://book-in-two.vercel.app/)
+
+---
 
 ## 프로젝트 소개
 
-- 한 줄 정리 : 도서 관련 의견 공유 웹사이트
-- 내용 : 도서 정보 관람이 가능하고, 사용자 간 의견 공유 커뮤니티가 마련되어있는 도서 관련 사이트
+- **한 줄 정리**: 알라딘 OpenAPI로 도서 정보를 제공하고, 사용자 간 댓글·좋아요·북마크를 통해 의견을 공유할 수 있는 도서 커뮤니티 웹사이트
+- **주요 가치**: 카테고리·베스트셀러·신간을 빠르게 탐색하고, 마음에 든 책에 태그/메모를 붙여 개인 서재로 관리
 
-## ⏳ 제작기간
+## ⏳ 제작 기간
 
-- 2024/07/08(월) ~ 2024/07/14(일)
+- **MVP 개발**: 2024/07/08 ~ 2024/07/14 (팀 프로젝트)
+- **개인 리팩토링 및 기능 확장**: 2024/07 ~ 현재 진행 중
 
-## 기술 환경 및 스택
+---
 
-<div align='center'>
-<img src="https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB"/> 
-<img src="https://img.shields.io/badge/-React%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white" />
-<img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" /> 
-<img src="https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white" />
-<img src="https://img.shields.io/badge/Next.js-%23000000.svg?style=for-the-badge&logo=Next.js&logoColor=white" />
-<img src="https://img.shields.io/badge/nextui-000000%23000000.svg?style=for-the-badge&logo=nextui&logoColor=white" />
+## 🛠 기술 스택
+
+### Frontend
+
+<div align='left'>
+<img src="https://img.shields.io/badge/Next.js%2015-000000?style=for-the-badge&logo=Next.js&logoColor=white" />
+<img src="https://img.shields.io/badge/React%2019-20232a?style=for-the-badge&logo=react&logoColor=61DAFB" />
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
 </div>
 
-## 📑 페이지구성
+### State / Data
 
-- 메인페이지
-- 상세페이지
-- 로그인 & 회원가입 페이지
-- 마이페이지
+<div align='left'>
+<img src="https://img.shields.io/badge/TanStack%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white" />
+<img src="https://img.shields.io/badge/Zustand-000000?style=for-the-badge&logo=react&logoColor=white" />
+</div>
+
+### Backend / Infra
+
+<div align='left'>
+<img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+<img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+<img src="https://img.shields.io/badge/Aladin%20OpenAPI-FF6F00?style=for-the-badge&logo=bookstack&logoColor=white" />
+</div>
+
+### Editor / Utilities
+
+- **에디터**: Tiptap v3 (StarterKit + Placeholder)
+- **HTML sanitize**: DOMPurify, sanitize-html
+- **메일**: Nodemailer (비밀번호 재설정 / 이메일 인증)
+- **유틸**: dayjs, uuid, lucide-react
+
+### Test
+
+<div align='left'>
+<img src="https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" />
+<img src="https://img.shields.io/badge/MSW-FF6A33?style=for-the-badge&logo=mock-service-worker&logoColor=white" />
+<img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" />
+<img src="https://img.shields.io/badge/Testing%20Library-E33332?style=for-the-badge&logo=testing-library&logoColor=white" />
+</div>
+
+---
+
+## 📑 주요 기능
+
+### 메인 페이지
+
+- 알라딘 OpenAPI 기반 베스트셀러 / 신간 / 추천도서 진열
+- **SSR 하이드레이션** 기반 초기 진입 최적화
+- 카테고리(국내·외서·eBook) 분류 진입
+
+### 카테고리 페이지
+
+- `Bestseller / ItemNewAll / ItemNewSpecial / BlogBest / ItemEditorChoice` 쿼리 타입 전환
+- `Book / Foreign / eBook` 타겟 전환
+- 페이지네이션 (알라딘 정책상 최대 50페이지)
+
+### 상세 페이지
+
+- 도서 정보 (가격·표지·소개·구매 링크)
+- **댓글** 조회 / 작성 / 수정 / 삭제 (낙관적 업데이트)
+- **좋아요** 기능 (낙관적 업데이트, 비로그인 사용자 안내)
+- **북마크** + 메모 + 태그 관리
+
+### 마이페이지
+
+- 내 책(myBooks): 북마크 / 댓글 / 좋아요한 책 통합 관리
+- **검색 / 정렬 / 필터** 통합 UI (탭 간 상태 일관성 유지)
+- 계정 설정: 아이디·비밀번호·닉네임·아바타 변경, 회원 탈퇴
+
+### 인증
+
+- Supabase Auth 기반 로그인 / 회원가입 / 이메일 인증
+- 비밀번호 재설정 (메일 토큰 발급 → 확인 → 변경)
+- 소셜 로그인 UI 컴포넌트
+
+---
 
 ## 🔩 프로젝트 구조
 
+도메인 단위 모듈 구조로 정리되어 있으며, `app` 라우팅 / 재사용 `components` / 도메인 비즈니스 로직 `shared`로 책임을 분리했습니다.
+
 ```
-project-root/
-├── README.md
-├── .gitignore
-├── public/
-│   ├── images
-│   ├── json
-│   └── projectbookin.ico
+BookIn/
+├── public/                          # 정적 자산
+├── supabase/                        # supabase 마이그레이션 / config
 ├── src/
-│   ├── app/
-│   │   ├── (Private)
-│   │   │     └──(mypage)
-│   │   │        ├── _components
-│   │   │        │   ├── AccountDeletion.tsx
-│   │   │        │   ├── ChangePassWord.tsx
-│   │   │        │   ├── CHangeUserId.tsx
-│   │   │        │   ├── ChangeUserNickName.tsx
-│   │   │        │   ├── commentlist.tsx
-│   │   │        │   ├── CoverImg.tsx
-│   │   │        │   ├── EyeFilledIcon.tsx
-│   │   │        │   ├── EyeSlashFilledIcon.tsx
-│   │   │        │   ├── Mypage.tsx
-│   │   │        │   └── userInfo.tsx
-│   │   │        └── page.tsx
-│   │   ├── (public)
-│   │   │    ├── (detailMainPage)
-│   │   │    │   └── [id]
-│   │   │    │       └── page.tsx
-│   │   │    ├── (Login)
-│   │   │    └── category
-│   │   │        └── [category]
-│   │   │            └── page.tsx
-│   │   ├── api
-│   │   │   ├──[id]
-│   │   │   ├──AladinAPi
-│   │   │   │   ├── [id]
-│   │   │   │   │    └── route.tsx
-│   │   │   │   └── route.ts
-│   │   │   │
-│   │   │   ├──auth
-│   │   │   │  └── callback
-│   │   │   │       └── route.tsx
-│   │   │   ├──comment
-│   │   │   │  └── route.tsx
-│   │   │   └──SupabaseAuth
-│   │   ├── auth
-│   │   │    └── confirm
-│   │   │        └── route.tsx
-│   │   ├── error
-│   │   │    └── page.tsx
-│   │   ├── login
-│   │   │    ├── action.tsx
-│   │   │    └── page.tsx
-│   │   ├── logout
-│   │   │    └── actions.ts
-│   │   ├── marketing
-│   │   │    └── page.tsx
-│   │   ├── private
-│   │   │    └── page.tsx
-│   │   ├── signup
-│   │   │    ├── action.tsx
-│   │   │    └── page.tsx
-│   │   ├── terms
-│   │   │    └── page.tsx
-│   │   ├── terms_of_use
-│   │   │    └── page.tsx
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── provider.tsx
-│   ├── components
-│   │   ├── comment
-│   │   │   ├── Comment.tsx
-│   │   │   ├── CommentForm.tsx
-│   │   │   ├── CommentList.tsx
-│   │   │   └── Pagination.tsx
-│   │   ├── home
-│   │   │   ├── Category.tsx
-│   │   │   ├── CategoryItem.tsx
-│   │   │   └── SkeletonItem.tsx
-│   │   ├── Buttons.tsx
-│   │   ├── DemoClientComponent.tsx
-│   │   ├── Footer.tsx
-│   │   ├── Header.tsx
-│   │   └── TopButton.tsx
-│   ├── hooks
-│   │   ├── useCommentQuery.tsx
-│   │   └── useGenres.tsx
-│   ├── styles
-│   │   └── TopButton.css
-│   ├── types
-│   │   ├── book.type.ts
-│   │   ├── button.type.ts
-│   │   ├── genre.type.ts
-│   │   ├── mypageCommentslist.type.ts
-│   │   ├── supabase.ts
-│   │   └── useInfo.type.ts
-│   ├── utils
-│   │   └── supabase
-│   │       ├── client.ts
-│   │       ├── middleware.ts
-│   │       └── server.ts
-│   └── middleware.ts
+│   ├── app/                         # Next.js App Router
+│   │   ├── (auth)/                  # 로그인·회원가입·비밀번호 재설정·이메일 확인
+│   │   ├── (private)/               # 로그인 필요 — mypage, settings
+│   │   │   └── mypage/_components/  # MyBookSection·Header·Pagination·Sidebar
+│   │   ├── (public)/                # 비로그인 접근 가능
+│   │   │   ├── (detailMainPage)/    # 도서 상세 + Comment 컴포넌트
+│   │   │   ├── category/            # 카테고리 페이지 (검색 기능 추가 예정)
+│   │   │   ├── marketing/
+│   │   │   ├── terms/
+│   │   │   └── terms_of_use/
+│   │   ├── api/                     # Route Handlers
+│   │   │   ├── aladin/              #   list / search / last-page
+│   │   │   ├── auth/                #   callback / email-callback / password-reset
+│   │   │   ├── bookmark/            #   memo / tags
+│   │   │   ├── comment/
+│   │   │   ├── like/                #   count / user
+│   │   │   ├── mybooks/             #   bookmarks / comments / likes
+│   │   │   └── user/                #   avatar / email / me / nickname / password / tags
+│   │   ├── actions/                 # Server Actions
+│   │   ├── layout.tsx · page.tsx · providers
+│   │
+│   ├── components/                  # 재사용 UI 컴포넌트
+│   │   ├── book/
+│   │   ├── bookmark/
+│   │   ├── common/                  # ui (Button, Dropdown) / filters / SkeletonGrid
+│   │   ├── form/                    # PasswordFields 등
+│   │   ├── home/
+│   │   ├── icons/                   # 소셜 로그인 아이콘 포함
+│   │   ├── layout/                  # header / session
+│   │   ├── modal/
+│   │   └── session/
+│   │
+│   ├── hooks/                       # 도메인별 커스텀 훅
+│   │   ├── auth/ · book/ · bookmark/ · comment/
+│   │   ├── like/ · mybooks/ · mypage/
+│   │   ├── url/                     # URL 쿼리 동기화
+│   │   └── common/
+│   │
+│   ├── shared/
+│   │   ├── api/                     # 클라이언트 API 래퍼 (mybooks 등)
+│   │   ├── constants/               # category / search / pagination / auth / time …
+│   │   ├── context/                 # React Context
+│   │   ├── domain/                  # 도메인 비즈니스 로직
+│   │   │   ├── aladin/ · auth/ · book/ · bookmark/ · category/
+│   │   │   ├── comment/ · countdown/ · detail/ · like/
+│   │   │   ├── mybooks/ · mypage/ · search/ · session/
+│   │   │   ├── tag/ · terms/ · user/
+│   │   ├── lib/                     # 외부 의존 래퍼·헬퍼
+│   │   │   ├── aladin/ · auth/ · book/ · bookmark/ · comment/
+│   │   │   ├── crypto/ · date/ · like/ · mail/(+templates)
+│   │   │   ├── message/             # RESULT_CODE 기반 메시지 시스템
+│   │   │   ├── network/ · server/(entities, mybooks)
+│   │   │   ├── supabase/            # client / server / middleware
+│   │   │   └── toast/
+│   │   ├── providers/               # QueryClient 등 전역 Provider
+│   │   ├── types/
+│   │   └── utils/                   # navigation / security / validation
+│   │
+│   ├── stores/                      # Zustand 스토어
+│   ├── data/                        # 정적 JSON 데이터 (장르 등)
+│   ├── test/                        # 테스트 유틸 · msw 핸들러
+│   ├── __test__/                    # 단위 테스트
+│   └── middleware.ts                # Supabase 세션 미들웨어
+│
+├── next.config.mjs · tailwind.config.ts · tsconfig.json
+├── vitest.config.ts · vitest.setup.ts
 └── .env.local
 ```
 
-## 📑 메인페이지
+### 폴더 분리 원칙
 
-- AladinApi를 통해 책들의 정보를 메인페이지에 표시
-- 베스트셀러, 신규, 인기책들을 분류해서 표시
-- Pagination을 통해 각 페이지를 통해 표시
+- **`app/`** — 라우팅·페이지 셸·서버 컴포넌트 / Route Handler. 라우트별 종속 컴포넌트는 `_components/`에 둠
+- **`components/`** — 라우트와 무관하게 재사용 가능한 UI
+- **`hooks/`** — 도메인별 React 훅 (`useXxxQuery`, `useXxxMutation` 등 TanStack Query 통합)
+- **`shared/domain/`** — 비즈니스 규칙·도메인 모델 (UI/프레임워크 비의존)
+- **`shared/lib/`** — Supabase·메일·암호화 등 외부 시스템 어댑터
+- **`stores/`** — Zustand 전역 상태 (검색·필터·UI 상태 등)
 
-## 📑 상세페이지
+---
 
-- 선택한 책의 정보, 가격, 제목 및 구매버튼 등을 표시
-- 댓글조회 & 수정 & 등록기능 구현
+## 🚀 시작하기
 
-## 📑 마이페이지
+### 환경 변수 (`.env.local`)
 
-- 로그인 & 회원가입 기능 구현
-- 아이디,비밀번호,닉네임,아바타 이미지 변경 기능구현
-- 회원탈퇴 기능구현
-- 본인의 작성글 내역 확인기능 구현
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+ALADIN_TTB_KEY=...
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+# 메일 발송용
+SMTP_HOST=...
+SMTP_PORT=...
+SMTP_USER=...
+SMTP_PASS=...
+```
 
-## 🛠️ 트러블슈팅
+### 스크립트
 
-### 1. react quill오류
+```bash
+yarn dev          # 개발 서버
+yarn build        # 프로덕션 빌드
+yarn start        # 빌드 결과 실행
+yarn lint         # ESLint
+yarn test         # vitest watch
+yarn test:run     # vitest 1회 실행 (CI)
+yarn test:ui      # vitest UI
+yarn genTypes     # supabase 스키마 → TypeScript 타입 생성
+```
 
-#### **오류**: react-quill 을 return문에서 띄울 때, 500 에러 발생
+---
 
-#### **조치**: next/dynamic 임포트,const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });로 불러와서 클라이언트 측에서만 로드되게 추가 처리해서 해결
+## ⚡ 주요 리팩토링 / 개선 이력
 
-### 2. supabase insert 오류
+| 항목                           | 내용                                                               |
+| ------------------------------ | ------------------------------------------------------------------ |
+| **폰트 로딩 최적화**           | `next/font` 기반 CJK self-host 전환으로 CLS / LCP 개선             |
+| **SSR 하이드레이션 전면 적용** | 전체 페이지에 SSR + TanStack Query prefetch / dehydrate 패턴 통일  |
+| **메시지 시스템 통합**         | RESULT_CODE 기반 toast 메시지 구조 정리 — 클라/서버 동일 코드 사용 |
+| **폴더 구조 재정리**           | 도메인 단위 모듈 구조 (`shared/domain` · `shared/lib`)로 책임 분리 |
+| **myBooks 통합**               | 북마크·댓글·좋아요 탭 검색·정렬·필터 단일 상태로 통합              |
+| **댓글 / 좋아요 / 북마크**     | 낙관적 업데이트 + invalidation 전략 적용                           |
+| **이미지 최적화**              | `next/image` 일괄 전환으로 LCP 개선                                |
 
-#### **오류**: [supabase insert 과정에서 발견한 연결 오류] 댓글 기능의 supabase 라우트 핸들러 부분을 switch 문으로 작성했더니, response.method를 인식하지 못하는 것으로 보임.(모든 case, default문까지 실행 안 됨) export function으로 변경하니, 500 에러와 함께 response.status is not a function 에러 발생.response자체가 undefined 반환되는 것으로 보이고,supabase DB에 null값의 항목들이 추가됨 + TypeError: Invalid URL 에러 발생. 셋팅 관련 문제로 예상
+---
 
-#### **조치**: .env.local 파일 url, key 형식 올바르게 변경.클라이언트 측 supabase client 연결. POST부분 핸들러의 함수 인자에 request 만 남기고 ,response는 함수 내부에서 const response = await request.json(); 로 선언. return NextResponse.json({ status: 'success' });(리턴 값 추가)
+## 🧪 테스트 전략
 
-### 3. 댓글 수정 500 에러 발생.
+- **단위 / 통합**: Vitest + React Testing Library
+- **API mocking**: MSW (`src/test/msw`)
+- **E2E**: Playwright (검색·인증·도서 상세 등 핵심 플로우)
+- **타입 안전성**: Supabase 스키마 → TypeScript 타입 자동 생성 (`yarn genTypes`)
 
-#### **오류**: 댓글 수정 제작 중 발생 에러 원인 모를 500 에러 발생.
+---
 
-#### **조치**: 테이블의 있는 전체 항목을 update의 값으로 지정하지 않아서 생겼던 문제였음 올바른 user_id, created_at 값 추가해 해결
+## 🛠 트러블슈팅 (대표 사례)
 
-### 4. 댓글 수정 바로 반영되지않는 문제
+<details>
+<summary><b>1. 댓글 수정 / 삭제 시 화면 즉시 반영 안 됨</b></summary>
 
-#### **오류**: 댓글 작성, 수정시에 화면에 바로 적용이 될 때가 있고 새로고침을 해야 적용될때가있음
+- **원인**: invalidate 후 refetch 타이밍과 사용자 체감 사이의 간극
+- **조치**: TanStack Query 낙관적 업데이트(`onMutate` → `setQueryData`) 적용 + Pagination total 카운트까지 일관성 유지
 
-#### **조치**: 낙관적 업데이트 적용(tanstack 공식 문서 참고)
+</details>
 
-### 5. 댓글 total 갯수 표시 오류
+<details>
+<summary><b>2. 마이페이지 ID 수정 시 값이 잘려서 저장</b></summary>
 
-#### **오류**: 댓글 기능의 페이지네이션이 새 댓글이 생겨서 total 페이지네이션 수가 하나 증가될 때, 화면에 즉시 반영되지 않음
+- **원인**: `useState` + `setTimeout` 조합과 `onAuthStateChange` 비동기 흐름이 맞물려 입력값이 일부만 반영
+- **조치**: 입력값을 `useRef`로 관리해 리렌더 타이밍 영향 제거
 
-#### **조치**: 삭제 기능에도 낙관적 업데이트 적용하니 해결
+</details>
 
-### 6. 댓글 수정 오류
+<details>
+<summary><b>3. 도서 이미지 LCP 지연</b></summary>
 
-#### **오류**: 댓글 작성 직후 list에 key가 없다는 경고.(낙관적 업데이트 적용 후 생김)
+- **원인**: 외부 도메인 이미지 + 일반 `<img>` 태그
+- **조치**: `next/image` 전환 + `priority` / `sizes` 지정, 카테고리 페이지 첫 화면 이미지 우선 로드
 
-#### **조치**: 입력할때 uuid로 id값도 직접 넣어주기
+</details>
 
-### 7. 성능개선
+<details>
+<summary><b>4. 폰트로 인한 CLS</b></summary>
 
-#### **오류**: lighthouse중 LCP에 확인된 이미지관련 로드지연
+- **원인**: 외부 CDN CJK 폰트 로드 지연
+- **조치**: `next/font` self-host로 전환, preload + display swap 전략 적용
 
-#### **조치**: Next UI에 제공된 Image 태그에서는 이미지 성능 개선효과 없으며 스타일링 제공되고 lazy loading은 별도로 구현해야될 필요로 확인됬습니다. Image태그를 모두 Next.js의 Image component로 변경
+</details>
 
-### 8. 마이페이지 아이디 수정 오류
+<details>
+<summary><b>5. Supabase Route Handler 500 에러</b></summary>
 
-#### **오류**: 마이페이지 아이디 변경 진행 시 입력한 ID가 짤려서 저장되는 증상 발생 ex) test@result.com으로 변경 시도하면 실제로 supabase users테이블에 test@re 로 저장되거나 test@으로 저장된다.
+- **원인**: `request.json()` 미사용 + 잘못된 환경변수 형식
+- **조치**: `.env.local` URL/Key 형식 교정, `NextResponse.json()` 명시적 반환으로 정리
 
-#### **탐색**:
+</details>
 
-##### 1. input의 입력가능 텍스트 수량 제한 때문에 문제발생?
+---
 
-##### 2. supabase.auth.onAuthStateChange 내에서 비동기 함수를 사용해야되서 setTimeout의 시간설정때문에 저장한된값이 일부만 보였던문제인가?
+## 📌 진행 중 / 예정
 
-##### 3. useEffect에서 마운트되는 시점과 사용자가 입력한 값의 시점이 즉 useState로 onChange에서 사용자의 입력값을 받으면서 setTimeout과 맞물려서 결과값이 짤려서 저장되는건가?
-
-#### **조치**:useState에서 문제 발생한부분으로 확인되여 입력값은 useRef로 대체해서 받아서 저장하니 짤리지않았습니다.
+- [ ] 카테고리 페이지 검색 기능 (`feat/category-search`)
+- [ ] 알라딘 검색 API 통합 UI / URL 쿼리 동기화
+- [ ] 검색 결과 페이지네이션 / 정렬 옵션 확장

@@ -48,12 +48,17 @@ const CategoryItem = ({ item, disabled }: { item: Item; disabled?: boolean }) =>
       </div>
 
       <div className="p-4 flex flex-col gap-2">
-        <h5 className="text-sm leading-5 font-semibold line-clamp-2 min-h-[40px]">{item.title}</h5>
+        <h5 className="text-sm leading-5 font-semibold line-clamp-1 min-h-[20px]">{item.title}</h5>
         <div className="h-[16px] flex items-center">
-          {rating > 0 && (
+          {rating > 0 ? (
             <div className="flex items-center gap-1 text-[11px]">
               <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
               <span className="text-gray-800 font-semibold">{rating}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-[11px]">
+              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              <span className="text-gray-800 font-semibold">평점 없음</span>
             </div>
           )}
         </div>

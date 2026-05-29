@@ -1,15 +1,23 @@
-import { SEARCH_QT_LIST, SearchQueryType } from '@/shared/constants/search';
+import { TargetTypes } from '@/shared/constants/category';
+import { SearchQueryType } from '@/shared/domain/search/types';
+import { APP_QUERY_KEYS } from '@/shared/domain/aladin/constants';
 import { NextRequest, NextResponse } from 'next/server';
+import { DEFAULT_SEARCH_QT, SEARCH_QT_LIST } from '@/shared/domain/search/constants';
 
-export async function GET(request: NextRequest) {
+export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
 
-  const keyword = searchParams.get('SearchKeyWord')?.trim() ?? '';
-  const rawPage = Number(searchParams.get('page') ?? '1');
+  const keyword = searchParams.get(APP_QUERY_KEYS.searchKeyWord)?.trim() ?? '';
+  const rawPage = Number(searchParams.get(APP_QUERY_KEYS.page) ?? '1');
   const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
+  const target = searchParams.get(APP_QUERY_KEYS.target)?.trim() as TargetTypes;
 
-  const rawSearchQueryType = (searchParams.get('QueryType') ?? 'Keyword').trim() as SearchQueryType;
-  const searchQueryType = SEARCH_QT_LIST.includes(rawSearchQueryType) ? rawSearchQueryType : 'Keyword';
+  const categoryId = searchParams.get(APP_QUERY_KEYS.categoryId)?.trim() ?? 0;
+
+  const rawSearchQueryType = (
+    searchParams.get(APP_QUERY_KEYS.searchQueryType) ?? DEFAULT_SEARCH_QT
+  ).trim() as SearchQueryType;
+  const searchQueryType = SEARCH_QT_LIST.includes(rawSearchQueryType) ? rawSearchQueryType : DEFAULT_SEARCH_QT;
 
   if (!keyword) return NextResponse.json({ items: [], total: 0 }, { status: 200 });
 
@@ -20,7 +28,8 @@ export async function GET(request: NextRequest) {
     ttbkey: ttbKey,
     Query: keyword,
     QueryType: searchQueryType,
-    SearchTarget: 'All',
+    SearchTarget: target,
+    CategoryId: String(categoryId),
     Start: String(page),
     MaxResults: '20',
     Sort: 'Accuracy',
@@ -42,4 +51,4 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching data:', error);
     return NextResponse.json({ message: '알라딘 검색 중 오류가 발생했습니다.' }, { status: 500 });
   }
-}
+};

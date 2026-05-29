@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '../ui/Button';
-import { SearchQueryType } from '@/shared/constants/search';
+import { SearchQueryType } from '@/shared/domain/search/types';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { ChevronDown, Search, X } from 'lucide-react';
 import Dropdown from '../ui/Dropdown';
-import { SEARCH_TYPE_ITEMS, SEARCH_TYPE_LABEL } from '@/shared/domain/search/contants';
+import { SEARCH_QUERYTYPE_OPTION, SEARCH_TYPE_ITEMS, SEARCH_TYPE_LABEL } from '@/shared/domain/search/constants';
 
 type SearchBarProps = {
   value: string;
@@ -24,40 +24,31 @@ const SearchBar = ({
   searchQueryType,
   onChangeSearchQueryType,
 }: SearchBarProps) => {
-  const formRef = useRef<HTMLFormElement>(null);
   const [keyword, setKeyword] = useState(value);
-  useEffect(() => {
-    const input = formRef.current?.elements.namedItem('keyword') as HTMLInputElement | null;
-    if (input) input.value = value ?? '';
-  }, [value]);
+
   useEffect(() => {
     setKeyword(value);
   }, [value]);
 
-  const searchQtOptionMap: Record<SearchQueryType, string> = {
-    Keyword: '책 제목 또는 저자를 입력하세요',
-    Title: '검색할 제목을 입력하세요',
-    Author: '검색할 저자를 입력하세요',
-    Publisher: '검색할 출판사를 입력하세요',
+  const handleReset = () => {
+    setKeyword('');
+    onReset();
   };
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const trimmed = keyword.trim();
+    if (!trimmed) {
+      showToast(RESULT_CODE.VALIDATION_REQUIRED_SEARCHKEYWORD);
+      return;
+    }
+    onSubmit(trimmed);
+  };
+
   const currentLabel = SEARCH_TYPE_LABEL[searchQueryType];
   return (
     <div className="w-full flex justify-start items-center gap-2">
-      <form
-        onSubmit={(e: React.SubmitEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-
-          const keyword = (formData.get('keyword') as string | null)?.trim() ?? '';
-          if (!keyword) {
-            showToast(RESULT_CODE.VALIDATION_REQUIRED_SEARCHKEYWORD);
-            return;
-          }
-          onSubmit(keyword);
-        }}
-        ref={formRef}
-        className="flex w-full gap-1 rounded-2xl border border-gray-200 px-1 h-10"
-      >
+      <form onSubmit={handleSubmit} className="flex w-full gap-1 rounded-2xl border border-gray-200 px-1 h-10">
         <div className="relative shrink-0 flex items-center border-r border-gray-200 ">
           <Dropdown
             align="left"
@@ -80,8 +71,8 @@ const SearchBar = ({
             name="keyword"
             autoComplete="off"
             value={keyword}
-            maxLength={10}
-            placeholder={searchQtOptionMap[searchQueryType]}
+            maxLength={20}
+            placeholder={SEARCH_QUERYTYPE_OPTION[searchQueryType]}
             onChange={(e) => setKeyword(e.target.value)}
             className="flex-1 bg-transparent outline-none text-xs placeholder-gray-400 min-w-0 pl-2"
           />
@@ -94,10 +85,7 @@ const SearchBar = ({
             label="초기화"
             variant="secondary"
             size="xs"
-            onClick={() => {
-              onReset();
-              formRef.current?.reset();
-            }}
+            onClick={handleReset}
           >
             <X className="w-4 h-4" />
           </Button>

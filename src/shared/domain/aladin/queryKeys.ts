@@ -1,5 +1,6 @@
 import { TargetTypes } from '@/shared/constants/category';
-import { QueryType } from './constants';
+import { SearchQueryType } from '@/shared/domain/search/types';
+import { QueryType } from './types';
 
 export const aladinKeys = {
   all: ['books'] as const,
@@ -9,4 +10,12 @@ export const aladinKeys = {
 
   lastPage: (params: { queryType: QueryType; target: TargetTypes; categoryId: number }) =>
     [...aladinKeys.all, 'lastPage', params] as const,
+
+  search: (params: {
+    searchKeyWord?: string | null;
+    searchQueryType: SearchQueryType;
+    page: number;
+    target: TargetTypes;
+    categoryId: number | null;
+  }) => [...aladinKeys.all, 'search', params] as const,
 };

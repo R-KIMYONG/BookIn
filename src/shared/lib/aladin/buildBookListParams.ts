@@ -1,24 +1,26 @@
-import { DEFAULT_TARGET, TargetTypes } from '@/shared/constants/category';
-import { QueryType } from '@/shared/domain/aladin/constants';
+import { TargetTypes } from '@/shared/constants/category';
+import { QueryType } from '@/shared/domain/aladin/types';
 
 type AladinListParams = {
   queryType: QueryType;
   page: number;
-  target?: TargetTypes;
+  target: TargetTypes;
   categoryId?: number;
 };
 
-export const buildBookListParams = ({ queryType, page, target = DEFAULT_TARGET, categoryId }: AladinListParams) => {
+type ListParamKeyMap = Record<'queryType' | 'target' | 'page' | 'categoryId', string>;
+
+export const buildBookListParams = (args: AladinListParams, keys: ListParamKeyMap) => {
   const params = new URLSearchParams({
-    QueryType: queryType,
-    page: String(page),
-    target,
+    [keys.queryType]: args.queryType,
+    [keys.page]: String(args.page),
+    [keys.target]: args.target,
   });
 
-  if (categoryId) {
-    params.set('CategoryId', String(categoryId));
-  } else if (queryType === 'ItemEditorChoice') {
-    params.set('CategoryId', '170');
+  if (args.categoryId) {
+    params.set(keys.categoryId, String(args.categoryId));
+  } else if (args.queryType === 'ItemEditorChoice') {
+    params.set(keys.categoryId, '170');
   }
 
   return params;
