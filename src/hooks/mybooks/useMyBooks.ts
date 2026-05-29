@@ -43,6 +43,12 @@ export const useMyBooks = (
         tagId,
       }),
     staleTime: 5 * MINUTE, //3분
+    placeholderData: (prev, prevQuery) => {
+      // 같은 탭 내 전환(페이지/정렬/필터/검색)에서만 이전 목록 유지 → 깜빡임 방지
+      // 탭이 바뀌면 undefined → isPending → 스켈레톤 노출
+      const prevTab = (prevQuery?.queryKey[1] as { tab?: MyBooksTabType } | undefined)?.tab;
+      return prevTab === tab ? prev : undefined;
+    },
   });
   return {
     ...query,

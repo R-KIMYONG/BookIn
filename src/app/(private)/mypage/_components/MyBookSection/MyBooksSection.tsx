@@ -9,19 +9,16 @@ import { useMyBooks } from '@/hooks/mybooks/useMyBooks';
 import { useUserTags } from '@/hooks/bookmark/useUserTags';
 import { useMemo } from 'react';
 import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
-import dynamic from 'next/dynamic';
+import CommentBooksList from './lists/CommentBooksList';
+import LikeBooksList from './lists/LikeBooksList';
+import BookmarkBooksList from './lists/BookmarkBooksList';
 
-const CommentBooksList = dynamic(() => import('./lists/CommentBooksList'));
-
-const LikeBooksList = dynamic(() => import('./lists/LikeBooksList'));
-
-const BookmarkBooksList = dynamic(() => import('./lists/BookmarkBooksList'));
 const MyBooksSection = () => {
   const { query, setQuery } = useMypageQueryState();
 
   const { tab, page, sort, filter, search, searchField, tagId } = query;
 
-  const { result, isPending, isError, error, refetch } = useMyBooks(
+  const { result, isPending, isError, error, refetch, isPlaceholderData } = useMyBooks(
     tab,
     page,
     sort,
@@ -85,7 +82,15 @@ const MyBooksSection = () => {
     return <EmptyState description={emptyStateDescription} title={emptyStateTitle} />;
   }
 
-  return <div className="my-2 min-h-[200px] flex justify-center lg:min-h-[600px]">{renderList()}</div>;
+  return (
+    <div
+      className={`my-2 min-h-[200px] flex justify-center lg:min-h-[600px] transition-opacity ${
+        isPlaceholderData ? 'opacity-50 pointer-events-none' : 'opacity-100'
+      }`}
+    >
+      {renderList()}
+    </div>
+  );
 };
 
 export default MyBooksSection;

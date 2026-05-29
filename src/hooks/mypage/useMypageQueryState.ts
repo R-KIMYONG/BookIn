@@ -8,7 +8,6 @@ import { useCallback, useMemo } from 'react';
 import { buildParams } from './buildParams';
 import { parseQueryFromParams } from './parseQueryFromParams';
 
-
 export const useMypageQueryState = () => {
   const { setParams, getAllParams } = useUrlParams();
 
@@ -66,7 +65,7 @@ export const useMypageQueryState = () => {
         next.page = 1;
       }
 
-      setParams(buildParams(next), { replace: true });
+      setParams(buildParams(next), { replace: true, shallow: true });
     },
     [getAllParams, setParams]
   );
