@@ -103,11 +103,11 @@ const ProfilePage = async ({
   }
   for (const isbn of isbnList) {
     if (tab === 'like') {
-      queryClient.setQueryData(
-        likeKeys.detail(isbn),
-
-        { isbn13: isbn, liked: likes[isbn] ?? false, liked_count: likeCounts[isbn] ?? 0 }
-      );
+      queryClient.setQueryData(likeKeys.detail(isbn), {
+        isbn13: isbn,
+        liked: likes[isbn] ?? false,
+        liked_count: likeCounts[isbn] ?? 0,
+      });
     }
 
     if (tab === 'bookmark') {
@@ -131,7 +131,7 @@ const ProfilePage = async ({
   });
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Mypage section={section} />
+      <Mypage />
     </HydrationBoundary>
   );
 };
