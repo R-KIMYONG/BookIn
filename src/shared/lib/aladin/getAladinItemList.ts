@@ -1,14 +1,14 @@
 import 'server-only';
 
-import { MAX_RESULTS, QueryType } from '@/shared/domain/aladin/constants';
+import { MAX_RESULTS } from '@/shared/domain/aladin/constants';
 import { TargetTypes } from '@/shared/constants/category';
+import { QueryType } from '@/shared/domain/aladin/types';
 type GetAladinItemListArgs = {
   target: TargetTypes;
   queryType: QueryType;
   categoryId?: string;
   page: number;
 };
-
 
 export const getAladinItemList = async ({ target, queryType, categoryId, page }: GetAladinItemListArgs) => {
   //target : 'Book' | 'Foreign' | 'eBook' SerchTarget에필요함

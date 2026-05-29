@@ -1,5 +1,5 @@
 import { MyBooksTabType } from '../mypage/tab';
-import { TAG_DEFAULT } from '../tag/types';
+import { TAG_DEFAULT } from '../tag/constants';
 import { MyBooksFilter } from './filter';
 import { SearchField } from './search';
 import { MyBooksSort } from './sort';

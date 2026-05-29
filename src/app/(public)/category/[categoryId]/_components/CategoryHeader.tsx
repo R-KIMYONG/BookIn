@@ -2,21 +2,32 @@
 
 import { useMemo, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import useCategoryUrlState from '@/hooks/url/useCategoryUrlState';
 import Button from '@/components/common/ui/Button';
 import QueryTypeTabs from '@/components/common/filters/QueryTypeTabs';
 import InvalidCategory from './InvalidCategory';
 import { Genre } from '@/shared/domain/category/types';
 import { classifyCategory } from '@/shared/domain/category/classifyCategory';
+import SearchBar from '@/components/common/filters/SearchBar';
+import { TargetTypes } from '@/shared/constants/category';
+import { useBookListData } from '@/hooks/book/useBookListData';
 
 type CategoryHeaderProps = {
   categoryId: number;
   koreanGenres: Genre[];
   foreignGenres: Genre[];
   ebookGenres: Genre[];
+  target: TargetTypes;
+  page: number;
 };
 
-const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres }: CategoryHeaderProps) => {
+const CategoryHeader = ({
+  categoryId,
+  koreanGenres,
+  foreignGenres,
+  ebookGenres,
+  target,
+  page,
+}: CategoryHeaderProps) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -25,10 +36,12 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres }
     [koreanGenres, foreignGenres, ebookGenres, categoryId]
   );
 
-  const { queryType, target, setCategoryUrl } = useCategoryUrlState({
-    categoryId,
-    defaultTarget,
-  });
+  const { queryType, isFetching, searchTotal, isSearching, searchKeyWord, searchQueryType, setListUrl } =
+    useBookListData({
+      target,
+      page,
+      categoryId,
+    });
 
   if (!isValidCategory) return <InvalidCategory />;
 
@@ -43,12 +56,33 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres }
     <>
       <p className="font-bold border-b text-center pb-3">{groupLabel}</p>
 
-      <div className="md:flex-1 md:pr-3">
+      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <QueryTypeTabs
           value={queryType}
-          onChange={(k) => setCategoryUrl({ queryType: k, searchKeyWord: null, page: 1 })}
+          onChange={(k) => setListUrl({ queryType: k, searchKeyWord: null, page: 1 })}
           target={target}
+          disable={isPending}
         />
+        <div className="flex flex-col items-start md:items-end gap-1">
+          <SearchBar
+            value={searchKeyWord}
+            isSearching={isFetching}
+            searchQueryType={searchQueryType}
+            onSubmit={(keyword) => setListUrl({ searchKeyWord: keyword, page: 1 })}
+            onReset={() => setListUrl({ searchKeyWord: null, page: 1 })}
+            onChangeSearchQueryType={(sq) => setListUrl({ searchQueryType: sq, page: 1 })}
+          />
+
+          {isSearching && (
+            <p className="text-[12px] text-gray-600 text-nowrap md:pr-4 box-border pl-2">
+              {isFetching
+                ? '검색중...'
+                : searchTotal > 0
+                  ? `검색결과 ${searchTotal.toLocaleString()}개`
+                  : '검색결과가 없습니다.'}
+            </p>
+          )}
+        </div>
       </div>
 
       <nav
@@ -65,7 +99,10 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres }
                 variant={active ? 'primary' : 'secondary'}
                 label={tab.label}
                 disabled={isPending}
-                onClick={() => handleTabClick(tab.id)}
+                onClick={() => {
+                  if (active) return;
+                  handleTabClick(tab.id);
+                }}
               />
             );
           })}

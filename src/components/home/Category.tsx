@@ -1,108 +1,41 @@
 'use client';
 
 import CategoryItem from './CategoryItem';
-import { Item, SearchResult } from '@/shared/types/api';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import AppPagination from '../common/AppPagination';
-import getTotalPages from '@/shared/utils/pagination';
 import QueryTypeTabs from '../common/filters/QueryTypeTabs';
 import SearchBar from '../common/filters/SearchBar';
-import useHomeListUrlState from '@/hooks/url/useHomeListUrlState';
-import { SearchQueryType } from '@/shared/constants/search';
 import SkeletonGrid from '../common/SkeletonGrid';
 import { useMemo } from 'react';
-import { MINUTE } from '@/shared/constants/time';
-import { normalizeBook } from '@/shared/lib/book/normalizeBook';
 import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
-import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
 import { makeItemKey } from '@/shared/domain/book/makeItemKey';
 import { makeHref } from '@/shared/domain/book/makeHref';
-import { fetchAladinList } from '@/shared/lib/aladin/fetchAladinList.client';
-import { PagedResult } from '@/shared/domain/aladin/types';
-import { QueryType } from '@/shared/domain/aladin/constants';
 import { TargetTypes } from '@/shared/constants/category';
+import { useBookListData } from '@/hooks/book/useBookListData';
 
 type CategoryProps = {
-  queryType: QueryType;
   target: TargetTypes;
   page: number;
 };
-const emptyPaged = <T,>(itemsPerPage = 20): PagedResult<T> => ({
-  items: [],
-  totalResults: 0,
-  itemsPerPage,
-});
 
-const Category = ({ queryType, target, page }: CategoryProps) => {
-  // const [isPending] = useTransition();
-  const { searchKeyWord, searchQueryType, setHomeUrl } = useHomeListUrlState();
+const Category = ({ target, page }: CategoryProps) => {
+  const {
+    list,
+    queryType,
+    listDataPending,
+    totalPages,
+    isFetching,
+    searchTotal,
+    searchKeyWord,
+    searchQueryType,
+    setListUrl,
+  } = useBookListData({ target, page });
   const isSearching = Boolean(searchKeyWord?.trim());
 
-  const {
-    data: listData,
-    isPending: bookItemPending,
-    isFetching: bookItemFetching,
-  } = useQuery({
-    queryKey: aladinKeys.list({ queryType, page, target }),
-    queryFn: () => fetchAladinList({ queryType, page, target }),
-    retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: 3 * MINUTE,
-    placeholderData: keepPreviousData,
-    enabled: !isSearching,
-  });
-  const {
-    data: searchData,
-    isPending: searchPending,
-    isFetching: searchFetching,
-  } = useQuery({
-    queryKey: ['search', searchKeyWord, searchQueryType, page],
-    queryFn: async ({ queryKey }) => {
-      const [_, searchKeyWord, searchQueryType, page] = queryKey as [string, string | null, SearchQueryType, number];
-      if (!searchKeyWord?.trim()) return emptyPaged<Item>(20);
-
-      const params = new URLSearchParams({
-        SearchKeyWord: searchKeyWord,
-        page: String(page),
-        QueryType: searchQueryType,
-      });
-
-      const url = `/api/aladin/search?${params.toString()}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('검색 실패');
-      const data: SearchResult = await res.json();
-      return {
-        items: (data.item ?? []).map(normalizeBook),
-        totalResults: Number(data.totalResults ?? 0),
-        itemsPerPage: Number(data.itemsPerPage ?? 20),
-      };
-    },
-    staleTime: 1 * MINUTE,
-    placeholderData: keepPreviousData,
-    enabled: isSearching,
-  });
-  const searchTotal = searchData?.totalResults ?? 0;
-  const isFetching = isSearching ? searchFetching : bookItemFetching;
-  //데이터 새로 가져오기 검색중이면 검색의 데이터 다시 가져오기아닐 시 전체 리스트 리패칭
-  const isPending = isSearching ? searchPending : bookItemPending;
-
-  const list = useMemo(() => {
-    return isSearching ? (searchData?.items ?? []) : (listData?.items ?? []);
-  }, [isSearching, searchData?.items, listData?.items]);
-  //현재 화면에서 리스트카드의 정보 즉 각각의 카드
   const isbnList = useMemo(() => {
     return list.map((item) => item.isbn13).filter(Boolean);
   }, [list]);
-
   useFetchLikeCount(isbnList);
-
-  const totalResults = isSearching ? (searchData?.totalResults ?? 0) : (listData?.totalResults ?? 0);
-  //패칭해온 총결과
-  const perPage = isSearching ? (searchData?.itemsPerPage ?? 20) : (listData?.itemsPerPage ?? 20);
-  //API 응답의 itemsPerPage(페이지당 개수). 없거나 이상하면 20으로 fallback.
-
-  const totalPages = getTotalPages(totalResults, perPage);
 
   return (
     <section className="w-full max-w-7xl mx-auto flex flex-col gap-2 overflow-x-hidden">
@@ -110,7 +43,7 @@ const Category = ({ queryType, target, page }: CategoryProps) => {
         <div className="md:flex-1 md:pr-3 w-full ">
           <QueryTypeTabs
             value={queryType}
-            onChange={(k) => setHomeUrl({ queryType: k, searchKeyWord: null })}
+            onChange={(k) => setListUrl({ queryType: k, searchKeyWord: null })}
             disable={isSearching}
           />
         </div>
@@ -120,19 +53,23 @@ const Category = ({ queryType, target, page }: CategoryProps) => {
             value={searchKeyWord}
             isSearching={isFetching}
             searchQueryType={searchQueryType}
-            onSubmit={(keyword) => setHomeUrl({ searchKeyWord: keyword, page: 1 })}
-            onReset={() => setHomeUrl({ searchKeyWord: null, page: 1 })}
-            onChangeSearchQueryType={(sq) => setHomeUrl({ searchQueryType: sq, page: 1 })}
+            onSubmit={(keyword) => setListUrl({ searchKeyWord: keyword, page: 1 })}
+            onReset={() => setListUrl({ searchKeyWord: null, page: 1 })}
+            onChangeSearchQueryType={(sq) => setListUrl({ searchQueryType: sq, page: 1 })}
           />
 
           {isSearching && (
             <p className="text-[12px] text-gray-600 text-nowrap md:pr-4 box-border pl-2">
-              {searchTotal > 0 ? `검색결과 ${searchTotal}개` : '검색결과가 없습니다.'}
+              {isFetching
+                ? '검색중...'
+                : searchTotal > 0
+                  ? `검색결과 ${searchTotal.toLocaleString()}개`
+                  : '검색결과가 없습니다.'}
             </p>
           )}
         </div>
       </div>
-      {isPending ? (
+      {listDataPending ? (
         <SkeletonGrid count={20} />
       ) : (
         <div className="w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -157,7 +94,7 @@ const Category = ({ queryType, target, page }: CategoryProps) => {
           totalPages={totalPages}
           page={page}
           onChange={(p) => {
-            setHomeUrl({ page: p });
+            setListUrl({ page: p });
           }}
         />
       </div>

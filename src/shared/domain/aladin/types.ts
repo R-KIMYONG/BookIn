@@ -1,3 +1,4 @@
+export type QueryType = 'Bestseller' | 'ItemNewAll' | 'ItemNewSpecial' | 'BlogBest' | 'ItemEditorChoice';
 type UsedItem = {
   itemCount: number;
   minPrice: number;

@@ -1,56 +1,38 @@
 'use client';
 
 import { useMemo, useTransition } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import useCategoryUrlState from '@/hooks/url/useCategoryUrlState';
 import AppPagination from '@/components/common/AppPagination';
 import CategoryItem from '@/components/home/CategoryItem';
 import EmptyState from '@/components/common/EmptyState';
 import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
-import { MINUTE } from '@/shared/constants/time';
-import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
-import { fetchAladinList } from '@/shared/lib/aladin/fetchAladinList.client';
 import { makeHref } from '@/shared/domain/book/makeHref';
 import { makeItemKey } from '@/shared/domain/book/makeItemKey';
-import { QueryType } from '@/shared/domain/aladin/constants';
 import { TargetTypes } from '@/shared/constants/category';
 import Button from '@/components/common/ui/Button';
 import { useRouter } from 'next/navigation';
+import SkeletonGrid from '@/components/common/SkeletonGrid';
+import { HEADER_GROUPS } from '@/shared/domain/header/constants';
+import { Genre } from '@/shared/domain/category/types';
+import { useBookListData } from '@/hooks/book/useBookListData';
 
 type CategoryListProps = {
   categoryId: number;
-  queryType: QueryType;
   target: TargetTypes;
   page: number;
+  genreData: Genre[];
 };
 
-const CategoryList = ({ categoryId, queryType, target, page }: CategoryListProps) => {
+const CategoryList = ({ categoryId, target, page, genreData }: CategoryListProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const { setCategoryUrl } = useCategoryUrlState({ categoryId, defaultTarget: target });
+  const { list, listDataPending, totalPages, isError, error, isSearching, searchKeyWord, setListUrl } = useBookListData(
+    { target, page, categoryId }
+  );  
 
-  const { data, isError, error } = useQuery({
-    queryKey: aladinKeys.list({ queryType, page, target, categoryId }),
-    queryFn: () => fetchAladinList({ queryType, page, target, categoryId }),
-    staleTime: 3 * MINUTE,
-  });
-
-  const { data: lastPageData } = useQuery({
-    queryKey: aladinKeys.lastPage({ queryType, target, categoryId }),
-    queryFn: async () => {
-      const params = new URLSearchParams({ QueryType: queryType, target, CategoryId: String(categoryId) });
-      const res = await fetch(`/api/aladin/last-page?${params.toString()}`);
-      if (!res.ok) throw new Error('lastPage 실패');
-      return res.json() as Promise<{ lastPage: number }>;
-    },
-    staleTime: 10 * MINUTE,
-  });
-  const totalPages = lastPageData?.lastPage ?? 1;
-  const isEmpty = (data?.items?.length ?? 0) === 0 || totalPages === 0;
-
-  const isbnList = useMemo(() => (data?.items ?? []).map((item) => item.isbn13), [data?.items]);
+  const isbnList = useMemo(() => list.map((item) => item.isbn13).filter(Boolean), [list]);
   useFetchLikeCount(isbnList);
+
   if (isError) {
     return (
       <section className="max-w-7xl m-auto mt-10 px-10">
@@ -63,7 +45,7 @@ const CategoryList = ({ categoryId, queryType, target, page }: CategoryListProps
               size="sm"
               variant="primary"
               label="현재 페이지 1로"
-              onClick={() => setCategoryUrl({ page: 1 }, { replace: true, scroll: false })}
+              onClick={() => setListUrl({ page: 1 }, { replace: true, scroll: false })}
             />
           </div>
         </div>
@@ -71,7 +53,21 @@ const CategoryList = ({ categoryId, queryType, target, page }: CategoryListProps
     );
   }
 
-  if (isEmpty) {
+  if (listDataPending) {
+    return <SkeletonGrid count={20} />;
+  }
+
+  if (list.length === 0) {
+    if (isSearching) {
+      const targetLabel = HEADER_GROUPS.find((g) => g.key === target)?.label ?? '전체';
+      const categoryLabel = genreData.find((g) => g.id === categoryId)?.label ?? '전체';
+      return (
+        <EmptyState
+          title={`‘${targetLabel} > ${categoryLabel}’에서 ‘${searchKeyWord}’ 검색 결과가 없어요`}
+          description="대분류·소분류를 바꾸거나 검색어를 다시 확인해 주세요."
+        />
+      );
+    }
     return (
       <EmptyState
         title="이 카테고리에는 표시할 책이 없어요"
@@ -87,7 +83,7 @@ const CategoryList = ({ categoryId, queryType, target, page }: CategoryListProps
       <div
         className={`w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ${isPending ? 'opacity-60 ' : ''} transition-opacity`}
       >
-        {data?.items.map((item, index) => {
+        {list.map((item, index) => {
           const href = makeHref(item);
           const key = makeItemKey(item, index);
 
@@ -110,7 +106,7 @@ const CategoryList = ({ categoryId, queryType, target, page }: CategoryListProps
           disabled={isPending}
           onChange={(p) => {
             startTransition(() => {
-              setCategoryUrl({ page: p }, { scroll: false });
+              setListUrl({ page: p }, { scroll: false });
             });
           }}
         />

@@ -37,3 +37,7 @@ next-env.d.ts
 
 # lock files (use yarn only)
 package-lock.json
+
+echo "" >> .gitignore
+echo "# bundle analyzer output" >> .gitignore
+echo "/analyze/" >> .gitignore

@@ -11,7 +11,6 @@ const useUrlParams = () => {
   const searchParams = useSearchParams();
 
   const getParams = (key: string) => searchParams.get(key);
-  const getOrDefault = (key: string, fallback: string) => searchParams.get(key) ?? fallback;
 
   const getInt = (key: string, fallback = 1) => {
     const num = Number(searchParams.get(key));
@@ -45,7 +44,7 @@ const useUrlParams = () => {
     nav(url, { scroll: options.scroll ?? false });
   };
 
-  return { getParams, getOrDefault, getInt, setParams, getAllParams };
+  return { getParams, getInt, setParams, getAllParams };
 };
 
 export default useUrlParams;

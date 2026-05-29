@@ -9,7 +9,6 @@ import { FILTER_DEFAULT, MyBooksFilter } from '@/shared/domain/mybooks/filter';
 import { SEARCH_FIELD_DEFAULT, SearchField } from '@/shared/domain/mybooks/search';
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
 import { fetchMyBooksServer } from '@/hooks/mybooks/fetchMyBooksServer';
-import { TAG_DEFAULT } from '@/shared/domain/tag/types';
 import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
 import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
@@ -21,6 +20,7 @@ import { BookmarkInfo } from '@/shared/domain/bookmark/types';
 import { createClient } from '@/shared/lib/supabase/server';
 import { BookmarkBook } from '@/shared/domain/mybooks/types';
 import { getUserTagsServer } from '@/shared/lib/server/entities/getUserTagsServer';
+import { TAG_DEFAULT } from '@/shared/domain/tag/constants';
 
 export const metadata: Metadata = {
   title: '마이페이지',

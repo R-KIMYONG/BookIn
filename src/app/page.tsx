@@ -1,7 +1,8 @@
 import Category from '@/components/home/Category';
-import { DEFAULT_TARGET, TargetTypes } from '@/shared/constants/category';
-import { DEFAULT_QT, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
+import {  DEFAULT_TARGET, TargetTypes } from '@/shared/constants/category';
+import { DEFAULT_QT, QUERY_TYPE_LIST } from '@/shared/domain/aladin/constants';
 import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
+import { QueryType } from '@/shared/domain/aladin/types';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { getAladinList } from '@/shared/lib/aladin/getAladinList.server';
@@ -18,7 +19,6 @@ const Home = async ({
   const rawSearchParams = await searchParams;
 
   const rawQt = rawSearchParams.qt;
-
   const queryType: QueryType = QUERY_TYPE_LIST.includes(rawQt as QueryType) ? (rawQt as QueryType) : DEFAULT_QT;
 
   const target = (rawSearchParams.target as TargetTypes) ?? DEFAULT_TARGET;
@@ -56,7 +56,7 @@ const Home = async ({
   return (
     <main className="px-1 sm:px-6 md:px-10 flex-1">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <Category queryType={queryType} target={target} page={page} />
+        <Category  target={target} page={page} />
       </HydrationBoundary>
     </main>
   );

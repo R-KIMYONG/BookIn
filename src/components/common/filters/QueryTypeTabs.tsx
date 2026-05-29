@@ -1,20 +1,15 @@
-import { QueryType } from '@/shared/domain/aladin/constants';
+import { QueryType } from '@/shared/domain/aladin/types';
 import Button from '../ui/Button';
+import { TargetTypes } from '@/shared/constants/category';
+import { ALL_TABS } from '@/shared/domain/aladin/constants';
 
 type QueryTypeTabsProps = {
   value: QueryType;
   onChange: (next: QueryType) => void;
   disable?: boolean;
-  target?: 'Book' | 'Foreign' | 'eBook';
+  target?: TargetTypes;
 };
 
-const ALL_TABS: { key: QueryType; label: string }[] = [
-  { key: 'Bestseller', label: '베스트셀러' },
-  { key: 'ItemNewAll', label: '새로 나온 책' },
-  { key: 'ItemNewSpecial', label: '화제의 책' },
-  { key: 'BlogBest', label: '베스트 예감' },
-  { key: 'ItemEditorChoice', label: '편집자 추천' },
-];
 const QueryTypeTabs = ({ value, onChange, disable, target }: QueryTypeTabsProps) => {
   const tabs = target && target !== 'Book' ? ALL_TABS.filter((t) => t.key !== 'BlogBest') : ALL_TABS;
 
