@@ -1,8 +1,9 @@
 import 'server-only';
 import { TargetTypes } from '@/shared/constants/category';
-import { MAX_PAGE, MAX_RESULTS, QueryType } from '@/shared/domain/aladin/constants';
+import { MAX_PAGE, MAX_RESULTS } from '@/shared/domain/aladin/constants';
 import { getAladinItemList } from './getAladinItemList';
 import { unstable_cache } from 'next/cache';
+import { QueryType } from '@/shared/domain/aladin/types';
 
 
 type getLastPageServerProps = {

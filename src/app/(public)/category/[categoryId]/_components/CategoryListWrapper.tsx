@@ -7,18 +7,20 @@ import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmark
 import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { QueryType } from '@/shared/domain/aladin/constants';
 import { TargetTypes } from '@/shared/constants/category';
 import CategoryList from './CategoryList';
+import { QueryType } from '@/shared/domain/aladin/types';
+import { Genre } from '@/shared/domain/category/types';
 
 type CategoryListWrapperProps = {
   categoryId: number;
   queryType: QueryType;
   target: TargetTypes;
   page: number;
+  genreData: Genre[];
 };
 
-const CategoryListWrapper = async ({ categoryId, queryType, target, page }: CategoryListWrapperProps) => {
+const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreData }: CategoryListWrapperProps) => {
   const queryClient = new QueryClient();
 
   const [listData, lastPageData] = await Promise.all([
@@ -54,7 +56,7 @@ const CategoryListWrapper = async ({ categoryId, queryType, target, page }: Cate
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CategoryList categoryId={categoryId} queryType={queryType} target={target} page={page} />
+      <CategoryList categoryId={categoryId}  target={target} page={page} genreData={genreData} />
     </HydrationBoundary>
   );
 };

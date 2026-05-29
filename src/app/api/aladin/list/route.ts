@@ -1,21 +1,21 @@
 import { ALLOWED_TARGETS, DEFAULT_TARGET, TargetTypes } from '@/shared/constants/category';
-import { DEFAULT_QT, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
+import { DEFAULT_QT, QUERY_TYPE_LIST, APP_QUERY_KEYS } from '@/shared/domain/aladin/constants';
+import { QueryType } from '@/shared/domain/aladin/types';
 import { getAladinList } from '@/shared/lib/aladin/getAladinList.server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-
-    const rawQueryType = (searchParams.get('QueryType') ?? DEFAULT_QT).trim();
+    const rawQueryType = (searchParams.get(APP_QUERY_KEYS.queryType) ?? DEFAULT_QT).trim();
     const queryType = QUERY_TYPE_LIST.includes(rawQueryType as QueryType) ? (rawQueryType as QueryType) : DEFAULT_QT;
 
-    const rawTarget = (searchParams.get('target') ?? DEFAULT_TARGET).trim() as TargetTypes;
+    const rawTarget = (searchParams.get(APP_QUERY_KEYS.target) ?? DEFAULT_TARGET).trim() as TargetTypes;
     const target: TargetTypes = ALLOWED_TARGETS.includes(rawTarget) ? rawTarget : DEFAULT_TARGET;
-    const rawPage = Number(searchParams.get('page'));
+    const rawPage = Number(searchParams.get(APP_QUERY_KEYS.page));
     const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
 
-    const rawCategoryId = Number(searchParams.get('CategoryId'));
+    const rawCategoryId = Number(searchParams.get(APP_QUERY_KEYS.categoryId));
 
     const categoryId = Number.isFinite(rawCategoryId) && rawCategoryId > 0 ? rawCategoryId : undefined;
 

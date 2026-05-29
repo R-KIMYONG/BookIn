@@ -1,12 +1,13 @@
 import { Suspense } from 'react';
 import { getGenres } from '@/shared/domain/category/getGenres';
-import { DEFAULT_QT, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
+import { DEFAULT_QT, QUERY_TYPE_LIST } from '@/shared/domain/aladin/constants';
 import { ALLOWED_TARGETS, TargetTypes } from '@/shared/constants/category';
 import SkeletonGrid from '@/components/common/SkeletonGrid';
 import CategoryHeader from './_components/CategoryHeader';
 import CategoryListWrapper from './_components/CategoryListWrapper';
 import { redirect } from 'next/navigation';
 import { classifyCategory } from '@/shared/domain/category/classifyCategory';
+import { QueryType } from '@/shared/domain/aladin/types';
 
 type CategoryPageProps = {
   params: Promise<{ categoryId: string }>;
@@ -24,7 +25,7 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     : DEFAULT_QT;
 
   const genres = getGenres();
-  const { defaultTarget: computedDefault } = classifyCategory({
+  const { defaultTarget: computedDefault, genreData } = classifyCategory({
     categoryId,
     koreanGenres: genres.koGenres,
     foreignGenres: genres.foGenres,
@@ -52,11 +53,19 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
         koreanGenres={genres.koGenres}
         foreignGenres={genres.foGenres}
         ebookGenres={genres.ebGenres}
+        target={target}
+        page={page}
       />
 
       <div className="w-full flex-1">
         <Suspense key={`${categoryId}-${queryType}-${target}`} fallback={<SkeletonGrid count={20} />}>
-          <CategoryListWrapper categoryId={categoryId} queryType={queryType} target={target} page={page} />
+          <CategoryListWrapper
+            categoryId={categoryId}
+            queryType={queryType}
+            target={target}
+            page={page}
+            genreData={genreData}
+          />
         </Suspense>
       </div>
     </section>

@@ -10,3 +10,5 @@ export const COLOR_TOKENS = [
   { key: 'violet', className: '!bg-violet-100 text-violet-800 ring-violet-200' },
   { key: 'fuchsia', className: '!bg-fuchsia-100 text-fuchsia-800 ring-fuchsia-200' },
 ] as const;
+
+export const TAG_DEFAULT = 'all';

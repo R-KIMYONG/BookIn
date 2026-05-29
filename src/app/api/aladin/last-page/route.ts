@@ -1,8 +1,9 @@
 import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
 import { getAladinItemList } from '@/shared/lib/aladin/getAladinItemList';
 
-import { MAX_PAGE, MAX_RESULTS, QUERY_TYPE_LIST, QueryType } from '@/shared/domain/aladin/constants';
+import { MAX_PAGE, MAX_RESULTS, QUERY_TYPE_LIST } from '@/shared/domain/aladin/constants';
 import { NextRequest, NextResponse } from 'next/server';
+import { QueryType } from '@/shared/domain/aladin/types';
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
