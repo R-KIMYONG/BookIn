@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 type SetOptions = {
   scroll?: boolean;
   replace?: boolean;
+  shallow?: boolean;
 };
 const useUrlParams = () => {
   const router = useRouter();
@@ -38,8 +39,13 @@ const useUrlParams = () => {
       else params.set(key, String(value));
       //최종목적은 URL에 없으면 지우고 있으면 설정하는거임
     }
+    const query = params.toString();
+    const url = `${pathname}?${query}`; //현재pathname을 기초로 새로운URL을 만든다 즉 반복문으로 set하거나 delte한 최신버전의 url로 업데이트
 
-    const url = `${pathname}?${params.toString()}`; //현재pathname을 기초로 새로운URL을 만든다 즉 반복문으로 set하거나 delte한 최신버전의 url로 업데이트
+    if (options.shallow) {
+      window.history.replaceState(null, '', url);
+      return;
+    }
     const nav = options.replace ? router.replace : router.push;
     nav(url, { scroll: options.scroll ?? false });
   };

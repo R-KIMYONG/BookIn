@@ -13,13 +13,7 @@ const MyBooksPagination = () => {
 
   return (
     <div className="mt-6 flex justify-center">
-      <AppPagination
-        page={page}
-        onChange={(p) => {
-          setQuery({ page: p });
-        }}
-        totalPages={totalPages}
-      />
+      <AppPagination page={page} onChange={(p) => setQuery({ page: p })} totalPages={totalPages} />
     </div>
   );
 };
