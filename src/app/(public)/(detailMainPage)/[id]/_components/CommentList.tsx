@@ -7,7 +7,6 @@ import Button from '@/components/common/ui/Button';
 import AppPagination from '@/components/common/AppPagination';
 import { useCommentMutation } from '@/hooks/comment/useCommentMutation';
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
-import { useClientPagination } from '@/hooks/url/useClientPagination';
 import { MINUTE } from '@/shared/constants/time';
 import { commentKeys } from '@/shared/domain/comment/queryKeys';
 import { formatDateTime } from '@/shared/lib/date/formatDateTime';
@@ -15,6 +14,7 @@ import { getCommentList } from '@/shared/lib/comment/getCommentList';
 import { CommentListResult, CommentWithUser } from '@/shared/domain/comment/types';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { useClientPagination } from '@/hooks/url/useClientPagination';
 const ConfirmModal = dynamic(() => import('@/components/modal/ConfirmModal'), { ssr: false });
 type CommentListProps = {
   isEdit: boolean;

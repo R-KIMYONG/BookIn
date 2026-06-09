@@ -5,12 +5,12 @@ import Image from 'next/image';
 import BookmarkButton from '@/components/book/BookmarkButton';
 import { PencilLine } from 'lucide-react';
 import Button from '@/components/common/ui/Button';
-import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import TagArea from '@/components/bookmark/TagArea';
 import { hasMemo } from '@/shared/domain/bookmark/hasMemo';
 import { formatDateTime } from '@/shared/lib/date/formatDateTime';
 import { isNew } from '@/shared/lib/date/isNew';
 import { NEW_DAYS } from '@/shared/domain/bookmark/constants';
+import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 
 const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
   const { open } = useBookmarkMemoUrlState();
@@ -23,7 +23,6 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
         const memoExists = hasMemo(book.memo);
         const date = formatDateTime(book.created_at);
         const bookInfo = { isbn13: book.isbn13, cover: book.cover, title: book.title, author: book.author };
-
         const tagNames = (book.tags ?? [])
           .map((tag) => {
             return {

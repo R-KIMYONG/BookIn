@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "genTypes": "supabase gen types typescript --project-id vshtzcektgnzzfgtstdy --schema public > src/types/supabase.ts",
+    "genTypes": "supabase gen types typescript --project-id vshtzcektgnzzfgtstdy --schema public > src/shared/types/supabase.ts",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run"

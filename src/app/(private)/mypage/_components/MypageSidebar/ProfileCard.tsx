@@ -11,9 +11,11 @@ const ProfileCard = async () => {
   } = await supabase.auth.getUser();
 
   if (!user) return null;
-  const avatar = user.user_metadata?.avatar;
 
-  const nickname = user.user_metadata?.nickname;
+  const { data: profile } = await supabase.from('users').select('nickname, avatar').eq('id', user.id).single();
+  const avatar = profile?.avatar || '/images/noImg.png';
+
+  const nickname = profile?.nickname;
 
   return (
     <div className="bg-white px-4 py-3 sm:px-6 border-b border-gray-100">
@@ -21,13 +23,7 @@ const ProfileCard = async () => {
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative h-11 w-11 overflow-hidden rounded-full border bg-gray-50 shrink-0">
             <Link href={'/mypage/settings'}>
-              <Image
-                src={avatar || '/images/noImg.png'}
-                alt="avatarImg"
-                className="object-cover cursor-pointer"
-                sizes="44px"
-                fill
-              />
+              <Image src={avatar} alt="avatarImg" className="object-cover cursor-pointer" sizes="44px" fill />
             </Link>
           </div>
 

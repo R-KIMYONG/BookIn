@@ -16,6 +16,11 @@ import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmark
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { getBookmarkTagsByIsbn } from '@/shared/lib/server/entities/getBookmarkTagsByIsbn';
+import ViewTracker from './_components/ViewTracker';
+import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
+import { Eye, Star } from 'lucide-react';
+import { getSalesBadge, toneClass } from '@/shared/domain/detail/getSalesBadge';
+import { getBookKey } from '@/shared/domain/book/getBookKey';
 
 const MainDetail = async ({
   params,
@@ -32,12 +37,14 @@ const MainDetail = async ({
     data: { user },
   } = await supabase.auth.getUser();
   const userId = user?.id ?? null;
+
   const data = await getAladinDetail(id);
   const item: AladinItem = data?.item?.[0];
   if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
+  const isbnKey = getBookKey(item);
   const bookId = await upsertBook({
     supabase,
-    bookInfo: { title: item.title, author: item.author, cover: item.cover, isbn13: item.isbn13 },
+    bookInfo: { title: item.title, author: item.author, cover: item.cover, isbn13: isbnKey },
   });
 
   //가격
@@ -96,7 +103,8 @@ const MainDetail = async ({
   const queryClient = new QueryClient();
   const isbn = item.isbn13;
 
-  const [likes, likeCounts, bookmarks] = await Promise.all([
+  const [viewCount, likes, likeCounts, bookmarks] = await Promise.all([
+    getBookStatsByIsbn([isbn]),
     getLikesByIsbnList([isbn]),
     getLikeCountsByIsbnList([isbn]),
     getBookmarksByIsbnList([isbn]),
@@ -118,16 +126,18 @@ const MainDetail = async ({
     const bookmarkTags = await getBookmarkTagsByIsbn(isbn);
     queryClient.setQueryData(bookmarkKeys.tags.detail(userId, isbn), { tags: bookmarkTags });
   }
+  const salesBadge = getSalesBadge(salesPoint);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
         <div className="rounded-2xl bg-white shadow">
           <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[260px_1fr]">
+            <ViewTracker isbn13={isbn} />
             {/* 이미지 */}
             <div className="flex justify-center lg:justify-start">
               <div className="w-full max-w-[220px]">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-xl ring-1 ring-black/5 bg-gray-50">
                   <Image
                     src={item.cover}
                     alt={item.title}
@@ -156,11 +166,40 @@ const MainDetail = async ({
                 </div>
               )}
 
-              {/* 신뢰 */}
-              <div className="flex items-center gap-4 text-xs text-gray-500">
-                {rating > 0 && <span>평점 {rating}</span>}
-                {salesPoint > 0 && <span>판매량 {salesPoint.toLocaleString()}</span>}
-                <DetailActionsContainer bookInfo={bookInfo} />
+              {/* 지표 + 액션 */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* 메트릭 칩들 */}
+                <div className="flex items-center gap-1.5 text-xs">
+                  {/* 조회수 — 0이어도 표시 */}
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-gray-600">
+                    <Eye className="w-3.5 h-3.5 text-gray-400" />
+                    <span className="tabular-nums font-medium">{viewCount[isbn].view_count.toLocaleString()}</span>
+                  </span>
+
+                  {/* 평점 — 있을 때만 */}
+                  {rating > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-amber-700">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span className="tabular-nums font-medium">{rating}</span>
+                    </span>
+                  )}
+
+                  {/* 판매량 — 있을 때만 */}
+                  {salesBadge && (
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium ${toneClass[salesBadge.tone]}`}
+                    >
+                      <salesBadge.Icon className="w-3.5 h-3.5 fill-current" />
+                      {salesBadge.label}
+                      <span className="tabular-nums font-semibold">{salesPoint.toLocaleString()}</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* 액션 (좋아요·북마크) — 칩과 분리, 오른쪽 */}
+                <div className="ml-auto">
+                  <DetailActionsContainer bookInfo={bookInfo} />
+                </div>
               </div>
               <div>
                 <DetailBookmarkTags isbn13={bookInfo?.isbn13} userId={userId} />

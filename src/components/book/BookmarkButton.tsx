@@ -1,11 +1,11 @@
 import { useBookmark } from '@/hooks/bookmark/useBookmark';
-import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { toast } from 'react-toastify';
 import Button from '../common/ui/Button';
 import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
 import { BookInfo } from '@/shared/types/bookInfo';
 import BookmarkSavedToast from '../bookmark/BookmarkSavedToast';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { useBookmarkCache } from '@/hooks/bookmark/useBookmarkCache';
 
 type BookmarkButtonProps = {

@@ -1,4 +1,3 @@
-import useBookListUrlState from '../url/useBookListUrlState';
 import { TargetTypes } from '@/shared/constants/category';
 import { useQuery } from '@tanstack/react-query';
 import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
@@ -6,6 +5,7 @@ import { useSearchBooks } from '../search/useSearchBooks';
 import getTotalPages from '@/shared/utils/pagination';
 import { fetchAladinList } from '@/shared/lib/aladin/fetchAladinList.client';
 import { MINUTE } from '@/shared/constants/time';
+import useBookListUrlState from '../url/useBookListUrlState';
 
 type UseBookListDataProps = {
   target: TargetTypes;

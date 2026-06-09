@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import Button from '@/components/common/ui/Button';
 import { useCommentMutation } from '@/hooks/comment/useCommentMutation';
 import { sanitizeHtmlClient } from '@/shared/utils/security/sanitizeHtml.client';
-import { useCallback, useRef, useState, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import { useCallback, useRef, useState, Dispatch, SetStateAction, useMemo } from 'react';
 import type { Editor } from '@tiptap/react';
 import { MAX_LENGTH, MAX_LINES } from '@/shared/constants/comment';
 import { TargetValue } from './Comment/types';
