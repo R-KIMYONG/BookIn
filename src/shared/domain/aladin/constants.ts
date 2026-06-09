@@ -20,6 +20,7 @@ export const APP_QUERY_KEYS = {
   searchQueryType: 'sq',
   page: 'page',
   categoryId: 'ci',
+  rankingModal: 'rm',
 } as const;
 export const ALADIN_ITEMLIST_KEYS = {
   queryType: 'QueryType',

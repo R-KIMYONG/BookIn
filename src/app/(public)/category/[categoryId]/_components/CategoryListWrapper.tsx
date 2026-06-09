@@ -11,6 +11,8 @@ import { TargetTypes } from '@/shared/constants/category';
 import CategoryList from './CategoryList';
 import { QueryType } from '@/shared/domain/aladin/types';
 import { Genre } from '@/shared/domain/category/types';
+import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
+import { statsKeys } from '@/shared/domain/book/queryKeys';
 
 type CategoryListWrapperProps = {
   categoryId: number;
@@ -34,10 +36,11 @@ const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreD
   const isbnList = (listData?.items ?? []).map((item) => item.isbn13);
 
   if (isbnList.length > 0) {
-    const [likes, likeCounts, bookmarks] = await Promise.all([
+    const [likes, likeCounts, bookmarks, statsMap] = await Promise.all([
       getLikesByIsbnList(isbnList),
       getLikeCountsByIsbnList(isbnList),
       getBookmarksByIsbnList(isbnList),
+      getBookStatsByIsbn(isbnList),
     ]);
 
     for (const isbn of isbnList) {
@@ -52,11 +55,12 @@ const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreD
         memoExists: bookmarks[isbn]?.memoExists ?? false,
       });
     }
+    queryClient.setQueryData(statsKeys.batch(isbnList), statsMap);
   }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CategoryList categoryId={categoryId}  target={target} page={page} genreData={genreData} />
+      <CategoryList categoryId={categoryId} target={target} page={page} genreData={genreData} />
     </HydrationBoundary>
   );
 };

@@ -3,12 +3,12 @@
 import BookmarkMemoModal from '@/components/modal/BookmarkMemoModal';
 import { useEffect } from 'react';
 import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
-import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { useBookmarkMemo } from '@/hooks/bookmark/useBookmarkMemo';
 import { useUpdateBookmarkMemo } from '@/hooks/bookmark/useUpdateBookmarkMemo';
 import { useAuth } from '@/shared/context/AuthContext';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 
 const BookmarkMemoContainer = () => {
   const { isOpen, isbn, close } = useBookmarkMemoUrlState();

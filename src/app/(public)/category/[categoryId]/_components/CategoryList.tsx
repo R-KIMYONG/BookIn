@@ -15,6 +15,8 @@ import SkeletonGrid from '@/components/common/SkeletonGrid';
 import { HEADER_GROUPS } from '@/shared/domain/header/constants';
 import { Genre } from '@/shared/domain/category/types';
 import { useBookListData } from '@/hooks/book/useBookListData';
+import { useBookStats } from '@/hooks/book/useBookStats';
+import { getBookKey } from '@/shared/domain/book/getBookKey';
 
 type CategoryListProps = {
   categoryId: number;
@@ -28,10 +30,12 @@ const CategoryList = ({ categoryId, target, page, genreData }: CategoryListProps
   const router = useRouter();
   const { list, listDataPending, totalPages, isError, error, isSearching, searchKeyWord, setListUrl } = useBookListData(
     { target, page, categoryId }
-  );  
+  );
 
   const isbnList = useMemo(() => list.map((item) => item.isbn13).filter(Boolean), [list]);
   useFetchLikeCount(isbnList);
+
+  const { data: stats } = useBookStats(isbnList);
 
   if (isError) {
     return (
@@ -83,17 +87,26 @@ const CategoryList = ({ categoryId, target, page, genreData }: CategoryListProps
       <div
         className={`w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ${isPending ? 'opacity-60 ' : ''} transition-opacity`}
       >
-        {list.map((item, index) => {
-          const href = makeHref(item);
-          const key = makeItemKey(item, index);
-
+        {list.map((book, index) => {
+          const href = makeHref(book);
+          const key = makeItemKey(book, index);
+          const bookKey = getBookKey(book);
           return href ? (
             <Link href={href} key={key}>
-              <CategoryItem item={item} />
+              <CategoryItem
+                item={book}
+                viewCount={bookKey ? (stats?.[bookKey]?.view_count ?? 0) : 0}
+                commentCount={bookKey ? (stats?.[bookKey]?.comment_count ?? 0) : 0}
+              />
             </Link>
           ) : (
             <div key={key} className="opacity-60 cursor-not-allowed" title="상세 페이지가 없어서 이동할 수 없어요">
-              <CategoryItem item={item} disabled={true} />
+              <CategoryItem
+                item={book}
+                disabled={true}
+                viewCount={bookKey ? (stats?.[bookKey]?.view_count ?? 0) : 0}
+                commentCount={bookKey ? (stats?.[bookKey]?.comment_count ?? 0) : 0}
+              />
             </div>
           );
         })}

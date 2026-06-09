@@ -1,4 +1,5 @@
-import useUrlParams from './useUrlParams';
+import useUrlParams from "./useUrlParams";
+
 
 type useClientPaginationProps = {
   paramKey?: string;

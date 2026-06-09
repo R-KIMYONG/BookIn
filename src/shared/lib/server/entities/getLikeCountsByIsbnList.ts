@@ -11,9 +11,7 @@ export const getLikeCountsByIsbnList = async (isbnList: string[]) => {
 
   const { data, error } = await supabase.from('book_stats').select('isbn13, like_count').in('isbn13', isbnList);
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   const countMap: Record<string, number> = {};
 

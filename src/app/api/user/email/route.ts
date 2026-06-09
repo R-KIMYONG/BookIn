@@ -5,8 +5,7 @@ import { hashToken } from '@/shared/lib/crypto/hashToken';
 import { clearEmailChangeState } from '@/shared/lib/supabase/users';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import { sendEmailChangeMail } from '@/shared/lib/mail/sendEmailChangeMail';
-
-const EMAIL_CHANGE_EXPIRES_MS = 60 * 60 * 1000; //한시간으로 설정
+import { HOUR } from '@/shared/constants/time';
 
 export const PATCH = async (request: NextRequest) => {
   //1. 변경할 이메일 request에서 확보
@@ -61,7 +60,7 @@ export const PATCH = async (request: NextRequest) => {
       .from('users')
       .update({
         pending_email: newEmail,
-        pending_email_expires_at: new Date(Date.now() + EMAIL_CHANGE_EXPIRES_MS).toISOString(),
+        pending_email_expires_at: new Date(Date.now() + 1 * HOUR).toISOString(),
         email_change_token_hash: tokenHash,
       })
       .eq('id', user.id);

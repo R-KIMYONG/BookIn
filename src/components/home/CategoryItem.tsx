@@ -2,11 +2,20 @@ import { Item } from '@/shared/types/api';
 import Image from 'next/image';
 import LikeButton from '../book/LikeButton';
 import BookmarkButton from '../book/BookmarkButton';
-import { Star } from 'lucide-react';
+import { Eye, MessageCircleMore, Star } from 'lucide-react';
+import { formatAuthor } from '@/shared/domain/book/formatAuthor';
 
-const CategoryItem = ({ item, disabled }: { item: Item; disabled?: boolean }) => {
+type CategoryItemProps = {
+  item: Item;
+  disabled?: boolean;
+  viewCount: number;
+  commentCount: number;
+};
+
+const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemProps) => {
   const rating = item.customerReviewRank ?? 0;
   const coverSrc = item.cover?.startsWith('http') ? item.cover : '/images/noImg.png';
+
   //청불 처리 필요
   //settings hydration으로 해야됨
   return (
@@ -19,7 +28,7 @@ const CategoryItem = ({ item, disabled }: { item: Item; disabled?: boolean }) =>
           src={coverSrc}
           alt={`${item.title} 책 표지`}
           fill
-          unoptimized
+          // unoptimized
           className="object-cover"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 200px"
         />
@@ -49,21 +58,24 @@ const CategoryItem = ({ item, disabled }: { item: Item; disabled?: boolean }) =>
 
       <div className="p-4 flex flex-col gap-2">
         <h5 className="text-sm leading-5 font-semibold line-clamp-1 min-h-[20px]">{item.title}</h5>
-        <div className="h-[16px] flex items-center">
-          {rating > 0 ? (
-            <div className="flex items-center gap-1 text-[11px]">
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-gray-800 font-semibold">{rating}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1 text-[11px]">
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-gray-800 font-semibold">평점 없음</span>
-            </div>
-          )}
+        <div className="h-[16px] flex items-center justify-between">
+          <div className="flex items-center gap-1 text-[11px]">
+            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            <span className="text-gray-800 font-semibold">{rating > 0 ? rating : '평점 없음'}</span>
+          </div>
+          <div className="flex items-center gap-3 text-[11px] text-gray-400">
+            <span className="flex items-center gap-0.5">
+              <Eye className="w-3 h-3" />
+              <span className="tabular-nums">{viewCount.toLocaleString()}</span>
+            </span>
+            <span className="flex items-center gap-0.5">
+              <MessageCircleMore className="w-3 h-3" />
+              <span className="tabular-nums">{commentCount.toLocaleString()}</span>
+            </span>
+          </div>
         </div>
 
-        <p className="text-xs text-gray-600 truncate">저자: {item.author?.split(',')[0] ?? '저자 정보 없음'}</p>
+        <p className="text-xs text-gray-600 truncate">{formatAuthor(item.author)}</p>
       </div>
     </article>
   );
