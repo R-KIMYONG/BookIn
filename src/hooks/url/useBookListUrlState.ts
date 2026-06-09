@@ -1,11 +1,11 @@
 'use client';
 
-import useUrlParams from './useUrlParams';
 import { DEFAULT_QT, QUERY_TYPE_LIST, APP_QUERY_KEYS } from '@/shared/domain/aladin/constants';
 import { SearchQueryType } from '@/shared/domain/search/types';
 import { DEFAULT_TARGET, TARGET_LIST, TargetTypes } from '@/shared/constants/category';
 import { QueryType } from '@/shared/domain/aladin/types';
 import { DEFAULT_SEARCH_QT, SEARCH_QT_LIST } from '@/shared/domain/search/constants';
+import useUrlParams from './useUrlParams';
 
 // 도서 리스트 화면(홈 / 카테고리)에서 공통으로 사용하는 URL 키
 

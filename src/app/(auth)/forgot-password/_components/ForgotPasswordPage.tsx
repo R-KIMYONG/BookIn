@@ -11,11 +11,11 @@ import { SECOND } from '@/shared/constants/time';
 import { requestPasswordReset } from '@/shared/lib/auth/requestPasswordReset';
 import { authKeys } from '@/shared/domain/auth/queryKeys';
 import { AuthResetPasswordRequest } from '@/shared/domain/auth/types';
-import useUrlParams from '@/hooks/url/useUrlParams';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import RetryButton from './RetryButton';
 import useNow from '@/hooks/common/useNow';
+import useUrlParams from '@/hooks/url/useUrlParams';
 
 type PasswordResetState = {
   pendingEmail: string | null;

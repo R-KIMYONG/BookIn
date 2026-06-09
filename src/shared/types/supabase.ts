@@ -52,6 +52,60 @@ export type Database = {
           },
         ]
       }
+      book_views: {
+        Row: {
+          book_id: string
+          composite_hash: string | null
+          device_key: string
+          id: string
+          ip_hash: string | null
+          isbn13: string
+          user_agent_hash: string | null
+          user_id: string | null
+          view_date: string
+          viewed_at: string
+        }
+        Insert: {
+          book_id: string
+          composite_hash?: string | null
+          device_key: string
+          id?: string
+          ip_hash?: string | null
+          isbn13: string
+          user_agent_hash?: string | null
+          user_id?: string | null
+          view_date?: string
+          viewed_at?: string
+        }
+        Update: {
+          book_id?: string
+          composite_hash?: string | null
+          device_key?: string
+          id?: string
+          ip_hash?: string | null
+          isbn13?: string
+          user_agent_hash?: string | null
+          user_id?: string | null
+          view_date?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_views_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_views_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookmark_tag_links: {
         Row: {
           bookmark_id: string
@@ -273,6 +327,30 @@ export type Database = {
           },
         ]
       }
+      ranking_snapshots: {
+        Row: {
+          created_at: string
+          isbn13: string
+          rank: number
+          score: number
+          snapshot_date: string
+        }
+        Insert: {
+          created_at?: string
+          isbn13: string
+          rank: number
+          score: number
+          snapshot_date: string
+        }
+        Update: {
+          created_at?: string
+          isbn13?: string
+          rank?: number
+          score?: number
+          snapshot_date?: string
+        }
+        Relationships: []
+      }
       user_book_comments: {
         Row: {
           book_id: string
@@ -359,7 +437,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      book_ranking: {
+        Row: {
+          author: string | null
+          comment_count: number | null
+          isbn13: string | null
+          like_count: number | null
+          score: number | null
+          thumbnail_url: string | null
+          title: string | null
+          view_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_user: { Args: { user_id: string }; Returns: undefined }

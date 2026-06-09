@@ -1,5 +1,4 @@
 'use client';
-import useUrlParams from '@/hooks/url/useUrlParams';
 import { SEARCH_FIELD_DEFAULT } from '@/shared/domain/mybooks/search';
 import { SORT_DEFAULT } from '@/shared/domain/mybooks/sort';
 import { MyPageQuery } from '@/shared/domain/mybooks/types';
@@ -7,6 +6,7 @@ import { MYBOOKS_DEFAULT_TAB } from '@/shared/domain/mypage/tab';
 import { useCallback, useMemo } from 'react';
 import { buildParams } from './buildParams';
 import { parseQueryFromParams } from './parseQueryFromParams';
+import useUrlParams from '../url/useUrlParams';
 
 export const useMypageQueryState = () => {
   const { setParams, getAllParams } = useUrlParams();
@@ -65,7 +65,7 @@ export const useMypageQueryState = () => {
         next.page = 1;
       }
 
-      setParams(buildParams(next), { replace: true, shallow: true });
+      setParams(buildParams(next), { replace: true });
     },
     [getAllParams, setParams]
   );
