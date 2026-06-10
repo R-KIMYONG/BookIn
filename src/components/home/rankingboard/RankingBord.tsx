@@ -6,10 +6,10 @@ import RankingModal from './RankingModal';
 import Button from '@/components/common/ui/Button';
 import { rankBadge } from '@/shared/domain/ranking/rankBadge';
 import RankChangeBadge from './RankChangeBadge';
-import { useRankingModal } from '@/hooks/url/useRankingModal';
+import { useState } from 'react';
 
 const RankingBoard = ({ books }: { books: RankedBook[] }) => {
-  const { isOpen, open, close } = useRankingModal();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const top10 = books.slice(0, 10);
 
@@ -71,13 +71,13 @@ const RankingBoard = ({ books }: { books: RankedBook[] }) => {
         })}
       </ol>
       <Button
-        onClick={open}
+        onClick={() => setIsModalOpen(true)}
         variant="secondary"
         size="xs"
         label="전체 순위 더보기"
         rightIcon={<ChevronRight className="w-4 h-4" />}
       />
-      <RankingModal isOpen={isOpen} onClose={close} books={books} />
+      <RankingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} books={books} />
     </aside>
   );
 };
