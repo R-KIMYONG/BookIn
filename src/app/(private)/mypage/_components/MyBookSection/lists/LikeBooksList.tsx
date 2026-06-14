@@ -11,7 +11,14 @@ const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
       {data.map((book, index) => {
         const isAboveFold = index < 6;
         const date = formatDateTime(book.created_at);
-        const bookInfo = { isbn13: book.isbn13, cover: book.cover, title: book.title, author: book.author };
+        const bookInfo = {
+          isbn13: book.isbn13,
+          cover: book.cover,
+          title: book.title,
+          author: book.author,
+          categoryId: book.categoryId,
+          categoryName: book.categoryName,
+        };
         return (
           <li key={book.book_id}>
             <Link href={`/${book.isbn13}`}>

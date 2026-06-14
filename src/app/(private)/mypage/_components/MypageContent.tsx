@@ -1,6 +1,7 @@
 'use client';
 import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 import MyBooksContainer from './MyBooksContainer';
+import RecommendContainer from './recommend/RecommendContainer';
 
 const MypageContent = () => {
   const { query } = useMypageQueryState();
@@ -8,7 +9,7 @@ const MypageContent = () => {
     case 'myBooks':
       return <MyBooksContainer />;
     case 'recommend':
-      return <div className="mx-auto w-1/2 text-center py-10">서비스 준비중...</div>;
+      return <RecommendContainer />;
   }
 };
 export default MypageContent;

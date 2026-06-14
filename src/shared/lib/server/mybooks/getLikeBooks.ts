@@ -67,7 +67,7 @@ export const getLikeBooks = async ({
 
   let likeQuery = supabase
     .from('likes')
-    .select('*,books!inner(title,thumbnail_url,author,isbn13)', {
+    .select('*,books!inner(title,thumbnail_url,author,isbn13,category_id,category_name)', {
       count: 'exact',
     })
     .eq('user_id', userId);
@@ -114,6 +114,8 @@ export const getLikeBooks = async ({
       created_at: item.created_at,
       isbn13: item.isbn13 ?? bookInfo.isbn,
       author: bookInfo.author ?? '',
+      categoryId: bookInfo.category_id,
+      categoryName: bookInfo.category_name,
     };
   });
   return {

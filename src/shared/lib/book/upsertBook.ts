@@ -10,7 +10,14 @@ export const upsertBook = async ({ supabase, bookInfo }: UpsertBookProps) => {
   const { data, error } = await supabase
     .from('books')
     .upsert(
-      { isbn13: bookInfo.isbn13, title: bookInfo.title, author: bookInfo.author, thumbnail_url: bookInfo.cover },
+      {
+        isbn13: bookInfo.isbn13,
+        title: bookInfo.title,
+        author: bookInfo.author,
+        thumbnail_url: bookInfo.cover,
+        category_id: bookInfo.categoryId,
+        category_name: bookInfo.categoryName,
+      },
       { onConflict: 'isbn13' }
     )
     .select('id')

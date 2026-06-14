@@ -47,6 +47,8 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
                   title: book.title,
                   cover: coverSrc,
                   author: book.author,
+                  categoryId: book.categoryId,
+                  categoryName: book.categoryName,
                 }}
               />
 
@@ -56,6 +58,8 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
                   title: book.title,
                   cover: coverSrc,
                   author: book.author,
+                  categoryId: book.categoryId,
+                  categoryName: book.categoryName,
                 }}
                 scope="home"
               />

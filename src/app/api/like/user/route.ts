@@ -38,14 +38,13 @@ export const GET = async (request: NextRequest) => {
 
 export const POST = async (request: NextRequest) => {
   const supabase = await createClient();
-
-  const { isbn13, title, cover, author } = await request.json();
+  const { isbn13, title, cover, author, categoryId, categoryName } = await request.json();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const bookId = await upsertBook({ supabase, bookInfo: { isbn13, title, cover, author } });
+  const bookId = await upsertBook({ supabase, bookInfo: { isbn13, title, cover, author, categoryId, categoryName } });
 
   const { data: existing } = await supabase
     .from('likes')

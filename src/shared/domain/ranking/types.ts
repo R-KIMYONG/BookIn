@@ -26,4 +26,6 @@ export type TopViewType = {
   like_count: number;
   comment_count: number;
   score: number;
+  categoryId: number;
+  categoryName: string;
 };

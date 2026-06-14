@@ -14,7 +14,6 @@ import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 
 const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
   const { open } = useBookmarkMemoUrlState();
-
   return (
     <BooksGridContainer>
       {data.map((book, index) => {
@@ -22,7 +21,14 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
         const newBadge = isNew(book.created_at, NEW_DAYS);
         const memoExists = hasMemo(book.memo);
         const date = formatDateTime(book.created_at);
-        const bookInfo = { isbn13: book.isbn13, cover: book.cover, title: book.title, author: book.author };
+        const bookInfo = {
+          isbn13: book.isbn13,
+          cover: book.cover,
+          title: book.title,
+          author: book.author,
+          categoryId: book.categoryId,
+          categoryName: book.categoryName,
+        };
         const tagNames = (book.tags ?? [])
           .map((tag) => {
             return {
