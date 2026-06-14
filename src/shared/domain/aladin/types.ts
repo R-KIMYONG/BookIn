@@ -29,6 +29,7 @@ export type AladinItem = {
   priceSales: number;
   isbn13: string;
   isbn: string;
+  categoryId: number;
   customerReviewRank: number;
   salesPoint: number;
   categoryName: string;

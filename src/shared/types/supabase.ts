@@ -57,6 +57,7 @@ export type Database = {
           book_id: string
           composite_hash: string | null
           device_key: string
+          hidden: boolean
           id: string
           ip_hash: string | null
           isbn13: string
@@ -69,6 +70,7 @@ export type Database = {
           book_id: string
           composite_hash?: string | null
           device_key: string
+          hidden?: boolean
           id?: string
           ip_hash?: string | null
           isbn13: string
@@ -81,6 +83,7 @@ export type Database = {
           book_id?: string
           composite_hash?: string | null
           device_key?: string
+          hidden?: boolean
           id?: string
           ip_hash?: string | null
           isbn13?: string
@@ -222,6 +225,8 @@ export type Database = {
       books: {
         Row: {
           author: string | null
+          category_id: number | null
+          category_name: string | null
           created_at: string
           id: string
           isbn13: string
@@ -230,6 +235,8 @@ export type Database = {
         }
         Insert: {
           author?: string | null
+          category_id?: number | null
+          category_name?: string | null
           created_at?: string
           id?: string
           isbn13: string
@@ -238,6 +245,8 @@ export type Database = {
         }
         Update: {
           author?: string | null
+          category_id?: number | null
+          category_name?: string | null
           created_at?: string
           id?: string
           isbn13?: string
@@ -393,6 +402,47 @@ export type Database = {
           },
         ]
       }
+      user_recommendations: {
+        Row: {
+          created_at: string
+          id: string
+          input_snapshot: Json | null
+          recommendations: Json | null
+          regen_count: number
+          regen_date: string
+          taste_summary: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_snapshot?: Json | null
+          recommendations?: Json | null
+          regen_count?: number
+          regen_date: string
+          taste_summary?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_snapshot?: Json | null
+          recommendations?: Json | null
+          regen_count?: number
+          regen_date?: string
+          taste_summary?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recommendations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar: string | null
@@ -440,6 +490,8 @@ export type Database = {
       book_ranking: {
         Row: {
           author: string | null
+          category_id: number | null
+          category_name: string | null
           comment_count: number | null
           isbn13: string | null
           like_count: number | null
