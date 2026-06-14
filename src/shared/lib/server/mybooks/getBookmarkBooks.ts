@@ -106,7 +106,7 @@ export const getBookmarkBooks = async ({
   let bookmarkQuery = supabase
     .from('bookmarks')
     .select(
-      '*,books!inner(title,thumbnail_url,isbn13,author),tags:bookmark_tag_links(tag:bookmark_tags(id,name,slug,color))',
+      '*,books!inner(title,thumbnail_url,isbn13,author,category_id,category_name),tags:bookmark_tag_links(tag:bookmark_tags(id,name,slug,color))',
       { count: 'exact' }
     )
     .eq('user_id', userId);
@@ -172,6 +172,8 @@ export const getBookmarkBooks = async ({
       title: item.books.title,
       isbn13: item.books.isbn13,
       author: item.books.author,
+      categoryId: item.books.category_id,
+      categoryName: item.books.category_name,
       memo: item.memo ?? null,
       tags: (item.tags ?? []).map((l: any) => l.tag).filter(Boolean),
     };

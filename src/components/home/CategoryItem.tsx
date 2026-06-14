@@ -4,6 +4,7 @@ import LikeButton from '../book/LikeButton';
 import BookmarkButton from '../book/BookmarkButton';
 import { Eye, MessageCircleMore, Star } from 'lucide-react';
 import { formatAuthor } from '@/shared/domain/book/formatAuthor';
+import { getBookKey } from '@/shared/domain/book/getBookKey';
 
 type CategoryItemProps = {
   item: Item;
@@ -15,6 +16,7 @@ type CategoryItemProps = {
 const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemProps) => {
   const rating = item.customerReviewRank ?? 0;
   const coverSrc = item.cover?.startsWith('http') ? item.cover : '/images/noImg.png';
+  const isbnKey = getBookKey(item);
 
   //청불 처리 필요
   //settings hydration으로 해야됨
@@ -36,19 +38,23 @@ const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemP
         <div className="absolute bottom-2 z-20 flex gap-1 items-center text-xs text-white justify-between w-full px-4">
           <LikeButton
             bookInfo={{
-              isbn13: item.isbn13,
+              isbn13: isbnKey,
               title: item.title,
               cover: item.cover,
               author: item.author,
+              categoryId: item.categoryId,
+              categoryName: item.categoryName,
             }}
           />
 
           <BookmarkButton
             bookInfo={{
-              isbn13: item.isbn13,
+              isbn13: isbnKey,
               title: item.title,
               cover: item.cover,
               author: item.author,
+              categoryId: item.categoryId,
+              categoryName: item.categoryName,
             }}
             scope="home"
           />

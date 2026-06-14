@@ -3,4 +3,6 @@ export type BookInfo = {
   title: string;
   cover: string;
   author: string;
+  categoryId: number;
+  categoryName: string;
 };

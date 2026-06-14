@@ -44,7 +44,14 @@ const MainDetail = async ({
   const isbnKey = getBookKey(item);
   const bookId = await upsertBook({
     supabase,
-    bookInfo: { title: item.title, author: item.author, cover: item.cover, isbn13: isbnKey },
+    bookInfo: {
+      title: item.title,
+      author: item.author,
+      cover: item.cover,
+      isbn13: isbnKey,
+      categoryId: item.categoryId,
+      categoryName: item.categoryName,
+    },
   });
 
   //가격
@@ -98,6 +105,8 @@ const MainDetail = async ({
     cover: item.cover,
     author: item.author,
     isbn: item.isbn,
+    categoryId: item.categoryId,
+    categoryName: item.categoryName,
   };
 
   const queryClient = new QueryClient();

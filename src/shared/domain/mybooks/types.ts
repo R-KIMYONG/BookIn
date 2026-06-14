@@ -14,6 +14,8 @@ export type BookmarkRow = {
     thumbnail_url: string;
     isbn13: string;
     author: string;
+    category_id: number;
+    category_name: string;
   };
   tags: {
     tag: {
@@ -34,6 +36,8 @@ export type LikeRow = {
     isbn: string;
     thumbnail_url: string;
     author: string;
+    category_id: number;
+    category_name: string;
   }[];
 };
 
@@ -62,12 +66,16 @@ export type CommentBook = MyBookBase & {
 export type LikeBook = MyBookBase & {
   created_at: string;
   author: string;
+  categoryId: number;
+  categoryName: string;
 };
 
 export type BookmarkBook = MyBookBase & {
   created_at: string;
   author: string;
   memo: string | null;
+  categoryId: number;
+  categoryName: string;
   tags: {
     id: string;
     name: string;

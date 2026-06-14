@@ -8,11 +8,19 @@ import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { PencilLine } from 'lucide-react';
 import { useMemo } from 'react';
 
-const DetailActionsContainer = ({
-  bookInfo,
-}: {
-  bookInfo: { title: string; cover: string; author: string; isbn13: string; isbn: string };
-}) => {
+type DetailActionsContainerProps = {
+  bookInfo: {
+    title: string;
+    cover: string;
+    author: string;
+    isbn13: string;
+    isbn: string;
+    categoryId: number;
+    categoryName: string;
+  };
+};
+
+const DetailActionsContainer = ({ bookInfo }: DetailActionsContainerProps) => {
   const { open } = useBookmarkMemoUrlState();
   const bookKey = useMemo(() => {
     return bookInfo.isbn13?.trim() || bookInfo.isbn?.trim() || '';

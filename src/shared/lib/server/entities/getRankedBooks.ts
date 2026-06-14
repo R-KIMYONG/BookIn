@@ -1,13 +1,14 @@
 import 'server-only';
 import { createClient } from '../../supabase/server';
 import { RankedBook } from '@/shared/domain/ranking/types';
-import dayjs from 'dayjs';
+import dayjs from '@/shared/lib/date/dayjs';
 import { rankingCalcChange } from '@/shared/domain/ranking/rankingCalcChange';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 export const getRankedBooks = async (): Promise<RankedBook[]> => {
   const supabase = await createClient();
 
