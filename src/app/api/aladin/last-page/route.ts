@@ -17,5 +17,5 @@ export const GET = async (request: NextRequest) => {
   const categoryId = Number(searchParams.get('CategoryId')) || 0;
 
   const result = await getLastPageServer({ queryType, target, categoryId });
-  return NextResponse.json({ lastPage: result }, { status: 200 });
+  return NextResponse.json(result, { status: 200 });
 };
