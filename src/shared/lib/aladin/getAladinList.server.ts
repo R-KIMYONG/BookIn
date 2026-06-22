@@ -12,14 +12,12 @@ type GetAladinListParams = {
   page: number;
   target: TargetTypes;
   categoryId?: number;
-  signal?: AbortSignal;
 };
 export const getAladinList = async ({
   queryType,
   page,
   target,
   categoryId,
-  signal,
 }: GetAladinListParams): Promise<PagedResult<AladinBookInfo>> => {
   const ttbKey = process.env.ALADIN_TTB_KEY;
 
@@ -38,7 +36,6 @@ export const getAladinList = async ({
   const apiUrl = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
 
   const res = await fetch(apiUrl, {
-    signal,
     next: {
       revalidate: 60,
     },
