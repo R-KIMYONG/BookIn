@@ -7,7 +7,6 @@ import { QueryType } from '@/shared/domain/aladin/types';
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
-
   const rawTarget = (searchParams.get('target') ?? 'Book').trim();
   const target = TARGET_LIST.includes(rawTarget as TargetTypes) ? (rawTarget as TargetTypes) : 'Book';
   const rawQt = (searchParams.get('QueryType') ?? 'Bestseller').trim();

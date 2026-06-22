@@ -1,12 +1,14 @@
 'use client';
 import Link from 'next/link';
-import { ChevronRight, Heart, MessageCircleMore, Trophy } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { RankedBook } from '@/shared/domain/ranking/types';
 import RankingModal from './RankingModal';
 import Button from '@/components/common/ui/Button';
 import { rankBadge } from '@/shared/domain/ranking/rankBadge';
 import RankChangeBadge from './RankChangeBadge';
 import { useState } from 'react';
+import BookStats from '@/components/book/BookStats';
+import RankingInfo from './RankingInfo';
 
 const RankingBoard = ({ books }: { books: RankedBook[] }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,18 +16,17 @@ const RankingBoard = ({ books }: { books: RankedBook[] }) => {
   const top10 = books.slice(0, 10);
 
   if (top10.length === 0) return null;
-
   return (
     <aside className="w-full rounded-2xl bg-white shadow-md ring-1 ring-black/5 flex flex-col overflow-hidden self-start">
       {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-[#af5858]/5 to-transparent">
-        <h3 className="text-base font-bold flex items-center gap-1.5">
-          <Trophy className="w-4 h-4 text-[#af5858]" />
+        <h3 className="text-base font-bold flex items-center gap-1.5 group">
+          <span className="inline-block transition-transform duration-300 group-hover:scale-110">
+            <Trophy className="w-4 h-4 text-[#af5858] origin-bottom  group-hover:animate-trophy-ring" />
+          </span>
           종합 랭킹
         </h3>
-        <span className="text-[11px] text-gray-400 cursor-help" title="조회수·좋아요·댓글을 합산한 화제성 점수 순">
-          화제성 순 ⓘ
-        </span>
+        <RankingInfo />
       </div>
 
       {/* 리스트 */}
@@ -55,16 +56,13 @@ const RankingBoard = ({ books }: { books: RankedBook[] }) => {
                   {book.title}
                 </span>
 
-                <span className="shrink-0 w-12 flex items-center gap-2 text-[11px] text-gray-400 tabular-nums">
-                  <span className="flex items-center gap-0.5">
-                    <Heart className="w-3 h-3" />
-                    {book.like_count}
-                  </span>
-                  <span className="flex items-center gap-0.5">
-                    <MessageCircleMore className="w-3 h-3" />
-                    {book.comment_count}
-                  </span>
-                </span>
+                <BookStats
+                  likeCount={book.like_count}
+                  viewCount={book.view_count}
+                  commentCount={book.comment_count}
+                  size="sm"
+                  className="shrink-0"
+                />
               </Link>
             </li>
           );
@@ -75,7 +73,8 @@ const RankingBoard = ({ books }: { books: RankedBook[] }) => {
         variant="secondary"
         size="xs"
         label="전체 순위 더보기"
-        rightIcon={<ChevronRight className="w-4 h-4" />}
+        className="group"
+        rightIcon={<ChevronRight className="w-4 h-4 transform translate-x-0 group-hover:translate-x-1 transition-all duration-300" />}
       />
       <RankingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} books={books} />
     </aside>

@@ -9,6 +9,7 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const rawQueryType = (searchParams.get(APP_QUERY_KEYS.queryType) ?? DEFAULT_QT).trim();
     const queryType = QUERY_TYPE_LIST.includes(rawQueryType as QueryType) ? (rawQueryType as QueryType) : DEFAULT_QT;
+    const signal = request.signal;
 
     const rawTarget = (searchParams.get(APP_QUERY_KEYS.target) ?? DEFAULT_TARGET).trim() as TargetTypes;
     const target: TargetTypes = ALLOWED_TARGETS.includes(rawTarget) ? rawTarget : DEFAULT_TARGET;
@@ -19,10 +20,12 @@ export const GET = async (request: NextRequest) => {
 
     const categoryId = Number.isFinite(rawCategoryId) && rawCategoryId > 0 ? rawCategoryId : undefined;
 
-    const data = await getAladinList({ queryType, page, target, categoryId });
+    const data = await getAladinList({ queryType, page, target, categoryId, signal });
 
     return NextResponse.json(data);
   } catch (error) {
+    if (request.signal.aborted) return new NextResponse(null, { status: 499 });
+
     console.error(error);
     return NextResponse.json({ message: '알라딘 도서 목록 조회 실패' }, { status: 500 });
   }

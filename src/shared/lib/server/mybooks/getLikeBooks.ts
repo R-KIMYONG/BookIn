@@ -67,9 +67,12 @@ export const getLikeBooks = async ({
 
   let likeQuery = supabase
     .from('likes')
-    .select('*,books!inner(title,thumbnail_url,author,isbn13,category_id,category_name)', {
-      count: 'exact',
-    })
+    .select(
+      '*,books!inner(title,thumbnail_url,author,isbn13,category_id,category_name,book_stats(view_count,like_count,comment_count))',
+      {
+        count: 'exact',
+      }
+    )
     .eq('user_id', userId);
 
   if (search && searchField) {
@@ -106,6 +109,7 @@ export const getLikeBooks = async ({
 
   const likes = (data ?? []).map((item: LikeRow) => {
     const bookInfo = Array.isArray(item.books) ? item.books[0] : item.books;
+    const stats = Array.isArray(bookInfo?.book_stats) ? bookInfo?.book_stats[0] : bookInfo?.book_stats;
 
     return {
       book_id: item.book_id ?? '',
@@ -116,10 +120,13 @@ export const getLikeBooks = async ({
       author: bookInfo.author ?? '',
       categoryId: bookInfo.category_id,
       categoryName: bookInfo.category_name,
+      total_view_count: stats?.view_count ?? 0,
+      total_like_count: stats?.like_count,
+      total_comment_count: stats?.comment_count ?? 0,
     };
   });
   return {
     data: likes,
-    total: count ?? 0,
+    total: count ?? 0, //페이지네이션에서 총몇페이지 구분하기위함
   };
 };

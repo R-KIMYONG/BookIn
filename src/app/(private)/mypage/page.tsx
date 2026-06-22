@@ -14,13 +14,15 @@ import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmark
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
-import { MypageSectionType } from '@/shared/domain/mypage/section';
+import { MYPAGE_DEFAULT_SECTION, MypageSectionType } from '@/shared/domain/mypage/section';
 import { normalizeMyBooksKey } from '@/shared/domain/mybooks/normalizeMyBooksKey';
 import { BookmarkInfo } from '@/shared/domain/bookmark/types';
 import { createClient } from '@/shared/lib/supabase/server';
 import { BookmarkBook } from '@/shared/domain/mybooks/types';
 import { getUserTagsServer } from '@/shared/lib/server/entities/getUserTagsServer';
 import { TAG_DEFAULT } from '@/shared/domain/tag/constants';
+import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
+import { getRecommendations } from '@/shared/lib/server/entities/getRecommendations';
 
 export const metadata: Metadata = {
   title: '마이페이지',
@@ -61,7 +63,13 @@ const ProfilePage = async ({
 
   const tagId = typeof params.tagId === 'string' ? params.tagId : TAG_DEFAULT;
 
-  const section = typeof params.section === 'string' ? (params.section as MypageSectionType) : 'myBooks';
+  const section = typeof params.section === 'string' ? (params.section as MypageSectionType) : MYPAGE_DEFAULT_SECTION;
+
+  if (section !== MYPAGE_DEFAULT_SECTION && userId) {
+    const data = await getRecommendations(userId).catch(() => null);
+
+    if (data) queryClient.setQueryData(recommendationsKey.all, data);
+  }
 
   const result = await queryClient.fetchQuery({
     queryKey: myBooksKeys.list(

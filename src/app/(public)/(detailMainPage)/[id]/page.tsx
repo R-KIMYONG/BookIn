@@ -100,11 +100,10 @@ const MainDetail = async ({
 
   const category = item.categoryName?.split('>')?.pop() ?? '';
   const bookInfo = {
-    isbn13: item.isbn13,
+    isbn13: isbnKey,
     title: item.title,
     cover: item.cover,
     author: item.author,
-    isbn: item.isbn,
     categoryId: item.categoryId,
     categoryName: item.categoryName,
   };
@@ -211,7 +210,7 @@ const MainDetail = async ({
                 </div>
               </div>
               <div>
-                <DetailBookmarkTags isbn13={bookInfo?.isbn13} userId={userId} />
+                <DetailBookmarkTags isbn13={isbnKey} userId={userId} />
               </div>
               <div className="rounded-xl border px-4 py-4 space-y-3">
                 {/* 정가 */}

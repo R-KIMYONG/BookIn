@@ -79,9 +79,12 @@ export const getCommentBooks = async ({
 
   let commentQuery = supabase
     .from('user_book_comments')
-    .select('book_id,comment_count,last_commented_at, books(title,thumbnail_url,isbn13)', {
-      count: 'exact',
-    })
+    .select(
+      'book_id,comment_count,last_commented_at, books(title,thumbnail_url,isbn13, book_stats(view_count,like_count,comment_count))',
+      {
+        count: 'exact',
+      }
+    )
     .eq('user_id', userId);
 
   if (search && searchField) {
@@ -119,6 +122,7 @@ export const getCommentBooks = async ({
 
   const commentBooks = (data ?? []).map((item: CommentRow) => {
     const bookInfo = Array.isArray(item.books) ? item.books[0] : item.books;
+    const stats = Array.isArray(bookInfo?.book_stats) ? bookInfo?.book_stats[0] : bookInfo?.book_stats;
 
     return {
       book_id: item.book_id,
@@ -126,12 +130,15 @@ export const getCommentBooks = async ({
       cover: bookInfo?.thumbnail_url ?? '/images/noImg.png',
       comment_count: item.comment_count,
       last_commented_at: item.last_commented_at,
-      isbn13: bookInfo.isbn13 ?? '',
+      isbn13: bookInfo?.isbn13 ?? '',
+      total_like_count: stats?.like_count ?? 0,
+      total_view_count: stats?.view_count ?? 0,
+      total_comment_count: stats?.comment_count ?? 0,
     };
   });
 
   return {
     data: commentBooks,
-    total: count ?? 0,
+    total: count ?? 0, //페이지네이션에서 총몇페이지 구분하기위함
   };
 };

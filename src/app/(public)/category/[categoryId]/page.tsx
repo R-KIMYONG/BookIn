@@ -54,7 +54,6 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
         foreignGenres={genres.foGenres}
         ebookGenres={genres.ebGenres}
         target={target}
-        page={page}
       />
 
       <div className="w-full flex-1">
@@ -68,6 +67,8 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
           />
         </Suspense>
       </div>
+
+      
     </section>
   );
 };
