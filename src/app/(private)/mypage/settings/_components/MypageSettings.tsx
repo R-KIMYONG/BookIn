@@ -37,11 +37,14 @@ const MypageSettings = () => {
                 onClick={() => router.push('/mypage')}
                 variant="ghost"
                 label="마이페이지"
-                leftIcon={<ArrowLeft className="w-4- h-4" />}
+                className="group"
+                leftIcon={
+                  <ArrowLeft className="w-4- h-4 transition-transform duration-200 translate-x-0 group-hover:-translate-x-1" />
+                }
               />
 
-              <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-[#AF5858]" />
+              <div className="flex items-center gap-2 group w-fit">
+                <Settings className="w-5 h-5 text-[#AF5858] transform group-hover:rotate-180 duration-300" />
                 <h1 className="text-xl font-extrabold text-gray-900 sm:text-2xl">계정 설정</h1>
               </div>
 
@@ -54,9 +57,9 @@ const MypageSettings = () => {
                 variant="outline"
                 leftIcon={<House className="w-4 h-4" />}
                 onClick={() => router.push('/')}
-              >
-                홈으로
-              </Button>
+                className="transition hover:border-[#AF5858] hover:text-[#AF5858]"
+                label="홈으로"
+              />
             </div>
           </div>
         </div>

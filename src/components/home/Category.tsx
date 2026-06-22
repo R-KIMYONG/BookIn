@@ -1,45 +1,52 @@
 'use client';
-
-import CategoryItem from './CategoryItem';
-import Link from 'next/link';
-import AppPagination from '../common/AppPagination';
 import QueryTypeTabs from '../common/filters/QueryTypeTabs';
 import SearchBar from '../common/filters/SearchBar';
-import SkeletonGrid from '../common/SkeletonGrid';
-import { useMemo } from 'react';
-import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
-import { makeItemKey } from '@/shared/domain/book/makeItemKey';
-import { makeHref } from '@/shared/domain/book/makeHref';
 import { TargetTypes } from '@/shared/constants/category';
 import { useBookListData } from '@/hooks/book/useBookListData';
-import { useBookStats } from '@/hooks/book/useBookStats';
-import { getBookKey } from '@/shared/domain/book/getBookKey';
+import Button from '../common/ui/Button';
+import EmptyState from '../common/EmptyState';
+import BookListView from '../common/BookListView';
 
 type CategoryProps = {
   target: TargetTypes;
-  page: number;
 };
 
-const Category = ({ target, page }: CategoryProps) => {
+const Category = ({ target }: CategoryProps) => {
   const {
     list,
+    page,
     queryType,
     listDataPending,
     totalPages,
     isFetching,
+    isError,
+    error,
+    refetch,
     searchTotal,
     searchKeyWord,
     searchQueryType,
     setListUrl,
-  } = useBookListData({ target, page });
+  } = useBookListData({ target });
   const isSearching = Boolean(searchKeyWord?.trim());
 
-  const isbnList = useMemo(() => {
-    return list.map((item) => item.isbn13).filter(Boolean);
-  }, [list]);
-  useFetchLikeCount(isbnList);
+  const errorSlot = (
+    <div className="border rounded-xl p-6 my-6">
+      <p className="font-semibold">목록을 불러오지 못했어요</p>
+      <p className="text-sm text-gray-600 mt-2">{error?.message ?? '알 수 없는 오류'}</p>
+      <div className="mt-4">
+        <Button size="sm" variant="primary" label="다시 시도" onClick={() => refetch()} />
+      </div>
+    </div>
+  );
 
-  const { data: stats } = useBookStats(isbnList);
+  const emptySlot = isSearching ? (
+    <EmptyState
+      title={`‘${searchKeyWord}’ 검색 결과가 없어요`}
+      description="검색어나 검색 옵션을 다시 확인해 주세요."
+    />
+  ) : (
+    <EmptyState title="표시할 책이 없어요" description="다른 탭(베스트셀러/신간 등)을 선택해 보세요." />
+  );
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col gap-2 overflow-x-hidden">
@@ -47,7 +54,7 @@ const Category = ({ target, page }: CategoryProps) => {
         <div className="md:flex-1 md:pr-3 w-full ">
           <QueryTypeTabs
             value={queryType}
-            onChange={(k) => setListUrl({ queryType: k, searchKeyWord: null })}
+            onChange={(k) => setListUrl({ queryType: k, searchKeyWord: null }, { shallow: true })}
             disable={isSearching}
           />
         </div>
@@ -73,45 +80,17 @@ const Category = ({ target, page }: CategoryProps) => {
           )}
         </div>
       </div>
-      {listDataPending ? (
-        <SkeletonGrid count={20} />
-      ) : (
-        <div className="w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {list.map((book, index) => {
-            const href = makeHref(book);
-            const key = makeItemKey(book, index);
-            const bookKey = getBookKey(book);
-            return href ? (
-              <Link href={href} key={key}>
-                <CategoryItem
-                  item={book}
-                  viewCount={bookKey ? (stats?.[bookKey]?.view_count ?? 0) : 0}
-                  commentCount={bookKey ? (stats?.[bookKey]?.comment_count ?? 0) : 0}
-                />
-              </Link>
-            ) : (
-              <div key={key} className="opacity-60 cursor-not-allowed" title="상세 페이지가 없어서 이동할 수 없어요">
-                <CategoryItem
-                  item={book}
-                  disabled={true}
-                  viewCount={bookKey ? (stats?.[bookKey]?.view_count ?? 0) : 0}
-                  commentCount={bookKey ? (stats?.[bookKey]?.comment_count ?? 0) : 0}
-                />
-              </div>
-            );
-          })}
-        </div>
-      )}
-      {/* 페이지 네이션 */}
-      <div className="mt-6 flex justify-center">
-        <AppPagination
-          totalPages={totalPages}
-          page={page}
-          onChange={(p) => {
-            setListUrl({ page: p });
-          }}
-        />
-      </div>
+      <BookListView
+        list={list}
+        page={page}
+        totalPages={totalPages}
+        listDataPending={listDataPending}
+        isFetching={isFetching}
+        isError={isError}
+        errorSlot={errorSlot}
+        emptySlot={emptySlot}
+        onPageChange={(p) => setListUrl({ page: p }, { shallow: true })}
+      />
     </section>
   );
 };

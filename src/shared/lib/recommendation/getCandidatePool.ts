@@ -1,6 +1,6 @@
 import 'server-only';
 import { getAladinItemList } from '../aladin/getAladinItemList';
-import { Item } from '@/shared/types/api';
+import { AladinBookInfo } from '@/shared/types/api';
 import { POOL_QUERIES } from '@/shared/domain/recommend/constants';
 import { DEFAULT_TARGET } from '@/shared/constants/category';
 
@@ -15,7 +15,10 @@ export const getCandidatePool = async ({ excludeIsbns }: { excludeIsbns: Set<str
   );
   //후보 리스트를 합쳐
   const rawItems = lists.flatMap((list) => list.data.item ?? []);
-  const map = new Map<string, Pick<Item, 'isbn13' | 'title' | 'author' | 'cover' | 'categoryId' | 'categoryName'>>();
+  const map = new Map<
+    string,
+    Pick<AladinBookInfo, 'isbn13' | 'title' | 'author' | 'cover' | 'categoryId' | 'categoryName'>
+  >();
   //합친 후보중에 중복있으면 제거
   for (const it of rawItems) {
     if (!it.isbn13) continue;

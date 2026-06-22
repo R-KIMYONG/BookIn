@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { CommentBook } from '@/shared/domain/mybooks/types';
 import BooksGridContainer from './BooksGridContainer';
 import { formatDateTime } from '@/shared/lib/date/formatDateTime';
+import BookStats from '@/components/book/BookStats';
+import { formatCount } from '@/shared/utils/formatCount';
 const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
   return (
     <BooksGridContainer>
@@ -27,9 +29,14 @@ const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
             </Link>
             <div className="mt-2 h-14 px-2 text-xs">
               <p className="font-bold line-clamp-1 ">{book.title}</p>
-              <div className="flex justify-between mt-1">
+              <BookStats
+                viewCount={book.total_view_count}
+                likeCount={book.total_like_count}
+                commentCount={book.total_comment_count}
+              />
+              <div className="flex justify-between text-gray-400">
                 <span>{book.last_commented_at ? date : ''}</span>
-                <span>댓글 {book.comment_count}개</span>
+                <span>내 댓글 {formatCount(book.comment_count)}개</span>
               </div>
             </div>
           </li>

@@ -2,12 +2,13 @@ import Button from '@/components/common/ui/Button';
 import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
 import { RecommendDataType } from '@/shared/domain/recommend/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SkeletonView } from './SkeletonVIew';
 import MarqueeRow from './MarqueeRow';
 import { HOUR } from '@/shared/constants/time';
 import EmptyState from '@/components/common/EmptyState';
 import { Compass, RefreshCw, WifiOff } from 'lucide-react';
+import AnalyzingLoader from './AnalyzingLoader';
 
 const RecommendContainer = () => {
   const queryClient = useQueryClient();
@@ -24,10 +25,8 @@ const RecommendContainer = () => {
 
       if (!response.ok) {
         const body = await response.json();
-
         throw new Error(body.error ?? 'AI 호출 실패');
       }
-
       const data = await response.json();
 
       return data;
@@ -61,6 +60,13 @@ const RecommendContainer = () => {
     }
   }, [isSuccess, recommendData, mutate]);
 
+  const isGenerating = generating || recommendData === null; // 생성중 또는 데이터 없음
+  const [ringDone, setRingDone] = useState(true); // 이미 로드된 데이터는 바로 노출(true)
+
+  useEffect(() => {
+    if (isGenerating) setRingDone(false); // 로딩 시작하면 분석링 리셋
+  }, [isGenerating]);
+
   if (recommendPending) return <SkeletonView />;
 
   if ((recommendDataError || generateError) && recommendData == null) {
@@ -77,7 +83,10 @@ const RecommendContainer = () => {
       </div>
     );
   }
-  if (recommendData == null || generating) return <SkeletonView analyzing />;
+  if (isGenerating || !ringDone) {
+    return <AnalyzingLoader isReady={!isGenerating} onComplete={() => setRingDone(true)} />;
+  }
+  //TODO : 분석중 로딩을 현재 데이터 스테일 여부에 따라 렌더 & 그리고 해당 컨포넌트의 프로그레스바가 완료해야 결과 보이기
   if ('coldStart' in recommendData) {
     return (
       <EmptyState

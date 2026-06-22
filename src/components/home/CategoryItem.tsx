@@ -1,13 +1,14 @@
-import { Item } from '@/shared/types/api';
+import { AladinBookInfo } from '@/shared/types/api';
 import Image from 'next/image';
 import LikeButton from '../book/LikeButton';
 import BookmarkButton from '../book/BookmarkButton';
-import { Eye, MessageCircleMore, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { formatAuthor } from '@/shared/domain/book/formatAuthor';
 import { getBookKey } from '@/shared/domain/book/getBookKey';
+import BookStats from '../book/BookStats';
 
 type CategoryItemProps = {
-  item: Item;
+  item: AladinBookInfo;
   disabled?: boolean;
   viewCount: number;
   commentCount: number;
@@ -69,16 +70,7 @@ const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemP
             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
             <span className="text-gray-800 font-semibold">{rating > 0 ? rating : '평점 없음'}</span>
           </div>
-          <div className="flex items-center gap-3 text-[11px] text-gray-400">
-            <span className="flex items-center gap-0.5">
-              <Eye className="w-3 h-3" />
-              <span className="tabular-nums">{viewCount.toLocaleString()}</span>
-            </span>
-            <span className="flex items-center gap-0.5">
-              <MessageCircleMore className="w-3 h-3" />
-              <span className="tabular-nums">{commentCount.toLocaleString()}</span>
-            </span>
-          </div>
+          <BookStats viewCount={viewCount} commentCount={commentCount}/>
         </div>
 
         <p className="text-xs text-gray-600 truncate">{formatAuthor(item.author)}</p>

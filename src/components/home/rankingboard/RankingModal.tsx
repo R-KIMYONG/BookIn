@@ -1,10 +1,11 @@
 'use client';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { X, Trophy, Heart, MessageCircleMore } from 'lucide-react';
+import { X, Trophy } from 'lucide-react';
 import { RankedBook } from '@/shared/domain/ranking/types';
 import { rankBadge } from '@/shared/domain/ranking/rankBadge';
 import RankChangeBadge from './RankChangeBadge';
+import BookStats from '@/components/book/BookStats';
 
 type RankingModalProps = {
   isOpen: boolean;
@@ -33,8 +34,10 @@ const RankingModal = ({ isOpen, onClose, books }: RankingModalProps) => {
       <div className="relative z-10 w-full max-w-md max-h-[80vh] rounded-2xl bg-white shadow-xl flex flex-col overflow-hidden">
         {/* 헤더 (고정) */}
         <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#af5858]" />
+          <h2 className="text-lg font-bold flex items-center gap-2 group">
+            <span className="inline-block transition-transform duration-300 group-hover:scale-110">
+              <Trophy className="w-4 h-4 text-[#af5858] origin-bottom  group-hover:animate-trophy-ring" />
+            </span>
             종합 랭킹 TOP 50
           </h2>
           <button onClick={onClose} aria-label="닫기" className="p-1 rounded hover:bg-gray-100">
@@ -62,16 +65,13 @@ const RankingModal = ({ isOpen, onClose, books }: RankingModalProps) => {
                   <span className="flex-1 min-w-0 text-xs text-gray-800 truncate group-hover:text-[#af5858] transition-colors">
                     {book.title}
                   </span>
-                  <span className="shrink-0 flex items-center gap-2 text-[11px] text-gray-400 tabular-nums">
-                    <span className="flex items-center gap-0.5">
-                      <Heart className="w-3 h-3" />
-                      {book.like_count}
-                    </span>
-                    <span className="flex items-center gap-0.5">
-                      <MessageCircleMore className="w-3 h-3" />
-                      {book.comment_count}
-                    </span>
-                  </span>
+                  <BookStats
+                    likeCount={book.like_count}
+                    viewCount={book.view_count}
+                    commentCount={book.comment_count}
+                    size="sm"
+                    className="shrink-0"
+                  />
                 </Link>
               </li>
             );

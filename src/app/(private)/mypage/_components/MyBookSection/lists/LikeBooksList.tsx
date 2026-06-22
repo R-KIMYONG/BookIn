@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import LikeButton from '@/components/book/LikeButton';
 import { formatDateTime } from '@/shared/lib/date/formatDateTime';
+import BookStats from '@/components/book/BookStats';
 
 const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
   return (
@@ -39,10 +40,8 @@ const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
             </Link>
             <div className="mt-2 h-14 px-2 text-xs">
               <p className="font-bold line-clamp-1">{book.title}</p>
-
-              <div className="flex flex-col justify-between mt-1">
-                <span>{book.created_at ? date : ''}</span>
-              </div>
+              <BookStats viewCount={book.total_view_count} commentCount={book.total_comment_count} />
+              <span className="text-gray-400">{book.created_at ? date : ''}</span>
             </div>
           </li>
         );

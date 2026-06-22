@@ -1,6 +1,6 @@
 export const bookmarkKeys = {
   all: ['bookmark'] as const,
-  detail: (isbn: string) => ['bookmark', isbn] as const,
+  detail: (isbn: string) => [bookmarkKeys.all, isbn] as const,
   memo: (userId: string, isbn: string) => ['bookmarkMemo', userId, isbn] as const,
   tags: {
     user: () => ['bookmarkTags', 'user'] as const,

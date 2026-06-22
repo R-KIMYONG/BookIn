@@ -38,7 +38,7 @@ const ProfileCard = async () => {
           </div>
         </div>
         <Link href={'/mypage/settings'}>
-          <Settings className="text-gray-700 w-5 h-5" />
+          <Settings className="text-gray-700 w-5 h-5 transform hover:rotate-180 duration-300" />
         </Link>
       </div>
     </div>

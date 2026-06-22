@@ -5,6 +5,7 @@ import { BookInfo } from '@/shared/types/bookInfo';
 import cn from '@/shared/utils/cn';
 import { Heart } from 'lucide-react';
 import { useLikeCache } from '@/hooks/like/useLikeCache';
+import { formatCount } from '@/shared/utils/formatCount';
 
 type LikeButtonProps = {
   style?: string;
@@ -41,7 +42,7 @@ const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
           )}
         />
       }
-      label={String(count)}
+      label={formatCount(count)}
       disabled={isLoading}
       className={`${style}  !bg-black/50 !backdrop-blur-sm text-white !rounded-full transition-all duration-200 ease-out hover:!bg-black/70`}
       variant="ghost"

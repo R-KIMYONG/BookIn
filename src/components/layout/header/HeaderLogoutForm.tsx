@@ -6,6 +6,8 @@ import Button from '@/components/common/ui/Button';
 import { showToast } from '@/shared/lib/message/showToast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/shared/context/AuthContext';
+import { likeKeys } from '@/shared/domain/like/queryKeys';
+import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 
 const HeaderLogoutForm = () => {
   const pathname = usePathname();
@@ -16,7 +18,10 @@ const HeaderLogoutForm = () => {
     const result = await logout(formData);
 
     if (result.ok) {
-      queryClient.clear();
+      //개인화된 캐시만 지우고 공개 데이터는 유지
+      queryClient.removeQueries({ queryKey: likeKeys.all });
+      queryClient.removeQueries({ queryKey: bookmarkKeys.all });
+      queryClient.removeQueries({ queryKey: ['myStatus'] });
       router.replace(result.data.redirectTo);
       setUser(null);
     }

@@ -1,6 +1,6 @@
-import { Item } from '@/shared/types/api';
+import { AladinBookInfo } from '@/shared/types/api';
 
-export const normalizeBook = (item: Item): Item => {
+export const normalizeBook = (item: AladinBookInfo): AladinBookInfo => {
   const isbn13 = item.isbn13?.trim();
 
   const isbn10 = item.isbn?.trim();

@@ -2,8 +2,9 @@
 import BookmarkButton from '@/components/book/BookmarkButton';
 import LikeButton from '@/components/book/LikeButton';
 import Button from '@/components/common/ui/Button';
+import { useBookStats } from '@/hooks/book/useBookStats';
+import { useMyStatus } from '@/hooks/book/useMyStatus';
 import { useBookmarkCache } from '@/hooks/bookmark/useBookmarkCache';
-import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
 import { PencilLine } from 'lucide-react';
 import { useMemo } from 'react';
@@ -14,7 +15,6 @@ type DetailActionsContainerProps = {
     cover: string;
     author: string;
     isbn13: string;
-    isbn: string;
     categoryId: number;
     categoryName: string;
   };
@@ -22,16 +22,14 @@ type DetailActionsContainerProps = {
 
 const DetailActionsContainer = ({ bookInfo }: DetailActionsContainerProps) => {
   const { open } = useBookmarkMemoUrlState();
-  const bookKey = useMemo(() => {
-    return bookInfo.isbn13?.trim() || bookInfo.isbn?.trim() || '';
-  }, [bookInfo.isbn13, bookInfo.isbn]);
-
+  const bookKey = bookInfo.isbn13;
   const { data } = useBookmarkCache(bookKey);
   const memoExists = data?.memoExists ?? false;
   const bookmarked = data?.bookmarked ?? false;
   const ids = useMemo(() => (bookKey ? [bookKey] : []), [bookKey]);
 
-  useFetchLikeCount(ids);
+  useBookStats(ids);
+  useMyStatus(ids);
 
   const normalized = useMemo(
     () => ({
