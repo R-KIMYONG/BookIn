@@ -11,6 +11,7 @@ import { formatDateTime } from '@/shared/lib/date/formatDateTime';
 import { isNew } from '@/shared/lib/date/isNew';
 import { NEW_DAYS } from '@/shared/domain/bookmark/constants';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
+import BookStats from '@/components/book/BookStats';
 
 const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
   const { open } = useBookmarkMemoUrlState();
@@ -63,7 +64,13 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
 
                   <div className="absolute bottom-16 left-3 right-3 z-10 text-white">
                     <p className="line-clamp-1 text-xs font-bold">{book.title}</p>
-
+                    <BookStats
+                      viewCount={book.total_view_count}
+                      likeCount={book.total_like_count}
+                      commentCount={book.total_comment_count}
+                      size="xs"
+                      className="text-white mt-1"
+                    />
                     <span className="mt-1 block text-[11px] text-gray-200">{book.created_at ? date : ''}</span>
                   </div>
                 </div>

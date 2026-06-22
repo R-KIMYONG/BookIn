@@ -5,7 +5,7 @@ import { APP_QUERY_KEYS } from '@/shared/domain/aladin/constants';
 import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
 import { PagedResult } from '@/shared/domain/aladin/types';
 import { normalizeBook } from '@/shared/lib/book/normalizeBook';
-import { Item, SearchResult } from '@/shared/types/api';
+import { AladinBookInfo, SearchResult } from '@/shared/types/api';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 type useSearchBooksType = {
   searchKeyWord?: string | null;
@@ -33,7 +33,7 @@ export const useSearchBooks = ({
     queryKey: aladinKeys.search({ searchKeyWord, searchQueryType, page, target, categoryId }),
 
     queryFn: async () => {
-      if (!searchKeyWord?.trim()) return emptyPaged<Item>(20);
+      if (!searchKeyWord?.trim()) return emptyPaged<AladinBookInfo>(20);
 
       const params = new URLSearchParams({
         [APP_QUERY_KEYS.searchKeyWord]: searchKeyWord,

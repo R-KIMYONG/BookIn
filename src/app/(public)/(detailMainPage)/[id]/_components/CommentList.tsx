@@ -15,6 +15,7 @@ import { CommentListResult, CommentWithUser } from '@/shared/domain/comment/type
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useClientPagination } from '@/hooks/url/useClientPagination';
+import { formatCount } from '@/shared/utils/formatCount';
 const ConfirmModal = dynamic(() => import('@/components/modal/ConfirmModal'), { ssr: false });
 type CommentListProps = {
   isEdit: boolean;
@@ -49,7 +50,7 @@ const CommentList = ({
     error,
   } = useQuery<CommentListResult>({
     queryKey: commentKeys.list(bookId, page),
-    queryFn: async () => getCommentList({ bookId, page }),
+    queryFn: async ({ signal }) => getCommentList({ bookId, page, signal }),
     enabled: !!bookId,
     staleTime: 5 * MINUTE,
     placeholderData: keepPreviousData,
@@ -93,7 +94,7 @@ const CommentList = ({
         <div>
           <h3 className="text-lg font-extrabold text-gray-900">코멘트</h3>
           <p className="mt-1 text-xs text-gray-500">
-            총 <span className="font-bold text-[#AF5858]">{comments.total}</span>개
+            총 <span className="font-bold text-[#AF5858]">{formatCount(comments.total)}</span>개
           </p>
         </div>
       </div>

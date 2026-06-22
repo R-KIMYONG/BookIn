@@ -60,7 +60,14 @@ const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreD
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CategoryList categoryId={categoryId} target={target} page={page} genreData={genreData} />
+      <CategoryList
+        categoryId={categoryId}
+        target={target}
+        genreData={genreData}
+        initialPage={page}
+        initialQueryType={queryType}
+        initialList={listData}
+      />
     </HydrationBoundary>
   );
 };

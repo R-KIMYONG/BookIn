@@ -8,6 +8,7 @@ type GetAladinItemListArgs = {
   queryType: QueryType;
   categoryId?: string;
   page: number;
+
 };
 
 export const getAladinItemList = async ({ target, queryType, categoryId, page }: GetAladinItemListArgs) => {

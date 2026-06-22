@@ -17,21 +17,13 @@ type CategoryHeaderProps = {
   foreignGenres: Genre[];
   ebookGenres: Genre[];
   target: TargetTypes;
-  page: number;
 };
 
-const CategoryHeader = ({
-  categoryId,
-  koreanGenres,
-  foreignGenres,
-  ebookGenres,
-  target,
-  page,
-}: CategoryHeaderProps) => {
+const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres, target }: CategoryHeaderProps) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const { isValidCategory, groupLabel, genreData, defaultTarget } = useMemo(
+  const { isValidCategory, groupLabel, genreData } = useMemo(
     () => classifyCategory({ categoryId, koreanGenres, foreignGenres, ebookGenres }),
     [koreanGenres, foreignGenres, ebookGenres, categoryId]
   );
@@ -39,7 +31,6 @@ const CategoryHeader = ({
   const { queryType, isFetching, searchTotal, isSearching, searchKeyWord, searchQueryType, setListUrl } =
     useBookListData({
       target,
-      page,
       categoryId,
     });
 

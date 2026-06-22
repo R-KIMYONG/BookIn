@@ -16,6 +16,11 @@ export type BookmarkRow = {
     author: string;
     category_id: number;
     category_name: string;
+    book_stats: {
+      view_count: number;
+      like_count: number;
+      comment_count: number;
+    }[];
   };
   tags: {
     tag: {
@@ -38,6 +43,11 @@ export type LikeRow = {
     author: string;
     category_id: number;
     category_name: string;
+    book_stats: {
+      view_count: number;
+      like_count: number;
+      comment_count: number;
+    }[];
   }[];
 };
 
@@ -49,6 +59,11 @@ export type CommentRow = {
     title: string;
     thumbnail_url: string;
     isbn13: string;
+    book_stats: {
+      view_count: number;
+      like_count: number;
+      comment_count: number;
+    }[];
   }[];
 };
 export type MyBookBase = {
@@ -56,6 +71,9 @@ export type MyBookBase = {
   title: string;
   cover: string;
   isbn13: string;
+  total_like_count: number;
+  total_view_count: number;
+  total_comment_count: number;
 };
 
 export type CommentBook = MyBookBase & {

@@ -8,14 +8,14 @@ import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 import { useMyBooks } from '@/hooks/mybooks/useMyBooks';
 import { useUserTags } from '@/hooks/bookmark/useUserTags';
 import { useMemo } from 'react';
-import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
 import CommentBooksList from './lists/CommentBooksList';
 import LikeBooksList from './lists/LikeBooksList';
 import BookmarkBooksList from './lists/BookmarkBooksList';
+import { useBookStats } from '@/hooks/book/useBookStats';
+import { useMyStatus } from '@/hooks/book/useMyStatus';
 
 const MyBooksSection = () => {
   const { query, setQuery } = useMypageQueryState();
-
   const { tab, page, sort, filter, search, searchField, tagId } = query;
 
   const { result, isPending, isError, error, refetch, isPlaceholderData } = useMyBooks(
@@ -36,7 +36,8 @@ const MyBooksSection = () => {
     return result?.data.map((item) => item.isbn13) ?? [];
   }, [result?.data]);
 
-  useFetchLikeCount(tab === 'like' ? isbnList : []);
+  useBookStats(tab === 'like' ? isbnList : []);
+  useMyStatus(isbnList);
   const { emptyStateTitle, emptyStateDescription } = getMyBooksEmptyMessage({
     tab,
     search,

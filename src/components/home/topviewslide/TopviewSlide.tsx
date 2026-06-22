@@ -5,7 +5,6 @@ import { CircleChevronLeft, CircleChevronRight, CircleSmall, Pause, Play } from 
 import Button from '@/components/common/ui/Button';
 import { SECOND } from '@/shared/constants/time';
 import { TopViewType } from '@/shared/domain/ranking/types';
-import { useFetchLikeCount } from '@/hooks/like/useFetchLikeCount';
 
 const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
   const [slideIndex, setSlideIndex] = useState(1);
@@ -15,12 +14,8 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
   const [dragOffset, setDragOffset] = useState(0);
 
   const slides = books.map((book, i) => ({ book, rank: i + 1 }));
-
   const cloneSlides = [slides[slides.length - 1], ...slides, slides[0]]; //클론해서 점프방식으로 슬라이드 구현
 
-  const topViewIsbns = books.map((book) => book.isbn13);
-
-  useFetchLikeCount(topViewIsbns);
   useEffect(() => {
     if (!isPlaying || books.length <= 1) return;
 

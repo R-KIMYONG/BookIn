@@ -9,7 +9,7 @@ import useUrlParams from './useUrlParams';
 
 // 도서 리스트 화면(홈 / 카테고리)에서 공통으로 사용하는 URL 키
 
-type SetOptions = { replace?: boolean; scroll?: boolean };
+type SetOptions = { replace?: boolean; scroll?: boolean; shallow?: boolean };
 
 type SetInput = {
   page?: number;
@@ -21,20 +21,22 @@ type SetInput = {
 
 type UseBookListUrlStateOptions = {
   defaultTarget?: TargetTypes;
+  defaultPage?: number;
+  defaultQueryType?: QueryType;
 };
 
 const useBookListUrlState = (options?: UseBookListUrlStateOptions) => {
   const fallbackTarget = options?.defaultTarget ?? DEFAULT_TARGET;
   const { getParams, getInt, setParams } = useUrlParams();
 
-  const page = getInt(APP_QUERY_KEYS.page, 1);
+  const page = getInt(APP_QUERY_KEYS.page, options?.defaultPage ?? 1);
   const searchKeyWord = (getParams(APP_QUERY_KEYS.searchKeyWord) ?? '').trim();
 
   const targetParam = (getParams(APP_QUERY_KEYS.target) ?? '').trim() as TargetTypes;
   const target: TargetTypes = TARGET_LIST.includes(targetParam) ? targetParam : fallbackTarget;
 
   const qtParam = (getParams(APP_QUERY_KEYS.queryType) ?? '').trim() as QueryType;
-  const queryType: QueryType = QUERY_TYPE_LIST.includes(qtParam) ? qtParam : DEFAULT_QT;
+  const queryType: QueryType = QUERY_TYPE_LIST.includes(qtParam) ? qtParam : (options?.defaultQueryType ?? DEFAULT_QT);
 
   const sqParam = (getParams(APP_QUERY_KEYS.searchQueryType) ?? '').trim() as SearchQueryType;
   const searchQueryType: SearchQueryType = SEARCH_QT_LIST.includes(sqParam) ? sqParam : DEFAULT_SEARCH_QT;
@@ -49,7 +51,7 @@ const useBookListUrlState = (options?: UseBookListUrlStateOptions) => {
 
     // 검색어 없으면 q / sq 모두 URL에서 제거
     const qOut = nextSearchKeyWord ? nextSearchKeyWord : null;
-    const sqOut = qOut ? nextSearchQuery : null;
+    const sqOut = nextSearchKeyWord !== DEFAULT_SEARCH_QT ? nextSearchQuery : null;
 
     // 필터/검색이 바뀌면 page 1로 리셋
     const shouldResetPage =

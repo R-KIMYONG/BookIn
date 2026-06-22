@@ -11,6 +11,7 @@ import dayjs from '@/shared/lib/date/dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { HOUR } from '@/shared/constants/time';
+import { getRecommendations } from '@/shared/lib/server/entities/getRecommendations';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -34,15 +35,12 @@ export const GET = async () => {
 
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 });
 
-  const { data, error } = await supabase
-    .from('user_recommendations')
-    .select('recommendations, taste_summary, created_at')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (error) return NextResponse.json({ error: '불러오기 실패' }, { status: 500 });
-
-  return NextResponse.json(data, { status: 200 });
+  try {
+    const data = await getRecommendations(user.id);
+    return NextResponse.json(data ?? null, { status: 200 });
+  } catch {
+    return NextResponse.json({ error: '불러오기 실패' }, { status: 500 });
+  }
 };
 
 export const POST = async () => {

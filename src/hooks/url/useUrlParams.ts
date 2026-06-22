@@ -28,7 +28,7 @@ const useUrlParams = () => {
 
   const setParams = (
     next: Record<string, string | number | null | undefined>,
-    options: SetOptions = { scroll: false, replace: false }
+    options: SetOptions = { scroll: false, replace: false, shallow: false }
   ) => {
     const params = new URLSearchParams(searchParams.toString());
     const nextArray = Object.entries(next); // [ [page,2],[target,'Book'],[target,'ebook'] ]이런형태로 변경

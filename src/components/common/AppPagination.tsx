@@ -12,7 +12,11 @@ type AppPaginationProps = {
   totalPages: number;
   onChange: (next: number) => void;
   disabled?: boolean;
+  isFetching?: boolean;
 };
+
+const leftMoveAnimation = 'transition-transform translate-x-0 group-hover:-translate-x-0.5 duration-300';
+const rightMoveAnimation = 'transition-transform translate-x-0 group-hover:translate-x-0.5 duration-300';
 
 const clamp = (page: number, min: number, totalPages: number) => Math.min(totalPages, Math.max(min, page)); //1이상  총수 이하만 허용
 
@@ -22,17 +26,17 @@ const range = (start: number, end: number) => {
   return out;
 };
 
-const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationProps) => {
+const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: AppPaginationProps) => {
   //page=현재페이지를 나타남, totalPages=총페이지를 나타남, onChange=몇번페이지로 가라, disabled=비활성화 여부
   const [error, setError] = useState<boolean>(false);
   const safePage = clamp(page, 1, totalPages);
   const visibleCount = 3;
 
   useEffect(() => {
-    if (totalPages > 0 && page > totalPages) {
+    if (!isFetching && totalPages > 0 && page > totalPages) {
       onChange(totalPages);
     }
-  }, [page, totalPages, onChange]);
+  }, [page, totalPages, onChange, isFetching]);
 
   const blockStart = Math.max(1, Math.min(safePage - Math.floor(visibleCount / 2), totalPages - (visibleCount - 1)));
   const blockEnd = Math.min(totalPages, blockStart + (visibleCount - 1));
@@ -58,12 +62,23 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
       <div className="w-full flex flex-col items-center gap-3">
         <div className="px-4 flex items-center gap-2">
           <div className="flex items-center gap-1 shrink-0">
-            <Button variant="secondary" size="sm" onClick={prev10} disabled={disabled || !canPrev}>
-              <ChevronsLeft className="w-4 h-4" />
-            </Button>
-            <Button variant="secondary" size="sm" onClick={prev} disabled={disabled || !canPrev}>
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={prev10}
+              disabled={disabled || !canPrev}
+              className="group"
+              label={<ChevronsLeft className={`w-4 h-4 ${leftMoveAnimation}`} />}
+            />
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={prev}
+              disabled={disabled || !canPrev}
+              className="group"
+              label={<ChevronLeft className={`w-4 h-4 ${leftMoveAnimation}`} />}
+            />
           </div>
           <div className="flex flex-nowrap">
             <div className="inline-flex gap-1 px-1">
@@ -86,12 +101,23 @@ const AppPagination = ({ page, totalPages, onChange, disabled }: AppPaginationPr
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <Button variant="secondary" size="sm" onClick={next} disabled={disabled || !canNext}>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-            <Button variant="secondary" size="sm" onClick={next10} disabled={disabled || !canNext}>
-              <ChevronsRight className="w-4 h-4" />
-            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={next}
+              disabled={disabled || !canNext}
+              className="group"
+              label={<ChevronRight className={`w-4 h-4 ${rightMoveAnimation}`} />}
+            />
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={next10}
+              disabled={disabled || !canNext}
+              className="group"
+              label={<ChevronsRight className={`w-4 h-4 ${rightMoveAnimation}`} />}
+            />
           </div>
         </div>
         <form

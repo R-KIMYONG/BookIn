@@ -10,10 +10,10 @@ export type Book = {
   query: string;
   searchCategoryId: number;
   searchCategoryName: string;
-  item: Item[];
+  item: AladinBookInfo[];
 };
 
-export type Item = {
+export type AladinBookInfo = {
   title: string;
   link: string;
   author: string;
@@ -40,4 +40,4 @@ export type Item = {
   subInfo: object;
 };
 
-export type SearchResult = Pick<Book, 'item' | 'totalResults'| 'itemsPerPage'>;
+export type SearchResult = Pick<Book, 'item' | 'totalResults' | 'itemsPerPage'>;

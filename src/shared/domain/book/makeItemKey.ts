@@ -1,6 +1,6 @@
-import { Item } from '@/shared/types/api';
+import { AladinBookInfo } from '@/shared/types/api';
 
-export const makeItemKey = (it: Item, index: number) => {
+export const makeItemKey = (it: AladinBookInfo, index: number) => {
   const base =
     it.isbn13?.trim() ||
     it.isbn?.trim() ||

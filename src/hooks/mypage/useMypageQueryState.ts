@@ -65,7 +65,7 @@ export const useMypageQueryState = () => {
         next.page = 1;
       }
 
-      setParams(buildParams(next), { replace: true });
+      setParams(buildParams(next), { shallow: true });
     },
     [getAllParams, setParams]
   );

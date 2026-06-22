@@ -37,19 +37,17 @@ const Home = async ({
 
   const queryClient = new QueryClient();
 
-  const topBooks = await getTopViewBooks();
-  queryClient.setQueryData(rankingKeys.topViewBooks(TOP_VIEW_LIMIT), topBooks);
-
-  const rankingBooks = await getRankedBooks();
-  queryClient.setQueryData(rankingKeys.topRankingBooks(), rankingBooks);
-
+  const [listData, rankingBooks, topBooks] = await Promise.all([
+    getAladinList({ queryType, page, target }),
+    getRankedBooks(),
+    getTopViewBooks(),
+  ]);
   const topIsbnList = topBooks.map((b) => b.isbn13);
-
-  const listData = await getAladinList({ queryType, page, target });
-
+  queryClient.setQueryData(rankingKeys.topRankingBooks(), rankingBooks);
+  queryClient.setQueryData(rankingKeys.topViewBooks(TOP_VIEW_LIMIT), topBooks);
   queryClient.setQueryData(aladinKeys.list({ queryType, page, target }), listData);
 
-  const isbnList = (listData?.items ?? []).map((item) => item.isbn13);
+  const isbnList = (listData?.items ?? []).map((item) => item.isbn13).filter(Boolean);
 
   const allIsbns = [...new Set([...topIsbnList, ...isbnList])];
 
@@ -75,6 +73,10 @@ const Home = async ({
       });
     }
     queryClient.setQueryData(statsKeys.batch(isbnList), statsMap);
+    queryClient.setQueryData(
+      likeKeys.countBatch(isbnList),
+      isbnList.map((isbn) => ({ isbn13: isbn, liked_count: likeCounts[isbn] ?? 0 }))
+    );
     queryClient.setQueryData(recentbookKeys.list(), rencentBooks);
   }
   return (
@@ -82,7 +84,7 @@ const Home = async ({
       <HydrationBoundary state={dehydrate(queryClient)}>
         <TopSection />
         <RecentBooks />
-        <Category target={target} page={page} />
+        <Category target={target} />
       </HydrationBoundary>
     </main>
   );

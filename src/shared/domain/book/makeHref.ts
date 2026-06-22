@@ -1,6 +1,6 @@
-import { Item } from '@/shared/types/api';
+import { AladinBookInfo } from '@/shared/types/api';
 
-export const makeHref = (it: Item): string | undefined => {
+export const makeHref = (it: AladinBookInfo): string | undefined => {
   const isbn13 = it.isbn13?.trim();
   const isbn10 = it.isbn?.trim();
   const itemId = it.itemId;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import AuthToastHandler from '@/components/common/AuthToastHandler';
@@ -19,10 +19,13 @@ const QueryProvider = ({ children, initialUser }: QueryProviderProps) => {
   const [queryClient] = useState(() => new QueryClient());
 
   const [user, setUser] = useState<User | null>(initialUser);
-
+  useEffect(() => {
+    setUser((prev) => (prev?.id === initialUser?.id ? prev : initialUser));
+  }, [initialUser]);
+  const value = useMemo(() => ({ user, setUser }), [user]);
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ user, setUser }}>
+      <AuthContext.Provider value={value}>
         <AuthToastHandler />
         <AuthListener />
         {children}
