@@ -3,12 +3,12 @@ import 'server-only';
 import { MAX_RESULTS } from '@/shared/domain/aladin/constants';
 import { TargetTypes } from '@/shared/constants/category';
 import { QueryType } from '@/shared/domain/aladin/types';
+
 type GetAladinItemListArgs = {
   target: TargetTypes;
   queryType: QueryType;
   categoryId?: string;
   page: number;
-
 };
 
 export const getAladinItemList = async ({ target, queryType, categoryId, page }: GetAladinItemListArgs) => {
@@ -32,7 +32,7 @@ export const getAladinItemList = async ({ target, queryType, categoryId, page }:
 
   const url = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
 
-  const response = await fetch(url, { cache: 'no-store' });
+  const response = await fetch(url, { next: { revalidate: 3600 } });
   if (!response.ok) throw new Error(`Aladin API ${response.status}`);
 
   const data = await response.json();
