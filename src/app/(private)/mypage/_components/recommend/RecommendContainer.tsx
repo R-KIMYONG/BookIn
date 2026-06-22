@@ -86,7 +86,6 @@ const RecommendContainer = () => {
   if (isGenerating || !ringDone) {
     return <AnalyzingLoader isReady={!isGenerating} onComplete={() => setRingDone(true)} />;
   }
-  //TODO : 분석중 로딩을 현재 데이터 스테일 여부에 따라 렌더 & 그리고 해당 컨포넌트의 프로그레스바가 완료해야 결과 보이기
   if ('coldStart' in recommendData) {
     return (
       <EmptyState
