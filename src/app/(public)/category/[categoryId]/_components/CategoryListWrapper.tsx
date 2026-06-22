@@ -1,6 +1,5 @@
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import { getAladinList } from '@/shared/lib/aladin/getAladinList.server';
-import { getLastPageServer } from '@/shared/lib/aladin/getLastPageServer';
 import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
 import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
 import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
@@ -25,13 +24,9 @@ type CategoryListWrapperProps = {
 const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreData }: CategoryListWrapperProps) => {
   const queryClient = new QueryClient();
 
-  const [listData, lastPageData] = await Promise.all([
-    getAladinList({ queryType, page, target, categoryId }),
-    getLastPageServer({ queryType, target, categoryId }),
-  ]);
+  const listData = await getAladinList({ queryType, page, target, categoryId });
 
   queryClient.setQueryData(aladinKeys.list({ queryType, page, target, categoryId }), listData);
-  queryClient.setQueryData(aladinKeys.lastPage({ queryType, target, categoryId }), lastPageData);
 
   const isbnList = (listData?.items ?? []).map((item) => item.isbn13);
 
