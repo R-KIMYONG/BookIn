@@ -44,16 +44,14 @@ const CategoryList = ({
   } = useBookListData({ target, categoryId, initialQueryType, initialPage, initialList });
 
   const errorSlot = (
-    <section className="max-w-7xl m-auto mt-10 px-10">
-      <div className="border rounded-xl p-6">
-        <p className="font-semibold">문제가 발생했어요</p>
-        <p className="text-sm text-gray-600 mt-2">{error?.message ?? '알 수 없는 오류'}</p>
-        <div className="mt-4 flex gap-2">
-          <Button size="sm" variant="secondary" label="홈으로" onClick={() => router.push('/')} />
-          <Button size="sm" variant="primary" label="다시 시도" onClick={() => refetch()} />
-        </div>
+    <div className="border rounded-xl p-6 mt-10">
+      <p className="font-semibold">문제가 발생했어요</p>
+      <p className="text-sm text-gray-600 mt-2">{error?.message ?? '알 수 없는 오류'}</p>
+      <div className="mt-4 flex gap-2">
+        <Button size="sm" variant="secondary" label="홈으로" onClick={() => router.push('/')} />
+        <Button size="sm" variant="primary" label="다시 시도" onClick={() => refetch()} />
       </div>
-    </section>
+    </div>
   );
 
   const targetLabel = HEADER_GROUPS.find((g) => g.key === target)?.label ?? '전체';
