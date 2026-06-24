@@ -47,29 +47,29 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
 
   const page = Number(rawSearchParams.page ?? 1);
   return (
-    <section className="max-w-7xl m-auto mt-6 flex flex-col px-10 gap-4">
-      <CategoryHeader
-        categoryId={categoryId}
-        koreanGenres={genres.koGenres}
-        foreignGenres={genres.foGenres}
-        ebookGenres={genres.ebGenres}
-        target={target}
-      />
+    <main className="px-1 sm:px-6 md:px-10 flex-1">
+      <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
+        <CategoryHeader
+          categoryId={categoryId}
+          koreanGenres={genres.koGenres}
+          foreignGenres={genres.foGenres}
+          ebookGenres={genres.ebGenres}
+          target={target}
+        />
 
-      <div className="w-full flex-1">
-        <Suspense key={`${categoryId}-${queryType}-${target}`} fallback={<SkeletonGrid count={20} />}>
-          <CategoryListWrapper
-            categoryId={categoryId}
-            queryType={queryType}
-            target={target}
-            page={page}
-            genreData={genreData}
-          />
-        </Suspense>
-      </div>
-
-      
-    </section>
+        <div className="w-full flex-1">
+          <Suspense key={`${categoryId}-${queryType}-${target}`} fallback={<SkeletonGrid count={20} />}>
+            <CategoryListWrapper
+              categoryId={categoryId}
+              queryType={queryType}
+              target={target}
+              page={page}
+              genreData={genreData}
+            />
+          </Suspense>
+        </div>
+      </section>
+    </main>
   );
 };
 

@@ -43,7 +43,11 @@ const useUrlParams = () => {
     const url = `${pathname}?${query}`; //현재pathname을 기초로 새로운URL을 만든다 즉 반복문으로 set하거나 delte한 최신버전의 url로 업데이트
 
     if (options.shallow) {
-      window.history.replaceState(null, '', url);
+      // 서버를 거치지 않는 클라 네비. 기본은 pushState로 히스토리를 쌓아
+      // 뒤로/앞으로가 동작하게 한다. (Next 14.1+는 history API를 useSearchParams와 동기화)
+      // 히스토리를 남기고 싶지 않을 때만 replace: true로 replaceState 사용.
+      if (options.replace) window.history.replaceState(null, '', url);
+      else window.history.pushState(null, '', url);
       return;
     }
     const nav = options.replace ? router.replace : router.push;
