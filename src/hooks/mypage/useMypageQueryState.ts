@@ -65,7 +65,10 @@ export const useMypageQueryState = () => {
         next.page = 1;
       }
 
-      setParams(buildParams(next), { shallow: true });
+      const isNavChange =
+        partial.tab !== undefined || partial.section !== undefined || partial.page !== undefined;
+
+      setParams(buildParams(next), { shallow: true, replace: !isNavChange });
     },
     [getAllParams, setParams]
   );
