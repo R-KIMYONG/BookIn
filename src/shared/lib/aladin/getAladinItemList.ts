@@ -30,7 +30,7 @@ export const getAladinItemList = async ({ target, queryType, categoryId, page }:
 
   if (categoryId) params.set('CategoryId', categoryId);
 
-  const url = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
+  const url = `https://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
 
   const response = await fetch(url, { next: { revalidate: 3600 } });
   if (!response.ok) throw new Error(`Aladin API ${response.status}`);
