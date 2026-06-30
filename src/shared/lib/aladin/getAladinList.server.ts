@@ -21,9 +21,7 @@ export const getAladinList = async ({
 }: GetAladinListParams): Promise<PagedResult<AladinBookInfo>> => {
   const ttbKey = process.env.ALADIN_TTB_KEY;
 
-  if (!ttbKey) {
-    throw new Error('ALADIN_TTB_KEY is missing');
-  }
+  if (!ttbKey) throw new Error('ALADIN_TTB_KEY is missing');
 
   const params = buildBookListParams({ queryType, page, target, categoryId }, ALADIN_ITEMLIST_KEYS);
 
@@ -33,11 +31,11 @@ export const getAladinList = async ({
   params.set('Output', 'js');
   params.set('Version', '20131101');
 
-  const apiUrl = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
+  const apiUrl = `https://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
 
   const res = await fetch(apiUrl, {
     next: {
-      revalidate: 60,
+      revalidate: 3600,
     },
   });
 

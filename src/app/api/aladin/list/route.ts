@@ -4,6 +4,8 @@ import { QueryType } from '@/shared/domain/aladin/types';
 import { getAladinList } from '@/shared/lib/aladin/getAladinList.server';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
