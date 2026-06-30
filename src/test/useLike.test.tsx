@@ -8,23 +8,23 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useLike } from '@/hooks/like/useLike';
 import { LikeCache } from '@/shared/domain/like/types';
+import { likeKeys } from '@/shared/domain/like/queryKeys';
 
 const wrapperWith = (client: any) => {
   return ({ children }: { children: React.ReactNode }) =>
     React.createElement(QueryClientProvider, { client }, children);
 };
-vi.mock('@/hooks/useUser', () => {
+vi.mock('@/shared/context/AuthContext', () => {
   return {
-    default: () => ({
-      data: { id: 'user-1' }, // 로그인된 유저처럼
-      isLoading: false,
-      isError: false,
+    useAuth: () => ({
+      user: { id: 'user-1' }, // 로그인된 유저처럼
+      setUser: vi.fn(),
     }),
   };
 });
 
 describe('useLike', () => {
-  const bookInfo = { isbn13: 'X', title: 't', cover: 'c', author: 'a' };
+  const bookInfo = { isbn13: 'X', title: 't', cover: 'c', author: 'a', categoryId: 0, categoryName: '' };
 
   it('서버 에러면 optimistic을 rollback 한다', async () => {
     // 이번 테스트만 POST 실패하도록
@@ -35,8 +35,9 @@ describe('useLike', () => {
     );
 
     const queryClient = createTestQueryClient();
+    const detailKey = likeKeys.detail(bookInfo.isbn13);
 
-    queryClient.setQueryData<LikeCache>(['like', bookInfo.isbn13], {
+    queryClient.setQueryData<LikeCache>(detailKey, {
       isbn13: bookInfo.isbn13,
       liked: false,
       liked_count: 0,
@@ -47,8 +48,8 @@ describe('useLike', () => {
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
       if (event?.type !== 'updated') return;
       const q = event.query;
-      if (q.queryKey[0] === 'like' && q.queryKey[1] === bookInfo.isbn13) {
-        const v = queryClient.getQueryData<LikeCache>(['like', bookInfo.isbn13]);
+      if (JSON.stringify(q.queryKey) === JSON.stringify(detailKey)) {
+        const v = queryClient.getQueryData<LikeCache>(detailKey);
         if (v) seen.push(v);
       }
     });
@@ -68,7 +69,7 @@ describe('useLike', () => {
 
     // 최종적으로 rollback 되었는지
     await waitFor(() => {
-      const last = queryClient.getQueryData<LikeCache>(['like', bookInfo.isbn13]);
+      const last = queryClient.getQueryData<LikeCache>(detailKey);
       expect(last?.liked).toBe(false);
       expect(last?.liked_count).toBe(0);
     });

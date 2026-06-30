@@ -38,7 +38,7 @@ export const GET = async (request: NextRequest) => {
     Version: '20131101',
   });
 
-  const apiUrl = `http://www.aladin.co.kr/ttb/api/ItemSearch.aspx?${params.toString()}`;
+  const apiUrl = `https://www.aladin.co.kr/ttb/api/ItemSearch.aspx?${params.toString()}`;
 
   try {
     const response = await fetch(apiUrl, { cache: 'no-store' });
