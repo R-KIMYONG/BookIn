@@ -4,8 +4,8 @@ export const getRecommendations = async (userId: string) => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('user_recommendations')
-    .select('recommendations, taste_summary, created_at')
+    .from('user_recommendations_v2')
+    .select('*')
     .eq('user_id', userId)
     .maybeSingle();
 
