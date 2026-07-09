@@ -1,7 +1,7 @@
 import RecommendBookCard from './RecommendBookCard';
 import { RecommendBook } from '@/shared/domain/recommend/types';
 
-const MarqueeRow = ({ books = [], direction }: { books: RecommendBook[]; direction: 'left' | 'right' }) => {
+const MarqueeRow = ({ books, direction }: { books: RecommendBook[]; direction: 'left' | 'right' }) => {
   return (
     <div className="overflow-hidden">
       <div

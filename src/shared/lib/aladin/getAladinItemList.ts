@@ -9,9 +9,10 @@ type GetAladinItemListArgs = {
   queryType: QueryType;
   categoryId?: string;
   page: number;
+  maxResults?: number;
 };
 
-export const getAladinItemList = async ({ target, queryType, categoryId, page }: GetAladinItemListArgs) => {
+export const getAladinItemList = async ({ target, queryType, categoryId, page, maxResults }: GetAladinItemListArgs) => {
   //target : 'Book' | 'Foreign' | 'eBook' SerchTarget에필요함
   //queryType :  Bestseller' | 'ItemNewAll' | 'ItemNewSpecial' | 'BlogBest' |
   //categoryId : 예시)'12345'CategoryId에 넣을때 필요함 소분류고 문자열로옴
@@ -22,7 +23,7 @@ export const getAladinItemList = async ({ target, queryType, categoryId, page }:
     QueryType: queryType,
     SearchTarget: target,
     Start: String(page),
-    MaxResults: String(MAX_RESULTS),
+    MaxResults: String(maxResults ?? MAX_RESULTS),
     Cover: 'Big',
     Output: 'js',
     Version: '20131101',
