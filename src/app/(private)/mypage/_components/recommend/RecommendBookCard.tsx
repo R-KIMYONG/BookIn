@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { RecommendBook } from '@/shared/domain/recommend/types';
 
 const RecommendBookCard = ({ book }: { book: RecommendBook }) => {
-  const coverSrc = book.cover?.startsWith('http') ? book.cover : '/images/noImg.png';
+  const coverSrc = book.thumbnail_url?.startsWith('http') ? book.thumbnail_url : '/images/noImg.png';
   return (
     <Link href={`/${book.isbn13}?type=isbn13`} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden rounded-lg ring-1 ring-black/5 bg-gray-50">

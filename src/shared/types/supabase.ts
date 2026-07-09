@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      book_catalog: {
+        Row: {
+          author: string | null
+          category_id: number | null
+          category_name: string
+          created_at: string | null
+          description: string | null
+          embedding: string | null
+          id: string
+          isbn13: string | null
+          item_id: string
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          author?: string | null
+          category_id?: number | null
+          category_name: string
+          created_at?: string | null
+          description?: string | null
+          embedding?: string | null
+          id?: string
+          isbn13?: string | null
+          item_id: string
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          author?: string | null
+          category_id?: number | null
+          category_name?: string
+          created_at?: string | null
+          description?: string | null
+          embedding?: string | null
+          id?: string
+          isbn13?: string | null
+          item_id?: string
+          thumbnail_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       book_stats: {
         Row: {
           book_id: string
@@ -297,6 +339,21 @@ export type Database = {
           },
         ]
       }
+      keep_alive: {
+        Row: {
+          id: number
+          pinged_at: string | null
+        }
+        Insert: {
+          id: number
+          pinged_at?: string | null
+        }
+        Update: {
+          id?: number
+          pinged_at?: string | null
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           book_id: string
@@ -443,6 +500,38 @@ export type Database = {
           },
         ]
       }
+      user_recommendations_v2: {
+        Row: {
+          created_at: string | null
+          label: string | null
+          recommendations: Json
+          taste_summary: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          label?: string | null
+          recommendations: Json
+          taste_summary?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          label?: string | null
+          recommendations?: Json
+          taste_summary?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recommendations_v2_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar: string | null
@@ -505,6 +594,28 @@ export type Database = {
     }
     Functions: {
       delete_user: { Args: { user_id: string }; Returns: undefined }
+      match_book: {
+        Args: { match_count: number; query_embedding: string }
+        Returns: {
+          author: string
+          isbn13: string
+          item_id: string
+          similarity: number
+          thumbnail_url: string
+          title: string
+        }[]
+      }
+      match_book_for_user: {
+        Args: { match_count: number; p_user_id: string }
+        Returns: {
+          author: string
+          isbn13: string
+          item_id: string
+          similarity: number
+          thumbnail_url: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
