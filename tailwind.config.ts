@@ -1,7 +1,11 @@
 import type { Config } from 'tailwindcss';
+import personas from './src/data/personas.json';
+
+const personaColors = (personas as { color: string }[]).map((p) => p.color);
 
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  safelist: [...new Set(personaColors)],
 
   theme: {
     extend: {

@@ -1,6 +1,9 @@
 import 'server-only';
 import { createClient } from '../../supabase/server';
-export const getRecommendations = async (userId: string) => {
+import { Database } from '@/shared/types/supabase';
+
+type GetUserRecommendationV2Type = Database['public']['Tables']['user_recommendations_v2']['Row'];
+export const getRecommendations = async (userId: string): Promise<GetUserRecommendationV2Type> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase

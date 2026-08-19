@@ -2,7 +2,6 @@
 
 import { Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { is } from 'zod/v4/locales';
 
 const AI_ANALYSIS_STEPS = [
   { until: 50, label: 'AI가 취향을 분석하고 있어요…' },
@@ -11,8 +10,8 @@ const AI_ANALYSIS_STEPS = [
 ];
 
 type AnalyzingLoaderProps = {
-  isReady: boolean;
-  onComplete: () => void;
+  isReady?: boolean;
+  onComplete?: () => void;
 };
 
 const AnalyzingLoader = ({ isReady, onComplete }: AnalyzingLoaderProps) => {
@@ -42,7 +41,7 @@ const AnalyzingLoader = ({ isReady, onComplete }: AnalyzingLoaderProps) => {
   useEffect(() => {
     if (isReady && progress >= 100 && !completedRef.current) {
       completedRef.current = true;
-      const timer = setTimeout(onComplete, 300);
+      const timer = setTimeout(() => onComplete?.(), 300);
       return () => clearTimeout(timer);
     }
   }, [isReady, progress, onComplete]);
@@ -51,7 +50,7 @@ const AnalyzingLoader = ({ isReady, onComplete }: AnalyzingLoaderProps) => {
   const analysisStepComment = AI_ANALYSIS_STEPS.find((comment) => progress < comment.until)?.label;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-5 py-20">
+    <div className="flex flex-col items-center justify-center gap-5 py-10">
       <div className="relative h-32 w-32">
         <svg viewBox="0 0 120 120" className="h-32 w-32 -rotate-90">
           <circle r={R} cx="60" cy="60" stroke="#f0e7e7" strokeWidth="8" fill="none" />

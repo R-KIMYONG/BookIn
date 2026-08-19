@@ -1,0 +1,287 @@
+[
+  {
+    "id": "novel_master",
+    "icon": "BookOpen",
+    "color": "text-indigo-500",
+    "genre": "소설",
+    "title": "이야기 중독자",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "essay_master",
+    "icon": "Coffee",
+    "color": "text-amber-600",
+    "genre": "에세이",
+    "title": "감성 수집가",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "human_master",
+    "icon": "Brain",
+    "color": "text-violet-500",
+    "genre": "인문학",
+    "title": "사색가",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "self_master",
+    "icon": "TrendingUp",
+    "color": "text-emerald-500",
+    "genre": "자기계발",
+    "title": "성장 중독자",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "money_master",
+    "icon": "CircleDollarSign",
+    "color": "text-yellow-600",
+    "genre": "경제경영",
+    "title": "머니 헌터",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "comic_master",
+    "icon": "Sparkles",
+    "color": "text-pink-500",
+    "genre": "만화",
+    "title": "덕력 만렙",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "sci_master",
+    "icon": "FlaskConical",
+    "color": "text-cyan-500",
+    "genre": "과학",
+    "title": "호기심 천국",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "hist_master",
+    "icon": "Landmark",
+    "color": "text-stone-500",
+    "genre": "역사",
+    "title": "시간 여행자",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "travel_master",
+    "icon": "Plane",
+    "color": "text-sky-500",
+    "genre": "여행",
+    "title": "방랑자",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "cook_master",
+    "icon": "ChefHat",
+    "color": "text-orange-500",
+    "genre": "요리",
+    "title": "살림 장인",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "health_master",
+    "icon": "HeartPulse",
+    "color": "text-rose-500",
+    "genre": "건강",
+    "title": "웰빙 러버",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "art_master",
+    "icon": "Palette",
+    "color": "text-purple-500",
+    "genre": "예술",
+    "title": "감각파",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "kid_master",
+    "icon": "ToyBrick",
+    "color": "text-lime-600",
+    "genre": "어린이",
+    "title": "동심 지킴이",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "baby_master",
+    "icon": "Baby",
+    "color": "text-pink-400",
+    "genre": "유아",
+    "title": "그림책 요정",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "exam_master",
+    "icon": "Pencil",
+    "color": "text-slate-500",
+    "genre": "수험서",
+    "title": "합격 사냥꾼",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "social_master",
+    "icon": "Search",
+    "color": "text-teal-500",
+    "genre": "사회과학",
+    "title": "세상 관찰자",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "com_master",
+    "icon": "Code",
+    "color": "text-blue-500",
+    "genre": "컴퓨터",
+    "title": "코드 덕후",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "lang_master",
+    "icon": "Languages",
+    "color": "text-indigo-400",
+    "genre": "외국어",
+    "title": "언어 수집가",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "rel_master",
+    "icon": "Feather",
+    "color": "text-gray-500",
+    "genre": "종교",
+    "title": "구도자",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "parent_master",
+    "icon": "HeartHandshake",
+    "color": "text-rose-400",
+    "genre": "좋은부모",
+    "title": "육아 연구가",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "teen_master",
+    "icon": "Backpack",
+    "color": "text-green-500",
+    "genre": "청소년",
+    "title": "청춘 기록자",
+    "when": { "concentration": 0.5 }
+  },
+
+  {
+    "id": "novel_fan",
+    "icon": "BookText",
+    "color": "text-indigo-400",
+    "genre": "소설",
+    "title": "이야기 애호가",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "essay_fan",
+    "icon": "CloudSun",
+    "color": "text-amber-500",
+    "genre": "에세이",
+    "title": "잔잔러",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "human_fan",
+    "icon": "Lightbulb",
+    "color": "text-violet-400",
+    "genre": "인문학",
+    "title": "생각 산책자",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "self_fan",
+    "icon": "CheckCircle2",
+    "color": "text-emerald-400",
+    "genre": "자기계발",
+    "title": "자기관리러",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "comic_fan",
+    "icon": "Popcorn",
+    "color": "text-pink-400",
+    "genre": "만화",
+    "title": "가벼운 덕후",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "money_fan",
+    "icon": "BarChart3",
+    "color": "text-yellow-500",
+    "genre": "경제경영",
+    "title": "경제 관심러",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "sci_fan",
+    "icon": "Atom",
+    "color": "text-cyan-400",
+    "genre": "과학",
+    "title": "과학 호기심러",
+    "when": { "concentration": 0.3 }
+  },
+  {
+    "id": "kid_fan",
+    "icon": "Rabbit",
+    "color": "text-lime-500",
+    "genre": "어린이",
+    "title": "동화 애호가",
+    "when": { "concentration": 0.3 }
+  },
+
+  {
+    "id": "fanatic",
+    "icon": "Flame",
+    "color": "text-orange-600",
+    "title": "{dominant} 광",
+    "when": { "concentration": 0.7 }
+  },
+  {
+    "id": "onewell",
+    "icon": "Target",
+    "color": "text-red-500",
+    "title": "{dominant} 한 우물러",
+    "when": { "concentration": 0.5 }
+  },
+  {
+    "id": "favorite",
+    "icon": "Heart",
+    "color": "text-pink-500",
+    "title": "{dominant} 편애가",
+    "when": { "concentration": 0.3 }
+  },
+
+  {
+    "id": "omnivore",
+    "icon": "Rainbow",
+    "color": "text-fuchsia-500",
+    "title": "전방위 잡식가",
+    "when": { "variety": 12 }
+  },
+  { "id": "nomad", "icon": "Footprints", "color": "text-amber-500", "title": "장르 유목민", "when": { "variety": 8 } },
+  {
+    "id": "explorer",
+    "icon": "Compass",
+    "color": "text-cyan-600",
+    "title": "{dominant} 위주 탐험가",
+    "when": { "variety": 5 }
+  },
+  { "id": "scout", "icon": "Telescope", "color": "text-sky-600", "title": "취향 탐색자", "when": { "variety": 3 } },
+
+  {
+    "id": "library",
+    "icon": "Library",
+    "color": "text-indigo-600",
+    "title": "도서관 그 자체",
+    "when": { "total": 100 }
+  },
+  { "id": "heavy", "icon": "BookMarked", "color": "text-emerald-600", "title": "다독가", "when": { "total": 50 } },
+  { "id": "bookworm", "icon": "Bug", "color": "text-lime-500", "title": "책벌레", "when": { "total": 30 } },
+  { "id": "steady", "icon": "CalendarCheck", "color": "text-teal-600", "title": "꾸준러", "when": { "total": 15 } },
+
+  { "id": "sprout", "icon": "Sprout", "color": "text-emerald-400", "title": "취향 형성 중", "when": {} }
+]

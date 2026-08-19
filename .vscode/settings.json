@@ -8,5 +8,9 @@
   },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "js/ts.tsdk.path": "node_modules/typescript/lib"
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "commentTranslate.targetLanguage": "ko",
+  "commentTranslate.multiLineMerge": true,
+  "commentTranslate.browse.mode": "contrast",
+  "commentTranslate.source": "Google"
 }

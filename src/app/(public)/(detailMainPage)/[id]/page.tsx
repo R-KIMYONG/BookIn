@@ -40,7 +40,7 @@ const MainDetail = async ({
 
   const data = await getAladinDetail(id);
   const item: AladinItem = data?.item?.[0];
-  if (!item) return <EmptyState description="책 정보를 찾을 수 없습니다." />;
+  if (!item) throw new Error('책 정보를 찾을 수 없습니다.');
   const isbnKey = getBookKey(item);
   const bookId = await upsertBook({
     supabase,

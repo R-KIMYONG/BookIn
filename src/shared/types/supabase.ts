@@ -502,24 +502,33 @@ export type Database = {
       }
       user_recommendations_v2: {
         Row: {
-          created_at: string | null
+          anchor_cursor: number
           label: string | null
-          recommendations: Json
-          taste_summary: string | null
+          rails_created_at: string | null
+          reacted_count: number
+          recommendations: Json | null
+          taste_created_at: string | null
+          taste_summary: Json | null
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          anchor_cursor?: number
           label?: string | null
-          recommendations: Json
-          taste_summary?: string | null
+          rails_created_at?: string | null
+          reacted_count?: number
+          recommendations?: Json | null
+          taste_created_at?: string | null
+          taste_summary?: Json | null
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          anchor_cursor?: number
           label?: string | null
-          recommendations?: Json
-          taste_summary?: string | null
+          rails_created_at?: string | null
+          reacted_count?: number
+          recommendations?: Json | null
+          taste_created_at?: string | null
+          taste_summary?: Json | null
           user_id?: string
         }
         Relationships: [
@@ -545,6 +554,9 @@ export type Database = {
           password_reset_token_hash: string | null
           pending_email: string | null
           pending_email_expires_at: string | null
+          persona_at: string | null
+          persona_id: string | null
+          persona_title: string | null
         }
         Insert: {
           avatar?: string | null
@@ -558,6 +570,9 @@ export type Database = {
           password_reset_token_hash?: string | null
           pending_email?: string | null
           pending_email_expires_at?: string | null
+          persona_at?: string | null
+          persona_id?: string | null
+          persona_title?: string | null
         }
         Update: {
           avatar?: string | null
@@ -571,6 +586,9 @@ export type Database = {
           password_reset_token_hash?: string | null
           pending_email?: string | null
           pending_email_expires_at?: string | null
+          persona_at?: string | null
+          persona_id?: string | null
+          persona_title?: string | null
         }
         Relationships: []
       }
@@ -594,6 +612,33 @@ export type Database = {
     }
     Functions: {
       delete_user: { Args: { user_id: string }; Returns: undefined }
+      get_last_reacted_at: { Args: { p_user_id: string }; Returns: string }
+      get_reacted_count: { Args: { p_user_id: string }; Returns: number }
+      get_signal_mix: {
+        Args: { p_user_id: string }
+        Returns: {
+          bookmarks: number
+          comments: number
+          likes: number
+          views: number
+        }[]
+      }
+      get_taste_distribution: {
+        Args: { p_user_id: string }
+        Returns: {
+          cnt: number
+          genre: string
+        }[]
+      }
+      get_top_anchor: {
+        Args: { p_user_id: string }
+        Returns: {
+          category_id: number
+          category_name: string
+          isbn13: string
+          title: string
+        }[]
+      }
       match_book: {
         Args: { match_count: number; query_embedding: string }
         Returns: {
@@ -606,9 +651,15 @@ export type Database = {
         }[]
       }
       match_book_for_user: {
-        Args: { match_count: number; p_user_id: string }
+        Args: {
+          match_count?: number
+          p_anchor_isbn13?: string
+          p_user_id: string
+        }
         Returns: {
           author: string
+          category_id: number
+          category_name: string
           isbn13: string
           item_id: string
           similarity: number

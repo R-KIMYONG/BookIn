@@ -7,6 +7,7 @@ import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { useAuth } from '@/shared/context/AuthContext';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
 export const useLike = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
   const queryKey = likeKeys.detail(bookInfo.isbn13);
@@ -43,6 +44,7 @@ export const useLike = (bookInfo: BookInfo) => {
         liked: fresh.liked,
         liked_count: fresh.liked_count ?? old?.liked_count ?? 0,
       }));
+      queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
     },
     onError: (_err, _vars, context) => {
       if (context?.prev) {
