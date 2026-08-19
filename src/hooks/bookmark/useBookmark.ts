@@ -7,6 +7,7 @@ import { BookInfo } from '@/shared/types/bookInfo';
 import { useAuth } from '@/shared/context/AuthContext';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
 
 export const useBookmark = (bookInfo: BookInfo) => {
   const queryClient = useQueryClient();
@@ -44,6 +45,7 @@ export const useBookmark = (bookInfo: BookInfo) => {
       queryClient.setQueryData(bookmarkKeys.detail(isbn13), fresh);
 
       queryClient.invalidateQueries({ queryKey: bookmarkKeys.all });
+      queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
     },
     onError: (_err, _vars, context) => {
       console.error('[bookmark][mutation-error]', { _err, context });

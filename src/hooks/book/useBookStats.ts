@@ -3,7 +3,7 @@ import { statsKeys } from '@/shared/domain/book/queryKeys';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-type StatsRow = { view_count: number; comment_count: number; like_count: number };
+export type StatsRow = { view_count: number; comment_count: number; like_count: number };
 
 export const useBookStats = (isbnList: string[]) => {
   const queryClient = useQueryClient();

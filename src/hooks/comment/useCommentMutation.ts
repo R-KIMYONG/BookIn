@@ -2,6 +2,7 @@ import { commentKeys } from '@/shared/domain/comment/queryKeys';
 import { CommentListResult, SubmitItem } from '@/shared/domain/comment/types';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
 import { rankingKeys } from '@/shared/domain/ranking/queryKeys';
+import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
 import { createComment } from '@/shared/lib/comment/createComment';
 import { deleteComment } from '@/shared/lib/comment/deleteComment';
 import { updateComment } from '@/shared/lib/comment/updateComment';
@@ -16,6 +17,7 @@ export const useCommentMutation = (bookId: string, userId?: string | null) => {
       queryClient.invalidateQueries({ queryKey: commentKeys.byUser(userId) });
       queryClient.invalidateQueries({ queryKey: myBooksKeys.all });
       queryClient.invalidateQueries({ queryKey: rankingKeys.topViewBooks(5) });
+      queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
     }
   };
 

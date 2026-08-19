@@ -35,7 +35,7 @@ const useUrlParams = () => {
 
     for (const [key, value] of nextArray) {
       // [key,value]는 nextArray중의 각요소를 뜻함 [page,2]  / [target,'Book']이렇게해서 아래 if문에 진입
-      if (value === null || value === undefined || value === '') params.delete(key);
+      if (value === null || value === undefined || value === '' || value === 0) params.delete(key);
       else params.set(key, String(value));
       //최종목적은 URL에 없으면 지우고 있으면 설정하는거임
     }

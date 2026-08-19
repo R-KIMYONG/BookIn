@@ -25,7 +25,10 @@ export const upsertBookCatalog = async (
     };
   });
 
-  const { error } = await supabase.from('book_catalog').upsert(result, { onConflict: 'item_id' });
-
-  if (error) throw new Error(`book_catalog upsert 실패: ${error.message}`);
+  const CHUNK = 200;
+  for (let i = 0; i < result.length; i += CHUNK) {
+    const slice = result.slice(i, i + CHUNK);
+    const { error } = await supabase.from('book_catalog').upsert(slice, { onConflict: 'item_id' });
+    if (error) throw new Error(`book_catalog upsert 실패 (${i}~${i + slice.length}): ${error.message}`);
+  }
 };
