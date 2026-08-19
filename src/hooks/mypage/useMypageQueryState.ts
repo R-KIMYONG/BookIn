@@ -29,9 +29,9 @@ export const useMypageQueryState = () => {
 
       //section이 변경되면 리셋해야할것들
       if (partial.section !== undefined) {
-        next.tab = MYBOOKS_DEFAULT_TAB;
+        next.tab = MYBOOKS_DEFAULT_TAB;  //like: 좋아요가 기본탭
         next.search = '';
-        next.searchField = SEARCH_FIELD_DEFAULT[MYBOOKS_DEFAULT_TAB];
+        next.searchField = SEARCH_FIELD_DEFAULT[MYBOOKS_DEFAULT_TAB]; //title: 기본이 title로 지정
         next.sort = SORT_DEFAULT;
         next.filter = undefined;
         next.tagId = undefined;
@@ -65,8 +65,11 @@ export const useMypageQueryState = () => {
         next.page = 1;
       }
 
-      const isNavChange =
-        partial.tab !== undefined || partial.section !== undefined || partial.page !== undefined;
+      if (next.section === 'recommend') {
+        next.page = 0;
+      }
+
+      const isNavChange = partial.tab !== undefined || partial.section !== undefined || partial.page !== undefined;
 
       setParams(buildParams(next), { shallow: true, replace: !isNavChange });
     },

@@ -32,7 +32,6 @@ export const getAladinList = async ({
   params.set('Version', '20131101');
 
   const apiUrl = `https://www.aladin.co.kr/ttb/api/ItemList.aspx?${params.toString()}`;
-
   const res = await fetch(apiUrl, {
     next: {
       revalidate: 3600,
