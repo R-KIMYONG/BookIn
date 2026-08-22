@@ -42,3 +42,5 @@ export const SEARCH_QUERYTYPE_OPTION: Record<SearchQueryType, string> = {
   Author: '검색할 저자를 입력하세요',
   Publisher: '검색할 출판사를 입력하세요',
 };
+
+export const SEARCH_MAX_RESULTS  =50
