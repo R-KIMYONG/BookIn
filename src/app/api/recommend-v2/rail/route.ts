@@ -30,7 +30,8 @@ export const GET = async () => {
   const { data: currentCount } = await supabaseAdmin.rpc('get_reacted_count', { p_user_id: user.id });
 
   const stale =
-    currentCount !== data.reacted_count || (lastReacted && new Date(lastReacted) > new Date(data.rails_created_at));
+    currentCount !== data.reacted_count ||
+    (lastReacted && data.rails_created_at && new Date(lastReacted) > new Date(data.rails_created_at));
 
   if (stale) return NextResponse.json(null);
 

@@ -9,6 +9,7 @@ import { useAuth } from '@/shared/context/AuthContext';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
+import { LogOut } from 'lucide-react';
 
 const HeaderLogoutForm = () => {
   const pathname = usePathname();
@@ -33,7 +34,13 @@ const HeaderLogoutForm = () => {
   return (
     <form action={handleLogout}>
       <input type="hidden" name="next" value={pathname} />
-      <Button type="submit" variant="navbarDark" label="로그아웃" size="xs" className="w-full" />
+      <Button
+        type="submit"
+        variant="ghost"
+        label={<LogOut className="h-6 w-6" />}
+        size="xs"
+        className="w-full text-white/90 hover:text-white hover:bg-main"
+      />
     </form>
   );
 };

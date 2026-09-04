@@ -110,7 +110,7 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
       </div>
 
       {/* 네비게이션 바 */}
-      <div className="w-[350px] flex justify-between items-center mt-2">
+      <div className="w-full max-w-[350px] flex justify-between items-center mt-2">
         <div className="flex items-center gap-2">
           <Button
             size="xs"

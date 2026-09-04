@@ -11,6 +11,6 @@
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "commentTranslate.targetLanguage": "ko",
   "commentTranslate.multiLineMerge": true,
-  "commentTranslate.browse.mode": "contrast",
+  "commentTranslate.browse.mode": "inplace",
   "commentTranslate.source": "Google"
 }

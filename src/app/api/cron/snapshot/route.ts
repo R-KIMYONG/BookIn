@@ -2,14 +2,12 @@ import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (request: NextRequest) => {
-
   const auth = request.headers.get('authorization');
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
   const admin = createAdminClient();
-
 
   const todayKST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date());
 
@@ -24,14 +22,14 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json({ ok: true, message: 'no ranking data' });
   }
 
- 
-  const rows = ranking.map((book, i) => ({
-    snapshot_date: todayKST,
-    isbn13: book.isbn13,
-    rank: i + 1,
-    score: book.score,
-  }));
-
+  const rows = ranking
+    .filter((book) => book.isbn13 !== null)
+    .map((book, i) => ({
+      snapshot_date: todayKST,
+      isbn13: book.isbn13!,
+      rank: i + 1,
+      score: book.score ?? 0,
+    }));
 
   const { error: upsertErr } = await admin
     .from('ranking_snapshots')
