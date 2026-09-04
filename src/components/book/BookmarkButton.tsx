@@ -54,13 +54,16 @@ const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
       size="sm"
       aria-label="북마크"
       className={`${style} !bg-black/50 !backdrop-blur-sm !rounded-full !transition-all !duration-200 !ease-out
-              hover:!bg-black/70`}
+              hover:!bg-black/70 !p-2`}
       disabled={isLoading}
     >
       {bookmarked ? (
-        <BookmarkCheck className="w-4 h-4 text-yellow-400" />
+        <BookmarkCheck strokeWidth={2} className="w-3 h-3 text-yellow-400" />
       ) : (
-        <Bookmark className="w-4 h-4 text-gray-300 transition-colors duration-200 hover:text-yellow-300" />
+        <Bookmark
+          strokeWidth={2}
+          className="w-3 h-3 text-white transition-colors duration-200 hover:text-yellow-300"
+        />
       )}
     </Button>
   );

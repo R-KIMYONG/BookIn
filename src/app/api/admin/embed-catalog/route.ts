@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export const POST = async () => {
   // 1. supabase.from('book_catalog').select()  — 조회 (함수 호출)
-  // 2. fetch(embedURL, { method:'POST', body: {texts} })  — embed 함수 호출
+  // 2. supabase.functions.invoke('embed', { body: {texts} })  — embed 함수 호출
   // 3. supabase.from('book_catalog').update()  — 저장 (함수 호출)
 
   const supabase = createAdminClient();
@@ -27,28 +27,12 @@ export const POST = async () => {
     if (rows.length === 0) break;
 
     const texts = rows.map((b) => `${b.title} ${b.author} ${b.category_name} ${(b.description ?? '').slice(0,150)}`);
-    const embeddingResponse = await fetch('https://vshtzcektgnzzfgtstdy.supabase.co/functions/v1/embed', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-      body: JSON.stringify({ texts }),
+    const { data: embeddings, error: embedError } = await supabase.functions.invoke('embed', {
+      body: { texts },
     });
 
-    let embeddings;
-    try {
-      embeddings = await embeddingResponse.json();
-    } catch (error) {
-      console.error(`${loop}바퀴 JSON 파싱 실패, 재시도`);
-      failCount++;
-      if (failCount > 20) return NextResponse.json({ ok: false, message: '연속 실패 과다' }, { status: 500 });
-      await sleep(2000);
-      loop--;
-      continue;
-    }
-
-    if (!Array.isArray(embeddings) || embeddings.length !== rows.length) {
+    if (embedError || !Array.isArray(embeddings) || embeddings.length !== rows.length) {
+      console.error(`${loop}바퀴 embed 실패, 재시도`, embedError?.message);
       failCount++;
       if (failCount > 20) return NextResponse.json({ ok: false, message: '연속 실패 과다' }, { status: 500 });
       await sleep(2000);

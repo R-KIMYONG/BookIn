@@ -12,6 +12,8 @@ import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmark
 import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
 import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import SearchResultContainer from './_components/SearchResultContainer';
+import SearchOptionView from './_components/SearchOptionView';
 
 const searchPage = async ({
   searchParams,
@@ -74,9 +76,17 @@ const searchPage = async ({
       itemListSet.map((isbn) => ({ isbn13: isbn, liked_count: likeCounts[isbn] ?? 0 }))
     );
   }
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div>page</div>
+      <SearchOptionView keyword={keyword} target={target} searchQueryType={searchQueryType} categoryId={categoryId} />
+      <SearchResultContainer
+        keyword={keyword}
+        target={target}
+        searchQueryType={searchQueryType}
+        categoryId={categoryId}
+        page={page}
+      />
     </HydrationBoundary>
   );
 };

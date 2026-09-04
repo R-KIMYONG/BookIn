@@ -2,8 +2,11 @@ import HeaderLogo from './HeaderLogo';
 import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/shared/lib/supabase/server';
-import HeaderCategoriesServer from './HeaderCategoriesSever';
 import { SESSION_EXPIRES_AT } from '@/shared/domain/auth/constants';
+import SearchBarContainer from './SearchBarContainer';
+import CategoryDrawer from './CategoryDrawer';
+import { HeaderTopBar } from './HeaderTopBar';
+import HeaderDiggingMenu from './HeaderDiggingMenu';
 
 const Header = async () => {
   const cookieStore = await cookies();
@@ -18,26 +21,25 @@ const Header = async () => {
 
   const isLoggedIn = !!user;
   return (
-    <header className="w-full bg-main sticky top-0 z-50 backdrop-blur">
-      {/* 데스크탑버전에서 보이는 버전 */}
-      <div className="border-b border-white/10">
-        <nav className="relative flex h-12 items-center px-4 md:px-10">
-          <div className="hidden md:block">
-            <HeaderCategoriesServer />
-          </div>
-          <div className="absolute left-1/2 -translate-x-1/2">
-            <HeaderLogo />
-          </div>
-          <div className="ml-auto flex items-center gap-2 text-xs text-white/90">
-            <HeaderAuth isLoggedIn={isLoggedIn} tempSessionExpiresAt={tempSessionExpiresAt} />
-          </div>
-        </nav>
+    <HeaderTopBar>
+      {/* 1단 */}
+      <div className="flex h-12 items-center px-4 md:px-10">
+        <HeaderLogo />
+        <div className="ml-auto flex items-center gap-2 text-xs text-white/90">
+          <HeaderAuth isLoggedIn={isLoggedIn} tempSessionExpiresAt={tempSessionExpiresAt} />
+        </div>
       </div>
-      {/* 모바일에서 두줄케이스 */}
-      <div className="block border-t border-white/10 px-4 py-4 md:hidden">
-        <HeaderCategoriesServer />
+
+      {/* 2단 */}
+      <div className="flex h-12 items-center gap-3 border-t border-white/10 px-4 md:gap-6 md:px-10">
+        <CategoryDrawer />
+
+        <HeaderDiggingMenu />
+        <div className="min-w-0 flex-1 sm:max-w-72">
+          <SearchBarContainer />
+        </div>
       </div>
-    </header>
+    </HeaderTopBar>
   );
 };
 

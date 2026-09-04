@@ -43,4 +43,10 @@ export const SEARCH_QUERYTYPE_OPTION: Record<SearchQueryType, string> = {
   Publisher: '검색할 출판사를 입력하세요',
 };
 
-export const SEARCH_MAX_RESULTS  =50
+export const SEARCH_MAX_RESULTS = 50;
+
+export const RANGE = [
+  { v: 'Book' as const, label: '국내' },
+  { v: 'Foreign' as const, label: '외국' },
+  { v: 'eBook' as const, label: 'eBook' },
+];

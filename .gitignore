@@ -41,3 +41,5 @@ package-lock.json
 echo "" >> .gitignore
 echo "# bundle analyzer output" >> .gitignore
 echo "/analyze/" >> .gitignore
+
+.claude/

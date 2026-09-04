@@ -1,6 +1,5 @@
 'use client';
 import QueryTypeTabs from '../common/filters/QueryTypeTabs';
-import SearchBar from '../common/filters/SearchBar';
 import { TargetTypes } from '@/shared/constants/category';
 import { useBookListData } from '@/hooks/book/useBookListData';
 import Button from '../common/ui/Button';
@@ -57,27 +56,6 @@ const Category = ({ target }: CategoryProps) => {
             onChange={(k) => setListUrl({ queryType: k, searchKeyWord: null }, { shallow: true })}
             disable={isSearching}
           />
-        </div>
-
-        <div className="flex flex-col items-start md:items-end gap-1">
-          <SearchBar
-            value={searchKeyWord}
-            isSearching={isFetching}
-            searchQueryType={searchQueryType}
-            onSubmit={(keyword) => setListUrl({ searchKeyWord: keyword, page: 1 })}
-            onReset={() => setListUrl({ searchKeyWord: null, page: 1 })}
-            onChangeSearchQueryType={(sq) => setListUrl({ searchQueryType: sq, page: 1 })}
-          />
-
-          {isSearching && (
-            <p className="text-[12px] text-gray-600 text-nowrap md:pr-4 box-border pl-2">
-              {isFetching
-                ? '검색중...'
-                : searchTotal > 0
-                  ? `검색결과 ${searchTotal.toLocaleString()}개`
-                  : '검색결과가 없습니다.'}
-            </p>
-          )}
         </div>
       </div>
       <BookListView

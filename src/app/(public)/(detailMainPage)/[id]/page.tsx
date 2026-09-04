@@ -31,6 +31,8 @@ const MainDetail = async ({
 }) => {
   const supabase = await createClient();
   const { id } = await params;
+  if (!id)
+    return <EmptyState title="책 정보를 찾을 수 없어요11" description="주소를 다시 확인해 주세요." className="p-10" />;
   const { commentPage } = await searchParams;
   const page = Math.max(1, Number(commentPage ?? 1) || 1);
   const {
@@ -40,7 +42,15 @@ const MainDetail = async ({
 
   const data = await getAladinDetail(id);
   const item: AladinItem = data?.item?.[0];
-  if (!item) throw new Error('책 정보를 찾을 수 없습니다.');
+  if (!item) {
+    return (
+      <EmptyState
+        title="책 정보를 찾을 수 없어요"
+        description="삭제되었거나 잘못된 링크일 수 있어요."
+        className="py-10"
+      />
+    );
+  }
   const isbnKey = getBookKey(item);
   const bookId = await upsertBook({
     supabase,

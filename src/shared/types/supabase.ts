@@ -640,9 +640,15 @@ export type Database = {
         }[]
       }
       match_book: {
-        Args: { match_count: number; query_embedding: string }
+        Args: {
+          categories?: string[]
+          match_count: number
+          query_embedding: string
+        }
         Returns: {
           author: string
+          category_id: number
+          category_name: string
           isbn13: string
           item_id: string
           similarity: number

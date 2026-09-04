@@ -8,6 +8,8 @@ import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from '@/shared/providers/QueryProvider';
 import GlobalOverlays from './GlobalOverlays';
 import { Noto_Sans_KR, Noto_Sans_JP, Noto_Sans_SC } from 'next/font/google';
+import { Poppins } from 'next/font/google';
+const poppins = Poppins({ subsets: ['latin'], weight: ['600'], variable: '--font-poppins' });
 
 const notoSansKR = Noto_Sans_KR({
   weight: ['400', '500', '700'],
@@ -39,9 +41,6 @@ export const metadata: Metadata = {
     template: '%s | BookIn',
   },
   description: '책 추천 및 기록 서비스',
-  icons: {
-    icon: '/projectbookin.ico',
-  },
   openGraph: {
     title: 'BookIn',
     description: '책 추천 및 기록 서비스',
@@ -70,7 +69,10 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="ko" className={`${notoSansKR.variable} ${notoSansJP.variable} ${notoSansSC.variable}`}>
+    <html
+      lang="ko"
+      className={`${notoSansKR.variable} ${notoSansJP.variable} ${notoSansSC.variable} ${poppins.variable}`}
+    >
       <body>
         <QueryProvider initialUser={user}>
           <GlobalOverlays />

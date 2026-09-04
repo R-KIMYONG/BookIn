@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
 import { DropdownProps } from './types';
 
-const Dropdown = <T,>({ trigger, items, onSelect, align, variant = 'primary' }: DropdownProps<T>) => {
+const Dropdown = <T,>({ trigger, items, onSelect, align, variant = 'primary', menuClassName }: DropdownProps<T>) => {
   const [open, setOpen] = useState<boolean>(false);
   const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -64,6 +64,7 @@ const Dropdown = <T,>({ trigger, items, onSelect, align, variant = 'primary' }: 
             absolute 
             top-full 
             ${positionClass} 
+            ${menuClassName ?? 'w-40'}
             py-2 
             w-40 
             max-h-60 
@@ -104,7 +105,7 @@ const Dropdown = <T,>({ trigger, items, onSelect, align, variant = 'primary' }: 
                   className={
                     item.renderType === 'button'
                       ? ' text-center py-2 w-full'
-                      : 'w-full justify-start text-left text-sm text-gray-800 hover:bg-gray-100'
+                      : 'w-full justify-start text-left text-sm text-gray-800 hover:bg-gray-100 whitespace-nowrap'
                   }
                 />
               </div>
