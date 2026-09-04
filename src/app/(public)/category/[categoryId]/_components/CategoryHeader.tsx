@@ -7,7 +7,6 @@ import QueryTypeTabs from '@/components/common/filters/QueryTypeTabs';
 import InvalidCategory from './InvalidCategory';
 import { Genre } from '@/shared/domain/category/types';
 import { classifyCategory } from '@/shared/domain/category/classifyCategory';
-import SearchBar from '@/components/common/filters/SearchBar';
 import { TargetTypes } from '@/shared/constants/category';
 import { useBookListData } from '@/hooks/book/useBookListData';
 
@@ -54,7 +53,7 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres, 
           target={target}
           disable={isPending}
         />
-        <div className="flex flex-col items-start md:items-end gap-1">
+        {/* <div className="flex flex-col items-start md:items-end gap-1">
           <SearchBar
             value={searchKeyWord}
             isSearching={isFetching}
@@ -73,7 +72,7 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres, 
                   : '검색결과가 없습니다.'}
             </p>
           )}
-        </div>
+        </div> */}
       </div>
 
       <nav

@@ -32,7 +32,7 @@ const TempSessionBadge = ({ remainingSec, countDownText, isExpired }: TempSessio
   }, [remainingSec]);
   return (
     <>
-      <span className="inline-flex items-center gap-1 text-xs text-black md:text-white/90 max-w-[110px] truncate">
+      <span className="inline-flex items-center gap-1 text-xs text-white md:text-white/90 max-w-[110px] truncate">
         <strong className="font-semibold">{countDownText ?? '--:--:--'}</strong>
         {isExpired ? <span className="text-red-200">(만료됨)</span> : null}
         <ExtendButton />

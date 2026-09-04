@@ -49,7 +49,7 @@ const TermsPage = () => {
   };
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] flex items-center justify-center px-4 overflow-hidden">
-      <div className="w-full max-w-[460px]">
+      <div className="w-full max-w-[460px] py-4">
         <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
           <form onSubmit={handleSubmit} className="p-6 sm:p-7">
             <div className="mb-6">
@@ -80,7 +80,7 @@ const TermsPage = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          className={`inline-flex whitespace-nowrap items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                             item.required ? 'bg-[#af5858]/10 text-[#af5858]' : 'bg-gray-100 text-gray-600'
                           }`}
                         >

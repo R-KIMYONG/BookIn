@@ -10,4 +10,5 @@ export type DropdownProps<T> = {
   onSelect: (value: T) => void;
   align?: 'left' | 'right';
   variant?: ButtonVariant;
+  menuClassName?: string;
 };

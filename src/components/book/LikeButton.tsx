@@ -37,16 +37,16 @@ const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
       leftIcon={
         <Heart
           className={cn(
-            'h-4 w-4 transition-colors duration-200',
-            liked ? 'fill-red-500 text-red-500' : 'text-gray-300 hover:text-red-400'
+            'h-3 w-3 transition-colors duration-200',
+            liked ? 'fill-red-500 text-red-500' : 'text-white-300 hover:text-red-400'
           )}
         />
       }
       label={formatCount(count)}
       disabled={isLoading}
-      className={`${style}  !bg-black/50 !backdrop-blur-sm text-white !rounded-full transition-all duration-200 ease-out hover:!bg-black/70`}
+      className={`${style}  !bg-black/50 !backdrop-blur-sm text-white !rounded-full transition-all duration-200 ease-out hover:!bg-black/70 !p-2`}
       variant="ghost"
-      size="sm"
+      size="xs"
     />
   );
 };

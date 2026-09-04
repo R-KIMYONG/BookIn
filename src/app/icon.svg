@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="BookIn">
+  <rect width="48" height="48" rx="12" fill="#AF5858"/>
+  <path d="M12 11H36A4 4 0 0 1 40 15V29A4 4 0 0 1 36 33H23L15 40V33H12A4 4 0 0 1 8 29V15A4 4 0 0 1 12 11Z" fill="#ffffff"/>
+  <g stroke="#AF5858" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M17.5 15.5V28"/>
+    <path d="M24 28V22Q24 18.5 28.25 18.5Q32.5 18.5 32.5 22V28"/>
+  </g>
+</svg>

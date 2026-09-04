@@ -30,7 +30,7 @@ export const DELETE = async (request: NextRequest) => {
   let query = admin.from('book_views').update({ hidden: true });
 
   if (user) query = query.eq('user_id', user.id);
-  else query = query.eq('device_key', deviceKey);
+  else if (deviceKey) query = query.eq('device_key', deviceKey);
 
   if (isbn13) query = query.eq('isbn13', isbn13);
 

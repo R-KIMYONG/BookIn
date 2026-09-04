@@ -1,19 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import Button from '@/components/common/ui/Button';
-import { ButtonVariant } from '@/components/common/ui/Button/type';
 import useCurrentUrl from '@/hooks/common/useCurrentUrl';
+import { CircleUser } from 'lucide-react';
 
-type LoginLinkProps = {
-  btnVariant?: ButtonVariant;
-};
-
-const LoginLink = ({ btnVariant }: LoginLinkProps) => {
+const LoginLink = () => {
   const currentUrl = useCurrentUrl();
   return (
     <Link href={`/login?redirectTo=${encodeURIComponent(currentUrl)}`}>
-      <Button variant={btnVariant ?? 'navbarLight'} label="로그인" size="xs" className="w-full" />
+      <CircleUser className="h-6 w-6 text-white" />
     </Link>
   );
 };
