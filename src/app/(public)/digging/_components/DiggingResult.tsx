@@ -47,7 +47,10 @@ const DiggingResult = ({ answers, handleRestart, handleEdit, isLoggedIn }: Diggi
       setBooks(data.DiggingBookList);
       saveTodayDigging(data.reader, data.DiggingBookList);
       if (!isLoggedIn) setUsedToday(true);
-      setViewCount(3)
+      setViewCount(3);
+    },
+    onError: (e) => {
+      console.error(e);
     },
   });
 

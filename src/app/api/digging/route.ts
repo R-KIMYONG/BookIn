@@ -1,12 +1,12 @@
 import { DIGGING_GENRES, DIGGING_SYSTEM_PROMPT } from '@/shared/domain/digging/constants';
 import { DiggingSchema } from '@/shared/domain/digging/schema';
-import { MatchBookType } from '@/shared/domain/digging/types';
 import { AI_MODEL } from '@/shared/domain/recommend/constants';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod.mjs';
-
 import { NextRequest, NextResponse } from 'next/server';
+
+export const maxDuration = 60;
 
 export const POST = async (res: NextRequest) => {
   const supabaseAdmin = createAdminClient();
@@ -47,9 +47,6 @@ export const POST = async (res: NextRequest) => {
     categories: validCategories.length > 0 ? validCategories : undefined,
   });
   if (error) return NextResponse.json({ error: '책 검색 실패' }, { status: 500 });
-
-  console.log(reader)
-  console.log(DiggingBookList)
 
   return NextResponse.json({ reader, DiggingBookList }, { status: 200 });
 };
