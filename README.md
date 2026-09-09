@@ -1,20 +1,65 @@
 # 📚 책 In (BookIn)
 
-> 도서 정보 탐색과 사용자 의견 공유를 한 곳에서 — 알라딘 OpenAPI 기반 도서 커뮤니티
+> 알라딘 OpenAPI 기반 도서 탐색·커뮤니티에 조회수·랭킹과 AI 개인화 추천을 결합한 풀스택 웹 서비스
 
 🔗 **Live**: [book-in-two.vercel.app](https://book-in-two.vercel.app/)
+
+![BookIn — 조회수 TOP5·랭킹·최근 본 책](docs/screenshots/home.gif)
+
+<details>
+<summary>📸 스크린샷 더보기</summary>
+
+<br/>
+
+|                AI 디깅                |        AI 추천 / 취향 리포트         |       상세(댓글·좋아요·북마크)       |
+| :-----------------------------------: | :----------------------------------: | :----------------------------------: |
+| ![디깅](docs/screenshots/digging.gif) | ![추천](docs/screenshots/mypage.gif) | ![상세](docs/screenshots/detail.gif) |
+
+</details>
+
 
 ---
 
 ## 프로젝트 소개
 
-- **한 줄 정리**: 알라딘 OpenAPI로 도서 정보를 제공하고, 사용자 간 댓글·좋아요·북마크를 통해 의견을 공유할 수 있는 도서 커뮤니티 웹사이트
-- **주요 가치**: 카테고리·베스트셀러·신간을 빠르게 탐색하고, 마음에 든 책에 태그/메모를 붙여 개인 서재로 관리
+책을 **찾고(탐색) → 반응하고(좋아요·북마크·댓글) → 추천받는(AI)** 과정을 한 곳에서 끝내는 도서 커뮤니티입니다. 흩어진 베스트셀러·신간·리뷰·"내가 본 책"을 한 서비스에 모아, 탐색부터 개인 서재 관리, 다음 책 추천까지 이어지도록 설계했습니다.
+
+- **탐색** - 카테고리, 베스트셀러, 신간 조회수 TOP, 종합 랭킹
+- **기록** - 좋아요,북마크(+메모,태그), 댓글로 나만의 서재
+- **추천** - AI 개인화 추천(임베딩 벡터검색) + 선택형 문답 디깅
 
 ## ⏳ 제작 기간
 
-- **MVP 개발**: 2024/07/08 ~ 2024/07/14 (팀 프로젝트)
-- **개인 리팩토링 및 기능 확장**: 2024/07 ~ 현재 진행 중
+- 팀 MVP: 2024.07.08 ~ 07.14 (1주, FE 5명)
+- 개인 리팩토링·기능 확장: 2026.03 ~ 현재
+
+---
+## 📑 주요 기능
+
+### 🏠 메인
+- 베스트셀러·신간 진열
+- **조회수 TOP5 무한 슬라이드** · **종합 랭킹보드**(가중합 점수, 전일 대비 ▲▼NEW)
+- **최근 본 책** · **조건별 검색**
+- SSR + TanStack Query prefetch로 초기 진입 최적화
+
+### 🔎 검색 / 카테고리
+- **검색어·조건 기반 도서 검색**(`/search`) — 헤더 자립 검색바에서 진입
+- 카테고리: QueryType(베스트셀러·신간·블로그베스트 등) / Target(국내·외서·eBook) 전환 + 페이지네이션
+
+### 📖 상세
+- 도서 정보(가격·표지·소개·구매 링크)
+- 댓글 CRUD(낙관적 업데이트) · 좋아요 · 북마크(+메모·태그)
+- 진입 시 최근 본 책 자동 기록
+
+### 🤖 AI 기능
+- **개인화 추천** — 좋아요·북마크 취향을 임베딩해 벡터 검색(pgvector)으로 유사 도서 추천
+- **AI 디깅** — 선택형 문답으로 취향을 파낸 뒤 임베딩 검색으로 책 추천 (비회원 하루 1회 → 회원가입 유도)
+- **취향 리포트** — 활동 데이터를 차트·persona로 시각화 + AI 한 줄 분석
+
+### 👤 마이페이지 / 인증
+- myBooks: 좋아요·북마크·댓글 탭별 **검색·정렬·필터** 통합
+- 계정 설정(별도 settings): 이메일(아이디)·비밀번호·닉네임·아바타 변경, 탈퇴
+- Supabase Auth 로그인/회원가입/이메일 인증 + **소셜 로그인** + 메일 토큰 기반 비밀번호 재설정
 
 ---
 
@@ -44,145 +89,45 @@
 <img src="https://img.shields.io/badge/Aladin%20OpenAPI-FF6F00?style=for-the-badge&logo=bookstack&logoColor=white" />
 </div>
 
+### AI / 추천
+
+<div align='left'>
+<img src="https://img.shields.io/badge/Anthropic%20Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white" />
+<img src="https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white" />
+</div>
+
+- **LLM**: Claude Haiku 4.5 — structured output(JSON 강제), 서버 라우트 전용(클라 번들 영향 0)
+- **임베딩·벡터검색**: gte-small(384차원) + pgvector(HNSW) — Supabase Edge Functions로 임베딩 생성
+- **검증**: Zod — AI 응답·폼 런타임 검증
+
 ### Editor / Utilities
 
 - **에디터**: Tiptap v3 (StarterKit + Placeholder)
 - **HTML sanitize**: DOMPurify, sanitize-html
 - **메일**: Nodemailer (비밀번호 재설정 / 이메일 인증)
 - **유틸**: dayjs, uuid, lucide-react
+- **빌드 분석**: @next/bundle-analyzer
 
 ### Test
 
 <div align='left'>
 <img src="https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" />
 <img src="https://img.shields.io/badge/MSW-FF6A33?style=for-the-badge&logo=mock-service-worker&logoColor=white" />
-<img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" />
 <img src="https://img.shields.io/badge/Testing%20Library-E33332?style=for-the-badge&logo=testing-library&logoColor=white" />
 </div>
 
 ---
 
-## 📑 주요 기능
-
-### 메인 페이지
-
-- 알라딘 OpenAPI 기반 베스트셀러 / 신간 / 추천도서 진열
-- **SSR 하이드레이션** 기반 초기 진입 최적화
-- 카테고리(국내·외서·eBook) 분류 진입
-
-### 카테고리 페이지
-
-- `Bestseller / ItemNewAll / ItemNewSpecial / BlogBest / ItemEditorChoice` 쿼리 타입 전환
-- `Book / Foreign / eBook` 타겟 전환
-- 페이지네이션 (알라딘 정책상 최대 50페이지)
-
-### 상세 페이지
-
-- 도서 정보 (가격·표지·소개·구매 링크)
-- **댓글** 조회 / 작성 / 수정 / 삭제 (낙관적 업데이트)
-- **좋아요** 기능 (낙관적 업데이트, 비로그인 사용자 안내)
-- **북마크** + 메모 + 태그 관리
-
-### 마이페이지
-
-- 내 책(myBooks): 북마크 / 댓글 / 좋아요한 책 통합 관리
-- **검색 / 정렬 / 필터** 통합 UI (탭 간 상태 일관성 유지)
-- 계정 설정: 아이디·비밀번호·닉네임·아바타 변경, 회원 탈퇴
-
-### 인증
-
-- Supabase Auth 기반 로그인 / 회원가입 / 이메일 인증
-- 비밀번호 재설정 (메일 토큰 발급 → 확인 → 변경)
-- 소셜 로그인 UI 컴포넌트
-
----
-
 ## 🔩 프로젝트 구조
 
-도메인 단위 모듈 구조로 정리되어 있으며, `app` 라우팅 / 재사용 `components` / 도메인 비즈니스 로직 `shared`로 책임을 분리했습니다.
+의존 방향을 한쪽으로만 흐르게 설계했습니다: **UI → 훅 → 도메인/어댑터** (역방향 없음). 비즈니스 규칙은 React·Next에 의존하지 않는 `shared/domain`에 격리해, 테스트·재사용이 프레임워크와 무관하도록 했습니다.
 
-```
-BookIn/
-├── public/                          # 정적 자산
-├── supabase/                        # supabase 마이그레이션 / config
-├── src/
-│   ├── app/                         # Next.js App Router
-│   │   ├── (auth)/                  # 로그인·회원가입·비밀번호 재설정·이메일 확인
-│   │   ├── (private)/               # 로그인 필요 — mypage, settings
-│   │   │   └── mypage/_components/  # MyBookSection·Header·Pagination·Sidebar
-│   │   ├── (public)/                # 비로그인 접근 가능
-│   │   │   ├── (detailMainPage)/    # 도서 상세 + Comment 컴포넌트
-│   │   │   ├── category/            # 카테고리 페이지 (검색 기능 추가 예정)
-│   │   │   ├── marketing/
-│   │   │   ├── terms/
-│   │   │   └── terms_of_use/
-│   │   ├── api/                     # Route Handlers
-│   │   │   ├── aladin/              #   list / search / last-page
-│   │   │   ├── auth/                #   callback / email-callback / password-reset
-│   │   │   ├── bookmark/            #   memo / tags
-│   │   │   ├── comment/
-│   │   │   ├── like/                #   count / user
-│   │   │   ├── mybooks/             #   bookmarks / comments / likes
-│   │   │   └── user/                #   avatar / email / me / nickname / password / tags
-│   │   ├── actions/                 # Server Actions
-│   │   ├── layout.tsx · page.tsx · providers
-│   │
-│   ├── components/                  # 재사용 UI 컴포넌트
-│   │   ├── book/
-│   │   ├── bookmark/
-│   │   ├── common/                  # ui (Button, Dropdown) / filters / SkeletonGrid
-│   │   ├── form/                    # PasswordFields 등
-│   │   ├── home/
-│   │   ├── icons/                   # 소셜 로그인 아이콘 포함
-│   │   ├── layout/                  # header / session
-│   │   ├── modal/
-│   │   └── session/
-│   │
-│   ├── hooks/                       # 도메인별 커스텀 훅
-│   │   ├── auth/ · book/ · bookmark/ · comment/
-│   │   ├── like/ · mybooks/ · mypage/
-│   │   ├── url/                     # URL 쿼리 동기화
-│   │   └── common/
-│   │
-│   ├── shared/
-│   │   ├── api/                     # 클라이언트 API 래퍼 (mybooks 등)
-│   │   ├── constants/               # category / search / pagination / auth / time …
-│   │   ├── context/                 # React Context
-│   │   ├── domain/                  # 도메인 비즈니스 로직
-│   │   │   ├── aladin/ · auth/ · book/ · bookmark/ · category/
-│   │   │   ├── comment/ · countdown/ · detail/ · like/
-│   │   │   ├── mybooks/ · mypage/ · search/ · session/
-│   │   │   ├── tag/ · terms/ · user/
-│   │   ├── lib/                     # 외부 의존 래퍼·헬퍼
-│   │   │   ├── aladin/ · auth/ · book/ · bookmark/ · comment/
-│   │   │   ├── crypto/ · date/ · like/ · mail/(+templates)
-│   │   │   ├── message/             # RESULT_CODE 기반 메시지 시스템
-│   │   │   ├── network/ · server/(entities, mybooks)
-│   │   │   ├── supabase/            # client / server / middleware
-│   │   │   └── toast/
-│   │   ├── providers/               # QueryClient 등 전역 Provider
-│   │   ├── types/
-│   │   └── utils/                   # navigation / security / validation
-│   │
-│   ├── stores/                      # Zustand 스토어
-│   ├── data/                        # 정적 JSON 데이터 (장르 등)
-│   ├── test/                        # 테스트 유틸 · msw 핸들러
-│   ├── __test__/                    # 단위 테스트
-│   └── middleware.ts                # Supabase 세션 미들웨어
-│
-├── next.config.mjs · tailwind.config.ts · tsconfig.json
-├── vitest.config.ts · vitest.setup.ts
-└── .env.local
-```
-
-### 폴더 분리 원칙
-
-- **`app/`** — 라우팅·페이지 셸·서버 컴포넌트 / Route Handler. 라우트별 종속 컴포넌트는 `_components/`에 둠
-- **`components/`** — 라우트와 무관하게 재사용 가능한 UI
-- **`hooks/`** — 도메인별 React 훅 (`useXxxQuery`, `useXxxMutation` 등 TanStack Query 통합)
-- **`shared/domain/`** — 비즈니스 규칙·도메인 모델 (UI/프레임워크 비의존)
-- **`shared/lib/`** — Supabase·메일·암호화 등 외부 시스템 어댑터
-- **`stores/`** — Zustand 전역 상태 (검색·필터·UI 상태 등)
+- **`app/`** — 라우팅·페이지 셸·서버 컴포넌트 / Route Handler (라우트별 종속 컴포넌트는 `_components/`)
+- **`components/`** — 라우트와 무관하게 재사용하는 UI
+- **`hooks/`** — 도메인별 React 훅 (`useXxxQuery` / `useXxxMutation` — TanStack Query 통합)
+- **`shared/domain/`** — 비즈니스 규칙·도메인 모델 (UI·프레임워크 비의존)
+- **`shared/lib/`** — Supabase·메일·암호화·**추천 레일(rails)** 등 외부 시스템 어댑터
+- **`stores/`** — Zustand 전역 상태 (검색·필터·UI)
 
 ---
 
@@ -191,16 +136,23 @@ BookIn/
 ### 환경 변수 (`.env.local`)
 
 ```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...      # publishable 키
+SUPABASE_SERVICE_ROLE_KEY=...          # secret 키 (RLS 우회, 서버 전용)
+
+# 외부 API
 ALADIN_TTB_KEY=...
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-# 메일 발송용
-SMTP_HOST=...
-SMTP_PORT=...
-SMTP_USER=...
-SMTP_PASS=...
+ANTHROPIC_API_KEY=...                  # AI 추천·디깅
+
+# 메일 (Nodemailer + 네이버 SMTP)
+NAVER_EMAIL=...
+NAVER_EMAIL_PASSWORD=...
+
+# 보안 · 운영
+IP_HASH_SECRET=...                     # 조회수 dedup HMAC
+CRON_SECRET=...                        # Vercel Cron(랭킹 스냅샷) 인증
+ADMIN_BUILD_TOKEN=...                  # 임베딩 색인 라우트 보호
 ```
 
 ### 스크립트
@@ -218,26 +170,11 @@ yarn genTypes     # supabase 스키마 → TypeScript 타입 생성
 
 ---
 
-## ⚡ 주요 리팩토링 / 개선 이력
-
-| 항목                           | 내용                                                               |
-| ------------------------------ | ------------------------------------------------------------------ |
-| **폰트 로딩 최적화**           | `next/font` 기반 CJK self-host 전환으로 CLS / LCP 개선             |
-| **SSR 하이드레이션 전면 적용** | 전체 페이지에 SSR + TanStack Query prefetch / dehydrate 패턴 통일  |
-| **메시지 시스템 통합**         | RESULT_CODE 기반 toast 메시지 구조 정리 — 클라/서버 동일 코드 사용 |
-| **폴더 구조 재정리**           | 도메인 단위 모듈 구조 (`shared/domain` · `shared/lib`)로 책임 분리 |
-| **myBooks 통합**               | 북마크·댓글·좋아요 탭 검색·정렬·필터 단일 상태로 통합              |
-| **댓글 / 좋아요 / 북마크**     | 낙관적 업데이트 + invalidation 전략 적용                           |
-| **이미지 최적화**              | `next/image` 일괄 전환으로 LCP 개선                                |
-
----
-
 ## 🧪 테스트 전략
 
-- **단위 / 통합**: Vitest + React Testing Library
-- **API mocking**: MSW (`src/test/msw`)
-- **E2E**: Playwright (검색·인증·도서 상세 등 핵심 플로우)
-- **타입 안전성**: Supabase 스키마 → TypeScript 타입 자동 생성 (`yarn genTypes`)
+- **단위 / 통합**: Vitest + React Testing Library — 훅·도메인 순수함수·컴포넌트·**API 라우트**까지 계층별 커버 (`__tests__/`)
+- **API 모킹**: MSW — 네트워크 의존 없이 훅/라우트 테스트
+- **타입 안전성**: Supabase 스키마 → TypeScript 타입 자동 생성(`yarn genTypes`)으로 DB-코드 불일치를 컴파일 타임에 차단
 
 ---
 
@@ -283,10 +220,59 @@ yarn genTypes     # supabase 스키마 → TypeScript 타입 생성
 
 </details>
 
+<details>
+<summary><b>6. 알라딘이 신뢰할 total을 안 줌 → 마지막 페이지 계산 시 배포 504</b></summary>
+
+- **원인**: 알라딘 `totalResults`가 부정확 + 경계 probe 순차 호출이 RSC에 묶여 배포 타임아웃
+- **조치**: 지수+이진 탐색으로 경계 확정(O(log n)), `unstable_cache` 캐싱, `maxDuration` 상향
+
+</details>
+
+<details>
+<summary><b>7. 배포에서만 느린 목록 탭 전환 / 페이지 이동</b></summary>
+
+- **원인**: 전환마다 무거운 RSC가 캐시 없이 재실행 + 엣지에서 알라딘 레이턴시 증폭
+- **조치**: shallow(`replaceState`) 임시 대응 → `useQuery` + `pushState` 히스토리 복원 + 인접 페이지 prefetch로 재설계
+
+</details>
+
+<details>
+<summary><b>8. AI 디깅 "책 찾기"가 배포에서 504 (로딩 후 결과 없음)</b></summary>
+
+- **원인**: Anthropic + embed + match_book 순차 처리가 Vercel 기본 10초 초과 → 함수 강제 종료
+- **조치**: 라우트에 `export const maxDuration = 60` 지정
+
+</details>
+
+<details>
+<summary><b>9. 카테고리 필터 벡터검색 시 결과가 텅 빔 (HNSW)</b></summary>
+
+- **원인**: HNSW가 근접 탐색을 먼저 하고 필터를 나중에 적용 → 앞 결과가 다 걸러지면 빈 결과
+- **조치**: 후보를 `materialized CTE`로 먼저 물질화한 뒤 그 안에서 검색
+
+</details>
+
+<details>
+<summary><b>10. AI 응답 zod 검증에서 500 (enum + 개수 제한)</b></summary>
+
+- **원인**: `z.array(z.enum(목록)).min(2).max(3)` — AI가 목록 밖 값을 주거나 개수(2~3)를 어기면 통째로 실패
+- **조치**: `z.array(z.string())`로 완화 + 라우트에서 화이트리스트 교집합, 하나도 없으면 전체 검색 폴백
+
+</details>
+
+<details>
+<summary><b>11. 디깅 진행상태가 날짜 지나도 안 지워짐</b></summary>
+
+- **원인**: 결과는 날짜 만료되는데 "풀던 문제"엔 날짜 가드가 없어 어제 문항이 복원됨
+- **조치**: 저장·복원 양쪽에 KST 날짜 확인 통일
+
+</details>
+
 ---
 
 ## 📌 진행 중 / 예정
 
-- [ ] 카테고리 페이지 검색 기능 (`feat/category-search`)
-- [ ] 알라딘 검색 API 통합 UI / URL 쿼리 동기화
-- [ ] 검색 결과 페이지네이션 / 정렬 옵션 확장
+- [ ] 관련 도서 추천 레일 (검색어·상세 기반, 공용 컴포넌트)
+- [ ] 카테고리 "새로운 발견" 레일 (현재 카테고리 제외 추천)
+- [ ] E2E 테스트 도입 (Playwright)
+- [ ] 대화형 AI 어시스턴트
