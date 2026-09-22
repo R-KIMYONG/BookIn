@@ -1,3 +1,4 @@
+'use client'
 import { useBookmark } from '@/hooks/bookmark/useBookmark';
 import { toast } from 'react-toastify';
 import Button from '../common/ui/Button';

@@ -5,7 +5,13 @@ import Button from './Button';
 const ExtendButton = React.memo(() => {
   return (
     <form action={resetTempSession}>
-      <Button type="submit" size="xs" variant="ghost" label="연장" className='text-white' />
+      <Button
+        type="submit"
+        size="xs"
+        variant="ghost"
+        label="연장"
+        className="text-white hover:text-gray-500 transition-colors duration-200 ease-in-out"
+      />
     </form>
   );
 });

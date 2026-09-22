@@ -3,7 +3,7 @@ import { isImageExtension } from '@/shared/utils/validation/isImageExtension';
 import Button from '@/components/common/ui/Button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { CameraIcon } from 'lucide-react';
@@ -35,32 +35,30 @@ const AvatarUploadSection = ({ userAvatar }: { userAvatar: string }) => {
     },
   });
 
-  const handleAvatarUpload = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      const maxFileSize = 5 * 1024 * 1024;
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    const maxFileSize = 5 * 1024 * 1024;
 
-      if (!files || !files[0]) {
-        showToast(RESULT_CODE.COMMON_FILE_UPLOAD_CANCELLED);
-        return;
-      }
-      const file = files[0];
-      if (!isImageExtension(file)) {
-        showToast(RESULT_CODE.VALIDATION_INVALID_IMAGE_FILE);
-        return;
-      }
-      if (file.size > maxFileSize) {
-        showToast(RESULT_CODE.VALIDATION_IMAGE_FILE_TOO_LARGE);
-        return;
-      }
-      try {
-        await toastMutationPromise(updateAvatarImgMutation.mutateAsync(file), { pending: '아바타 업로드 중...' });
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [updateAvatarImgMutation]
-  );
+    if (!files || !files[0]) {
+      showToast(RESULT_CODE.COMMON_FILE_UPLOAD_CANCELLED);
+      return;
+    }
+    const file = files[0];
+    if (!isImageExtension(file)) {
+      showToast(RESULT_CODE.VALIDATION_INVALID_IMAGE_FILE);
+      return;
+    }
+    if (file.size > maxFileSize) {
+      showToast(RESULT_CODE.VALIDATION_IMAGE_FILE_TOO_LARGE);
+      return;
+    }
+    try {
+      await toastMutationPromise(updateAvatarImgMutation.mutateAsync(file), { pending: '아바타 업로드 중...' });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative h-28 w-28 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">

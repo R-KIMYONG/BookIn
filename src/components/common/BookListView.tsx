@@ -84,8 +84,10 @@ const BookListView = ({
       )}
 
       {/* 페이지네이션은 스켈레톤 중에도 항상 유지 */}
-      <div className="mt-6 flex justify-center">
-        <AppPagination totalPages={totalPages} page={page} isFetching={isFetching} onChange={onPageChange} />
+      <div className="mt-6 flex justify-center min-h-[2rem]">
+        {mounted && (
+          <AppPagination totalPages={totalPages} page={page} isFetching={isFetching} onChange={onPageChange} />
+        )}
       </div>
     </>
   );
