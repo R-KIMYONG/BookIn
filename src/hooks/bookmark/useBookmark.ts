@@ -46,6 +46,7 @@ export const useBookmark = (bookInfo: BookInfo) => {
 
       queryClient.invalidateQueries({ queryKey: bookmarkKeys.all });
       queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
+      queryClient.invalidateQueries({ queryKey: recommendationsKey.reactedCount() });
     },
     onError: (_err, _vars, context) => {
       console.error('[bookmark][mutation-error]', { _err, context });

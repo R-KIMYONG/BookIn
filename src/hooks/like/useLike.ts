@@ -45,6 +45,7 @@ export const useLike = (bookInfo: BookInfo) => {
         liked_count: fresh.liked_count ?? old?.liked_count ?? 0,
       }));
       queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
+      queryClient.invalidateQueries({ queryKey: recommendationsKey.reactedCount() });
     },
     onError: (_err, _vars, context) => {
       if (context?.prev) {
