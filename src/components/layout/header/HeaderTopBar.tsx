@@ -9,10 +9,18 @@ export const HeaderTopBar = ({ children }: { children: React.ReactNode }) => {
     lastY.current = window.scrollY;
     const update = () => {
       const y = window.scrollY;
+      const dy = y - lastY.current;
+      if (Math.abs(dy) > 200) {
+        //급격히 큰 이동일때 유저가 아니므로 점프하지않음
+        lastY.current = y;
+        ticking.current = false;
+        return;
+      }
+
       if (y < 80) setHidden(false);
-      else if (y - lastY.current > 8)
+      else if (dy > 8)
         setHidden(true); // 아래 8px+
-      else if (lastY.current - y > 8) setHidden(false); // 위 8px+
+      else if (-dy > 8) setHidden(false); // 위 8px+
       lastY.current = y;
       ticking.current = false;
     };

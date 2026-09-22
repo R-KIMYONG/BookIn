@@ -6,9 +6,17 @@ import { useTasteReport } from '@/hooks/taste/useTasteReport';
 import ErrorState from '@/components/common/ErrorState';
 import { scrollToRails } from '@/shared/domain/taste/scrollToRails';
 import { TasteReportSkeleton } from './TasteReportSkeleton';
+import { useReactedCount } from '@/hooks/taste/useReactedCount';
 
 const TasteReport = () => {
-  const { data, isError, refetch } = useTasteReport();
+  const { data: reactedCount } = useReactedCount();
+
+  const unlocked = (reactedCount ?? 0) >= TASTE_UNLOCK;
+  const { data, isError, refetch } = useTasteReport({ enabled: unlocked });
+
+  if (reactedCount === undefined) return <TasteReportSkeleton />;
+
+  if (!unlocked) return <TasteReportLock total={reactedCount} onExplore={() => scrollToRails('rails')} />;
 
   if (isError)
     return (
@@ -18,10 +26,8 @@ const TasteReport = () => {
         action={{ label: '다시 시도', onClick: () => refetch() }}
       />
     );
-  if (!data) return <TasteReportSkeleton />;
 
-  if (data.persona.total < TASTE_UNLOCK)
-    return <TasteReportLock total={data.persona.total} onExplore={() => scrollToRails('rails')} />;
+  if (!data) return <TasteReportSkeleton />;
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">

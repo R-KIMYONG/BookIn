@@ -18,6 +18,7 @@ export const useCommentMutation = (bookId: string, userId?: string | null) => {
       queryClient.invalidateQueries({ queryKey: myBooksKeys.all });
       queryClient.invalidateQueries({ queryKey: rankingKeys.topViewBooks(5) });
       queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
+      queryClient.invalidateQueries({ queryKey: recommendationsKey.reactedCount() });
     }
   };
 

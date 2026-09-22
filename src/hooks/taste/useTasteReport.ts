@@ -4,7 +4,7 @@ import { PersonaType, ReportType } from '@/shared/domain/taste/types';
 
 type TasteReportData = { genres: ReportType[]; persona: PersonaType };
 
-export const useTasteReport = () =>
+export const useTasteReport = ({ enabled }: { enabled: boolean }) =>
   useQuery<TasteReportData>({
     queryKey: recommendationsKey.tasteReport(),
     queryFn: async () => {
@@ -14,4 +14,5 @@ export const useTasteReport = () =>
       const data = await res.json();
       return data;
     },
+    enabled,
   });

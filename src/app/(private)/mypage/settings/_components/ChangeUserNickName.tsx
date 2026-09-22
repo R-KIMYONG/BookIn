@@ -4,7 +4,7 @@ import toastMutationPromise from '@/shared/lib/toast/toastMutationPromise';
 import Button from '@/components/common/ui/Button';
 import { MAX_LENGTH_NICKNME } from '@/shared/constants/user';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { ReactElement, useCallback, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { userKeys } from '@/shared/domain/user/queryKeys';
@@ -36,7 +36,7 @@ const ChangeUserNickName = ({ nickname }: { nickname: string }): ReactElement =>
     },
   });
 
-  const handleSaveNickname = useCallback(async (): Promise<void> => {
+  const handleSaveNickname = async (): Promise<void> => {
     const nextNickname = draftNickname.trim();
 
     if (nextNickname === nickname) {
@@ -54,7 +54,7 @@ const ChangeUserNickName = ({ nickname }: { nickname: string }): ReactElement =>
     } catch (error) {
       console.error(error);
     }
-  }, [changeNickNameMutation, draftNickname, nickname]);
+  }
 
   return (
     <form

@@ -27,11 +27,7 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres, 
     [koreanGenres, foreignGenres, ebookGenres, categoryId]
   );
 
-  const { queryType, isFetching, searchTotal, isSearching, searchKeyWord, searchQueryType, setListUrl } =
-    useBookListData({
-      target,
-      categoryId,
-    });
+  const { queryType, setListUrl } = useBookListData({ target, categoryId });
 
   if (!isValidCategory) return <InvalidCategory />;
 
@@ -53,26 +49,6 @@ const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres, 
           target={target}
           disable={isPending}
         />
-        {/* <div className="flex flex-col items-start md:items-end gap-1">
-          <SearchBar
-            value={searchKeyWord}
-            isSearching={isFetching}
-            searchQueryType={searchQueryType}
-            onSubmit={(keyword) => setListUrl({ searchKeyWord: keyword, page: 1 })}
-            onReset={() => setListUrl({ searchKeyWord: null, page: 1 })}
-            onChangeSearchQueryType={(sq) => setListUrl({ searchQueryType: sq, page: 1 })}
-          />
-
-          {isSearching && (
-            <p className="text-[12px] text-gray-600 text-nowrap md:pr-4 box-border pl-2">
-              {isFetching
-                ? '검색중...'
-                : searchTotal > 0
-                  ? `검색결과 ${searchTotal.toLocaleString()}개`
-                  : '검색결과가 없습니다.'}
-            </p>
-          )}
-        </div> */}
       </div>
 
       <nav

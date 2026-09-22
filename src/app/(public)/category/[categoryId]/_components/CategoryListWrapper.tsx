@@ -12,6 +12,10 @@ import { QueryType } from '@/shared/domain/aladin/types';
 import { Genre } from '@/shared/domain/category/types';
 import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
 import { statsKeys } from '@/shared/domain/book/queryKeys';
+import { Sparkles } from 'lucide-react';
+import BookRail from '@/app/(private)/mypage/_components/recommend/rail/BookRail';
+import { getRelatedBooks } from '@/shared/lib/rails/getRelatedBooks';
+import { getLastPageServer } from '@/shared/lib/aladin/getLastPageServer';
 
 type CategoryListWrapperProps = {
   categoryId: number;
@@ -24,21 +28,33 @@ type CategoryListWrapperProps = {
 const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreData }: CategoryListWrapperProps) => {
   const queryClient = new QueryClient();
 
-  const listData = await getAladinList({ queryType, page, target, categoryId });
+  const categoryLabel = genreData.find((b) => b.id === categoryId)?.label;
+
+  const [listData, related, lastPage] = await Promise.all([
+    getAladinList({ queryType, page, target, categoryId }),
+    getRelatedBooks(undefined, categoryLabel),
+    getLastPageServer({ queryType, target, categoryId }),
+  ]);
 
   queryClient.setQueryData(aladinKeys.list({ queryType, page, target, categoryId }), listData);
+  queryClient.setQueryData(aladinKeys.lastPage({ queryType, target, categoryId }), lastPage);
 
   const isbnList = (listData?.items ?? []).map((item) => item.isbn13);
+  const relatedIsbns = related.map((b) => b.isbn13);
 
-  if (isbnList.length > 0) {
+  const allIsbns = [...new Set([...isbnList, ...relatedIsbns])];
+
+  let relatedView = related;
+
+  if (allIsbns.length > 0) {
     const [likes, likeCounts, bookmarks, statsMap] = await Promise.all([
-      getLikesByIsbnList(isbnList),
-      getLikeCountsByIsbnList(isbnList),
-      getBookmarksByIsbnList(isbnList),
-      getBookStatsByIsbn(isbnList),
+      getLikesByIsbnList(allIsbns),
+      getLikeCountsByIsbnList(allIsbns),
+      getBookmarksByIsbnList(allIsbns),
+      getBookStatsByIsbn(allIsbns),
     ]);
 
-    for (const isbn of isbnList) {
+    for (const isbn of allIsbns) {
       queryClient.setQueryData(likeKeys.detail(isbn), {
         isbn13: isbn,
         liked: likes[isbn] ?? false,
@@ -50,9 +66,9 @@ const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreD
         memoExists: bookmarks[isbn]?.memoExists ?? false,
       });
     }
+    relatedView = relatedView.map((book) => ({ ...book, stats: statsMap[book.isbn13] }));
     queryClient.setQueryData(statsKeys.batch(isbnList), statsMap);
   }
-
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <CategoryList
@@ -63,6 +79,7 @@ const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreD
         initialQueryType={queryType}
         initialList={listData}
       />
+      <BookRail icon={<Sparkles className="h-4 w-4" />} label="새로운 발견" books={relatedView} />
     </HydrationBoundary>
   );
 };

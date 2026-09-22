@@ -76,7 +76,6 @@ const Comment = ({ bookId, initialUserId, initialPage }: CommentProps) => {
         bookId={bookId}
         initialPage={initialPage}
       />
-
       <div ref={formRef}>
         {initialUserId ? (
           <CommentForm

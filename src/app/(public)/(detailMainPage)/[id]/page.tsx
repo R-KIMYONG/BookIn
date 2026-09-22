@@ -18,9 +18,11 @@ import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { getBookmarkTagsByIsbn } from '@/shared/lib/server/entities/getBookmarkTagsByIsbn';
 import ViewTracker from './_components/ViewTracker';
 import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
-import { Eye, Star } from 'lucide-react';
+import { Eye, Sparkles, Star } from 'lucide-react';
 import { getSalesBadge, toneClass } from '@/shared/domain/detail/getSalesBadge';
 import { getBookKey } from '@/shared/domain/book/getBookKey';
+import BookRail from '@/app/(private)/mypage/_components/recommend/rail/BookRail';
+import { getRelatedBooks } from '@/shared/lib/rails/getRelatedBooks';
 
 const MainDetail = async ({
   params,
@@ -121,8 +123,8 @@ const MainDetail = async ({
   const queryClient = new QueryClient();
   const isbn = item.isbn13;
 
-  const [viewCount, likes, likeCounts, bookmarks] = await Promise.all([
-    getBookStatsByIsbn([isbn]),
+  const [related, likes, likeCounts, bookmarks] = await Promise.all([
+    getRelatedBooks(isbnKey),
     getLikesByIsbnList([isbn]),
     getLikeCountsByIsbnList([isbn]),
     getBookmarksByIsbnList([isbn]),
@@ -145,6 +147,9 @@ const MainDetail = async ({
     queryClient.setQueryData(bookmarkKeys.tags.detail(userId, isbn), { tags: bookmarkTags });
   }
   const salesBadge = getSalesBadge(salesPoint);
+
+  const viewCount = await getBookStatsByIsbn([isbn, ...related.map((b) => b.isbn13)]);
+  const relatedView = related.map((b) => ({ ...b, stats: viewCount[b.isbn13] }));
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -286,6 +291,7 @@ const MainDetail = async ({
         <div className="mt-8">
           <CommentSection bookId={bookId} page={page} userId={userId} />
         </div>
+        <BookRail icon={<Sparkles className="h-4 w-4" />} label="이 책과 비슷한 책" books={relatedView} />
       </div>
     </HydrationBoundary>
   );

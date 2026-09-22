@@ -10,7 +10,7 @@ const SkeletonGrid = ({ count = 20 }: { count?: number }) => {
               <div className="h-3 w-1/4 rounded bg-gray-200" />
               <div className="h-3 w-1/3 rounded bg-gray-200" />
             </div>
-            <div className="h-3 w-3/5 rounded bg-gray-200" />
+            <div className="h-4 w-3/5 rounded bg-gray-200" />
           </div>
         </div>
       ))}
