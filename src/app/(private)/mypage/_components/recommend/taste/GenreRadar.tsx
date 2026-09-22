@@ -4,17 +4,7 @@ import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, Responsi
 const GenreRadar = ({ data }: { data: ReportType[] }) => {
   return (
     <div className="flex items-center gap-4">
-      <ul className="flex flex-col gap-1.5 text-sm">
-        {data.map((g) => (
-          <li key={g.genre} className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2 text-gray-700">
-              <span className="h-2.5 w-2.5 rounded-full" />- {g.genre}
-            </span>
-            <span className="font-semibold text-gray-900">{g.cnt}권</span>
-          </li>
-        ))}
-      </ul>
-      <ResponsiveContainer width="70%" height={280}>
+      <ResponsiveContainer width="100%" height={280}>
         <RadarChart outerRadius="80%" data={data}>
           <PolarGrid />
           <PolarAngleAxis dataKey="genre" tick={{ dx: 5, dy: -5, fontSize: 14 }} />

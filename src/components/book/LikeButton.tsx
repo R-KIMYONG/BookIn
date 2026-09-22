@@ -1,3 +1,4 @@
+'use client'
 import { useLike } from '@/hooks/like/useLike';
 import { useRef } from 'react';
 import Button from '../common/ui/Button';

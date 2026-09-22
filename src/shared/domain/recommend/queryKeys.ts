@@ -5,4 +5,5 @@ export const recommendationsKey = {
   rail: () => [...recommendationsKey.all, 'rail'] as const,
   tasteReport: () => [...recommendationsKey.all, 'tasteReport'] as const,
   tasteAnalysis: () => [...recommendationsKey.all, 'tasteAnalysis'] as const,
+  reactedCount: () => [...recommendationsKey.all, 'reactedCount'] as const,
 };

@@ -12,7 +12,6 @@ type TastRePortFullProps = {
 const TastRePortFull = ({ genres, persona }: TastRePortFullProps) => {
   const Icon = PERSONA_ICONS[persona.icon] ?? Sprout;
   const chartMode = genres.length >= 3 ? 'radar' : genres.length === 2 ? 'donut' : 'single';
-
   const radarChartData = genres.slice(0, TOP_GENRES).map((g) => {
     return {
       genre: formatGenre(g.genre),

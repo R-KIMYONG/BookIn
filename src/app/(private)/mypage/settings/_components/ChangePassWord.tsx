@@ -72,7 +72,7 @@ const ChangePassWord = (): ReactElement => {
       handleClose();
     },
   });
-  const handleSaveNewPassWord = useCallback(async () => {
+  const handleSaveNewPassWord = async () => {
     if (passwordForm.newPassword.trim() === '') {
       showToast(RESULT_CODE.VALIDATION_REQUIRED_PASSWORD);
       return;
@@ -94,7 +94,7 @@ const ChangePassWord = (): ReactElement => {
     } catch (error) {
       console.error(error);
     }
-  }, [passwordForm, changePassWordMutation]);
+  };
 
   const checkPrevPassWordMutation = useMutation({
     mutationFn: async (prevPassword: string) => {
