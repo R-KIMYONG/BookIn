@@ -56,7 +56,6 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
           ebookGenres={genres.ebGenres}
           target={target}
         />
-
         <div className="w-full flex-1">
           <Suspense key={`${categoryId}-${queryType}-${target}`} fallback={<SkeletonGrid count={20} />}>
             <CategoryListWrapper
