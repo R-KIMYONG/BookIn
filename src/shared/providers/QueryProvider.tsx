@@ -7,6 +7,7 @@ import AuthToastHandler from '@/components/common/AuthToastHandler';
 import type { User } from '@supabase/supabase-js';
 import { AuthContext } from '@/shared/context/AuthContext';
 import { AuthListener } from '@/app/AuthListener';
+import { MINUTE } from '../constants/time';
 
 type QueryProviderProps = {
   children: React.ReactNode;
@@ -16,7 +17,14 @@ type QueryProviderProps = {
 export const UserContext = createContext<User | null>(null);
 
 const QueryProvider = ({ children, initialUser }: QueryProviderProps) => {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { staleTime: 1 * MINUTE },
+        },
+      })
+  );
 
   const [user, setUser] = useState<User | null>(initialUser);
   useEffect(() => {

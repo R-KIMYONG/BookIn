@@ -1,5 +1,4 @@
 import React from 'react';
-import MyBooksSectionSkeleton from './_components/MyBookSection/MyBooksSectionSkeleton';
 
 const Line = ({ className = '' }: { className?: string }) => (
   <div className={`animate-pulse rounded-md bg-gray-200 ${className}`} />
@@ -43,43 +42,10 @@ const MypageLoading = () => {
             </div>
           </section>
 
-          <section className="overflow-hidden shadow-sm">
-            <div className="rounded-2xl border border-gray-200 bg-white px-4 py-4">
-              {/* 탭 스켈레톤 */}
-              <div className="flex flex-wrap gap-2">
-                <div className="h-9 w-20 rounded-xl bg-gray-200 animate-pulse" />
-                <div className="h-9 w-20 rounded-xl bg-gray-100" />
-                <div className="h-9 w-20 rounded-xl bg-gray-100" />
-              </div>
-
-              {/* 리스트 스켈레톤 */}
-              <div className="my-2 lg:h-[calc(300px*2+16px)] space-y-3">
-                <MyBooksSectionSkeleton />
-              </div>
-
-              {/* 페이지 네이션 자리 */}
-              <div className="w-full flex flex-col items-center gap-3 pt-2">
-                <div className="px-4 flex items-center gap-2">
-                  <div className="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
-                  <div className="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
-                  <div className="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
-                  <div className="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
-                  <div className="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-44 rounded-full bg-gray-100 animate-pulse" />
-                  <div className="h-10 w-14 rounded-xl bg-gray-200 animate-pulse" />
-                </div>
-              </div>
-            </div>
-          </section>
+          <section className="min-h-[400px] animate-pulse rounded-2xl bg-gray-100" />
         </div>
       </div>
     </div>
-    // <div className="my-2 min-h-[400px]">
-    //   <div className="h-64 w-full animate-pulse rounded-2xl bg-gray-100" />
-    // </div>
   );
 };
 

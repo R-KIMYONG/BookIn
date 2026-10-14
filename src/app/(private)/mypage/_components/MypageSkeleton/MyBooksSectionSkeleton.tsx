@@ -1,5 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
-import BooksGridContainer from './lists/BooksGridContainer';
+import BooksGridContainer from '../MyBookSection/lists/BooksGridContainer';
 
 const MyBooksSectionSkeleton = () => {
   return (

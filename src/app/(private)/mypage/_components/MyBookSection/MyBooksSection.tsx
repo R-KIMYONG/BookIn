@@ -2,7 +2,6 @@
 
 import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
-import MyBooksSectionSkeleton from './MyBooksSectionSkeleton';
 import { getMyBooksEmptyMessage, getMyBooksErrorMessage } from './MyBooksMessage';
 import { useMypageQueryState } from '@/hooks/mypage/useMypageQueryState';
 import { useMyBooks } from '@/hooks/mybooks/useMyBooks';
@@ -13,6 +12,7 @@ import LikeBooksList from './lists/LikeBooksList';
 import BookmarkBooksList from './lists/BookmarkBooksList';
 import { useBookStats } from '@/hooks/book/useBookStats';
 import { useMyStatus } from '@/hooks/book/useMyStatus';
+import MyBooksSectionSkeleton from '../MypageSkeleton/MyBooksSectionSkeleton';
 
 const MyBooksSection = () => {
   const { query, setQuery } = useMypageQueryState();
