@@ -102,7 +102,7 @@ const LoginForm = ({ redirectTo }: LoginFromProps) => {
       </div>
 
       {/* 로그인 버튼: useFormStatus로 로딩 처리 */}
-      <FormSubmitButton label="로그인" loadingText="로그인중..." fullWidth/>
+      <FormSubmitButton label="로그인" loadingText="로그인중" fullWidth />
     </form>
   );
 };
