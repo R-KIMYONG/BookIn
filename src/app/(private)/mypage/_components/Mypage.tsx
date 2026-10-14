@@ -1,7 +1,12 @@
 import MypageSidebar from './MypageSidebar/MypageSidebar';
-import MypageContent from './MypageContent';
+import MypageContentServer from '../MypageContentServer';
+import { MypageProps } from '@/shared/domain/mypage/types';
+import { Suspense } from 'react';
+import { MYPAGE_DEFAULT_SECTION } from '@/shared/domain/mypage/section';
+import RecommendSkeleton from './MypageSkeleton/RecommendSkeleton';
+import MyBooksSectionSkeleton from './MypageSkeleton/MyBooksSectionSkeleton';
 
-const Mypage = () => {
+const Mypage = ({ page, sort, tab, search, memoFilter, searchField, tagId, section }: MypageProps) => {
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-2 overflow-x-hidden">
       <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
@@ -11,7 +16,18 @@ const Mypage = () => {
             <MypageSidebar />
           </section>
           {/* 본문(내 활동 책) */}
-          <MypageContent />
+          <Suspense fallback={section === MYPAGE_DEFAULT_SECTION ? <MyBooksSectionSkeleton /> : <RecommendSkeleton />}>
+            <MypageContentServer
+              page={page}
+              sort={sort}
+              search={search}
+              tab={tab}
+              searchField={searchField}
+              memoFilter={memoFilter}
+              tagId={tagId}
+              section={section}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

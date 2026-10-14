@@ -1,28 +1,12 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Mypage from './_components/Mypage';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
 import { MYBOOKS_DEFAULT_TAB, MyBooksTabType } from '@/shared/domain/mypage/tab';
 import { MyBooksSort, SORT_DEFAULT } from '@/shared/domain/mybooks/sort';
 import { FILTER_DEFAULT, MyBooksFilter } from '@/shared/domain/mybooks/filter';
 import { SEARCH_FIELD_DEFAULT, SearchField } from '@/shared/domain/mybooks/search';
-import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
-import { fetchMyBooksServer } from '@/hooks/mybooks/fetchMyBooksServer';
-import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
-import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
-import { likeKeys } from '@/shared/domain/like/queryKeys';
-import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
 import { MYPAGE_DEFAULT_SECTION, MypageSectionType } from '@/shared/domain/mypage/section';
-import { normalizeMyBooksKey } from '@/shared/domain/mybooks/normalizeMyBooksKey';
-import { BookmarkInfo } from '@/shared/domain/bookmark/types';
-import { createClient } from '@/shared/lib/supabase/server';
-import { BookmarkBook } from '@/shared/domain/mybooks/types';
-import { getUserTagsServer } from '@/shared/lib/server/entities/getUserTagsServer';
 import { TAG_DEFAULT } from '@/shared/domain/tag/constants';
-import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
-import { getRecommendations } from '@/shared/lib/server/entities/getRecommendations';
 
 export const metadata: Metadata = {
   title: '마이페이지',
@@ -34,15 +18,7 @@ const ProfilePage = async ({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const userId = user?.id;
   const params = await searchParams;
-
-  const queryClient = new QueryClient();
 
   const tab: MyBooksTabType = params.tab === 'comment' || params.tab === 'bookmark' ? params.tab : MYBOOKS_DEFAULT_TAB;
 
@@ -62,82 +38,17 @@ const ProfilePage = async ({
 
   const section = typeof params.section === 'string' ? (params.section as MypageSectionType) : MYPAGE_DEFAULT_SECTION;
 
-  if (section !== MYPAGE_DEFAULT_SECTION && userId) {
-    const data = await getRecommendations(userId).catch(() => null);
-
-    if (data) queryClient.setQueryData(recommendationsKey.all, data);
-  }
-
-  const result = await queryClient.fetchQuery({
-    queryKey: myBooksKeys.list(
-      normalizeMyBooksKey({
-        tab,
-        page,
-        sort,
-        filter: tab === 'bookmark' ? memoFilter : undefined,
-        search,
-        searchField,
-        tagId: tab === 'bookmark' ? tagId : undefined,
-      })
-    ),
-    queryFn: () =>
-      fetchMyBooksServer({
-        tab,
-        page,
-        pageSize: DEFAULT_PAGE_SIZE,
-        sort: sort ?? SORT_DEFAULT,
-        memoFilter: memoFilter ?? undefined,
-        search,
-        searchField,
-        tagId,
-      }),
-  });
-  const isbnList = result.data.map((v) => v.isbn13);
-  let likes: Record<string, boolean> = {};
-
-  let likeCounts: Record<string, number> = {};
-
-  let bookmarks: Record<string, BookmarkInfo> = {};
-
-  if (tab === 'like') {
-    [likes, likeCounts] = await Promise.all([getLikesByIsbnList(isbnList), getLikeCountsByIsbnList(isbnList)]);
-  }
-
-  if (tab === 'bookmark') {
-    bookmarks = await getBookmarksByIsbnList(isbnList);
-  }
-  for (const isbn of isbnList) {
-    if (tab === 'like') {
-      queryClient.setQueryData(likeKeys.detail(isbn), {
-        isbn13: isbn,
-        liked: likes[isbn] ?? false,
-        liked_count: likeCounts[isbn] ?? 0,
-      });
-    }
-
-    if (tab === 'bookmark') {
-      const book = (result.data as BookmarkBook[]).find((b) => b.isbn13 === isbn);
-      queryClient.setQueryData(bookmarkKeys.detail(isbn), {
-        isbn13: isbn,
-        bookmarked: bookmarks[isbn]?.bookmarked ?? false,
-        memoExists: !!book?.memo,
-      });
-    }
-  }
-  if (tab === 'bookmark' && userId) {
-    for (const book of result.data as BookmarkBook[]) {
-      queryClient.setQueryData(bookmarkKeys.tags.detail(userId, book.isbn13), { tags: book.tags ?? [] });
-    }
-  }
-
-  await queryClient.prefetchQuery({
-    queryKey: bookmarkKeys.tags.user(),
-    queryFn: getUserTagsServer,
-  });
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Mypage />
-    </HydrationBoundary>
+    <Mypage
+      page={page}
+      tab={tab}
+      sort={sort}
+      search={search}
+      memoFilter={memoFilter}
+      searchField={searchField}
+      tagId={tagId}
+      section={section}
+    />
   );
 };
 
