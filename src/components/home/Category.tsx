@@ -21,9 +21,7 @@ const Category = ({ target }: CategoryProps) => {
     isError,
     error,
     refetch,
-    searchTotal,
     searchKeyWord,
-    searchQueryType,
     setListUrl,
   } = useBookListData({ target });
   const isSearching = Boolean(searchKeyWord?.trim());
