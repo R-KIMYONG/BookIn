@@ -1,6 +1,6 @@
-export const RailsSkeleton = () => (
+export const RailsSkeleton = ({ col = 3 }: { col?: number }) => (
   <div className="mx-auto w-full py-8">
-    {Array.from({ length: 3 }).map((_, r) => (
+    {Array.from({ length: col }).map((_, r) => (
       <div key={r} className="mb-10">
         {/* 레일 라벨 (아이콘 + 제목) */}
         <div className="mb-4 flex items-center gap-2">

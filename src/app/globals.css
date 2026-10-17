@@ -80,3 +80,49 @@ header > nav > header {
     animation: none !important;
   }
 }
+
+/* 404 page */
+@keyframes nf-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+@keyframes nf-float-rot {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--nf-rot, 0deg));
+  }
+  50% {
+    transform: translateY(-18px) rotate(var(--nf-rot, 0deg));
+  }
+}
+@keyframes nf-blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(12px, -10px) scale(1.08);
+  }
+}
+.nf-float {
+  animation: nf-float 5s ease-in-out infinite;
+}
+.nf-float-rot {
+  animation: nf-float-rot 6s ease-in-out infinite;
+}
+.nf-blob {
+  animation: nf-blob 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf-float,
+  .nf-float-rot,
+  .nf-blob {
+    animation: none !important;
+  }
+}
