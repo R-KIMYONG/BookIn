@@ -3,12 +3,25 @@ import { commentKeys } from '@/shared/domain/comment/queryKeys';
 import { fetchComments } from '@/shared/lib/comment/fetchComments';
 import { createClient } from '@/shared/lib/supabase/server';
 import dynamic from 'next/dynamic';
-import CommentSkeleton from './Comment/CommentSkeleton';
-const Comment = dynamic(() => import('./Comment'), {
+import CommentSkeleton from './CommentSkeleton';
+import EmptyState from '@/components/common/EmptyState';
+
+const Comment = dynamic(() => import('./index'), {
   loading: () => <CommentSkeleton />,
 });
 
-const CommentSection = async ({ bookId, page, userId }: { bookId: string; page: number; userId: string | null }) => {
+const CommentSection = async ({
+  bookId,
+  page,
+  userId,
+}: {
+  bookId: string | null;
+  page: number;
+  userId: string | null;
+}) => {
+  if (!bookId) {
+    return <EmptyState title="댓글을 불러올 수 없어요" description="잠시 후 다시 시도해 주세요." className="py-6" />;
+  }
   const queryClient = new QueryClient();
   const supabase = await createClient();
 

@@ -8,10 +8,10 @@ import { sanitizeHtmlClient } from '@/shared/utils/security/sanitizeHtml.client'
 import { useCallback, useRef, useState, Dispatch, SetStateAction, useMemo } from 'react';
 import type { Editor } from '@tiptap/react';
 import { MAX_LENGTH, MAX_LINES } from '@/shared/constants/comment';
-import { TargetValue } from './Comment/types';
 import { SubmitItem } from '@/shared/domain/comment/types';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
+import { TargetValue } from './types';
 
 const TiptapEditor = dynamic(() => import('./TiptapEditor'), {
   ssr: false,

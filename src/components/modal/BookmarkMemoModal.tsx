@@ -10,7 +10,7 @@ import BookmarkTagPicker from '../bookmark/BookmarkTagPicker';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 
-const TiptapEditor = dynamic(() => import('@/app/(public)/(detailMainPage)/[id]/_components/TiptapEditor'), {
+const TiptapEditor = dynamic(() => import('@/app/(public)/(detailMainPage)/[id]/_components/Comment/TiptapEditor'), {
   ssr: false,
   loading: () => (
     <div className="min-h-[80px] px-3 py-2 text-sm text-gray-400 flex items-center gap-2">

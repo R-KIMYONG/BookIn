@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useBookmark } from '@/hooks/bookmark/useBookmark';
 import { toast } from 'react-toastify';
 import Button from '../common/ui/Button';
@@ -55,7 +55,7 @@ const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
       size="sm"
       aria-label="북마크"
       className={`${style} !bg-black/50 !backdrop-blur-sm !rounded-full !transition-all !duration-200 !ease-out
-              hover:!bg-black/70 !p-2`}
+              hover:!bg-black/70 !p-3`}
       disabled={isLoading}
     >
       {bookmarked ? (
@@ -63,7 +63,7 @@ const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
       ) : (
         <Bookmark
           strokeWidth={2}
-          className="w-3 h-3 text-white transition-colors duration-200 hover:text-yellow-300"
+          className="w-3 h-3 text-white transition-colors duration-200 hover:!text-yellow-300"
         />
       )}
     </Button>
