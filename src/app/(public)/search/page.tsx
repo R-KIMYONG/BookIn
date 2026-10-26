@@ -14,6 +14,10 @@ import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnL
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import SearchResultContainer from './_components/SearchResultContainer';
 import SearchOptionView from './_components/SearchOptionView';
+import { Suspense } from 'react';
+import SearchRailServer from './_components/SearchRailServer';
+import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
+import { getBookKey } from '@/shared/domain/book/getBookKey';
 
 const searchPage = async ({
   searchParams,
@@ -47,7 +51,7 @@ const searchPage = async ({
     searchList
   );
 
-  const isbnList = (searchList?.items ?? []).map((item) => item.isbn13).filter(Boolean);
+  const isbnList = (searchList?.items ?? []).map((item) => item.isbn13?.trim() || item.isbn?.trim()).filter(Boolean);
   const itemListSet = [...new Set([...isbnList])];
 
   if (itemListSet.length > 0) {
@@ -76,7 +80,6 @@ const searchPage = async ({
       itemListSet.map((isbn) => ({ isbn13: isbn, liked_count: likeCounts[isbn] ?? 0 }))
     );
   }
-
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <SearchOptionView keyword={keyword} target={target} searchQueryType={searchQueryType} categoryId={categoryId} />
@@ -87,6 +90,11 @@ const searchPage = async ({
         categoryId={categoryId}
         page={page}
       />
+      <section className="px-1 sm:px-6 md:px-10 mt-8">
+        <Suspense fallback={<RailsSkeleton col={1} />}>
+          <SearchRailServer itemListSet={itemListSet} categoryId={categoryId} />
+        </Suspense>
+      </section>
     </HydrationBoundary>
   );
 };
