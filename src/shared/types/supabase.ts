@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "12.2.12"
   }
   public: {
     Tables: {
@@ -674,7 +674,12 @@ export type Database = {
         }[]
       }
       match_book_similar: {
-        Args: { match_count?: number; p_category?: string; p_isbn13?: string }
+        Args: {
+          match_count?: number
+          p_category?: string
+          p_isbn13?: string
+          p_mall?: string
+        }
         Returns: {
           author: string
           category_id: number
