@@ -1,6 +1,7 @@
 export type Genre = {
   label: string;
   id: number;
+  path?: string;
 };
 
 export type GenresResult = {

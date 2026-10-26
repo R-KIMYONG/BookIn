@@ -8,6 +8,8 @@ import CategoryListWrapper from './_components/CategoryListWrapper';
 import { redirect } from 'next/navigation';
 import { classifyCategory } from '@/shared/domain/category/classifyCategory';
 import { QueryType } from '@/shared/domain/aladin/types';
+import CategoryRailServer from './_components/CategoryRailServer';
+import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
 
 type CategoryPageProps = {
   params: Promise<{ categoryId: string }>;
@@ -25,7 +27,7 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     : DEFAULT_QT;
 
   const genres = getGenres();
-  const { defaultTarget: computedDefault, genreData } = classifyCategory({
+  const { defaultTarget: computedDefault, genreData, groupLabel } = classifyCategory({
     categoryId,
     koreanGenres: genres.koGenres,
     foreignGenres: genres.foGenres,
@@ -46,6 +48,12 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     : computedDefault;
 
   const page = Number(rawSearchParams.page ?? 1);
+
+  // 레일 매칭용: DB category_name 경로 기준 (JSON 라벨과 표기가 다르면 path로 보정)
+  const genre = genreData.find((b) => b.id === categoryId);
+  const categoryPath = (genre?.path ?? genre?.label)?.replace(/\(eb\)$/, '');
+  // DB 몰 표기: 국내도서 / 외국도서 / 전자책 (groupLabel은 eBook만 다름)
+  const mall = groupLabel === 'eBook' ? '전자책' : groupLabel || undefined;
   return (
     <main className="px-1 sm:px-6 md:px-10 flex-1">
       <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
@@ -67,6 +75,11 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
             />
           </Suspense>
         </div>
+      </section>
+      <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
+        <Suspense fallback={<RailsSkeleton col={1} />}>
+          <CategoryRailServer categoryPath={categoryPath} mall={mall} />
+        </Suspense>
       </section>
     </main>
   );
