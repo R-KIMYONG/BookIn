@@ -11,6 +11,7 @@ import { QueryType } from '@/shared/domain/aladin/types';
 import CategoryRailServer from './_components/CategoryRailServer';
 import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
 
+export const maxDuration = 60;
 type CategoryPageProps = {
   params: Promise<{ categoryId: string }>;
   searchParams: Promise<{ qt?: QueryType; page?: string; target?: TargetTypes }>;
@@ -27,7 +28,11 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     : DEFAULT_QT;
 
   const genres = getGenres();
-  const { defaultTarget: computedDefault, genreData, groupLabel } = classifyCategory({
+  const {
+    defaultTarget: computedDefault,
+    genreData,
+    groupLabel,
+  } = classifyCategory({
     categoryId,
     koreanGenres: genres.koGenres,
     foreignGenres: genres.foGenres,
