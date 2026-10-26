@@ -5,7 +5,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Flame, Heart, RefreshCcw, Sparkles, WifiOff } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { RailBook } from '@/shared/domain/rails/types';
-import { useMyStatus } from '@/hooks/book/useMyStatus';
 import { useBookStats } from '@/hooks/book/useBookStats';
 import BookRail from './BookRail';
 import { RailsSkeleton } from './RailsSkeleton';
@@ -57,7 +56,6 @@ const RecommendRails = () => {
   );
 
   const { data: statsMap } = useBookStats(isbnList);
-  useMyStatus(isbnList);
   const attach = useCallback(
     (books: RailBook[]) => books.map((book) => ({ ...book, stats: statsMap?.[book.isbn13] })),
     [statsMap]

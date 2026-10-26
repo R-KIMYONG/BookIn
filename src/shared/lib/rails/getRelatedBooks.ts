@@ -4,7 +4,8 @@ import { RailBook } from '@/shared/domain/rails/types';
 
 export const getRelatedBooks = async (
   anchorIsbn13?: string, // -> 이거는 디테일 페이지용
-  anchorCategory?: string // ->이거는 카테고리 페이지용
+  anchorCategory?: string, // ->이거는 카테고리 페이지용
+  anchorMall?: string // -> 카테고리 페이지용 몰 제한 (국내도서/외국도서/전자책)
 ): Promise<RailBook[]> => {
   if (!anchorIsbn13 && !anchorCategory) return [];
   try {
@@ -13,6 +14,7 @@ export const getRelatedBooks = async (
     const { data, error } = await supabase.rpc('match_book_similar', {
       p_isbn13: anchorIsbn13,
       p_category: anchorCategory,
+      p_mall: anchorMall,
       match_count: 20,
     });
     if (error) {
