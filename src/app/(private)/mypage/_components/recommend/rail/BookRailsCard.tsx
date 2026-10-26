@@ -1,6 +1,4 @@
-import BookmarkButton from '@/components/book/BookmarkButton';
 import BookStats from '@/components/book/BookStats';
-import LikeButton from '@/components/book/LikeButton';
 import { formatAuthor } from '@/shared/domain/book/formatAuthor';
 import { RailBookView } from '@/shared/domain/rails/types';
 import Image from 'next/image';
@@ -42,10 +40,6 @@ const BookRailsCard = ({ book }: BookRailsCardProps) => {
           )}
 
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-          <div className="absolute bottom-2 flex w-full items-center justify-between px-3">
-            <LikeButton bookInfo={bookInfo} />
-            <BookmarkButton bookInfo={bookInfo} scope="home" />
-          </div>
         </div>
 
         <div className="mt-2 px-0.5">
