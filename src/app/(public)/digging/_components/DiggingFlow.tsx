@@ -1,13 +1,14 @@
 'use client';
 import Button from '@/components/common/ui/Button';
-import { QUESTIONS_COUNT } from '@/shared/domain/digging/constants';
+import { DIGGING_GUIDE, QUESTIONS_COUNT } from '@/shared/domain/digging/constants';
 import { DiggingQuestion, QUESTION_BANK } from '@/shared/domain/digging/questionBank';
 import { selectQuestions } from '@/shared/domain/digging/selectQuestions';
 import { ChevronFirst, ChevronLeft, ChevronRight, Info } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DiggingWrapper from './DiggingWrapper';
 import DiggingResult from './DiggingResult';
 import { getTodayKST } from '@/shared/domain/digging/dailyStore';
+import DiggingSkeleton from './DiggingSkeleton';
 
 const DiggingFlow = ({
   initialQuestions,
@@ -21,9 +22,29 @@ const DiggingFlow = ({
 
   const [pick, setPick] = useState<number[]>([]);
 
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState<boolean>(false);
+
+  const [open, setOpen] = useState<boolean>(false);
 
   const today = getTodayKST();
+
+  const guideRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (!guideRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
 
   useEffect(() => {
     const savedQna = localStorage.getItem('digging');
@@ -73,7 +94,7 @@ const DiggingFlow = ({
     localStorage.removeItem('digging');
   };
 
-  if (!loaded) return null;
+  if (!loaded) return <DiggingSkeleton />;
   if (questionIndex >= QUESTIONS_COUNT) {
     const answers = pick.map((optIdx, i) => questions[i].options[optIdx].signal);
     return (
@@ -91,15 +112,45 @@ const DiggingFlow = ({
             <p>/</p>
             <p>{QUESTIONS_COUNT}</p>
           </div>
-          <Button
-            variant="secondary"
-            onClick={() => {}}
-            className="flex items-center gap-0.5 text-[11px] text-gray-400 hover:text-gray-600 transition-colors group"
-            aria-label="랭킹 기준 안내"
-            label="Digging"
-            size="xs"
-            rightIcon={<Info className="w-3 h-3 mt-1 transition-transform duration-300 group-hover:scale-110" />}
-          />
+          <div ref={guideRef} className="relative">
+            <Button
+              variant="secondary"
+              onClick={() => setOpen((prev) => !prev)}
+              className="group flex items-center gap-0.5 text-[11px] text-gray-400 transition-colors hover:text-gray-600"
+              aria-controls="digging-guide"
+              aria-expanded={open}
+              label="Digging"
+              size="xs"
+              rightIcon={<Info className="mt-1 h-3 w-3 transition-transform duration-300 group-hover:scale-110" />}
+            />
+            {open && (
+              <div
+                id="digging-guide"
+                className="absolute right-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-main/15 bg-white px-4 py-3 text-xs leading-relaxed text-gray-600 shadow-lg"
+              >
+                <p className="font-semibold text-main">AI 디깅이란?</p>
+                <p className="mt-1">레코드 가게에서 판을 뒤적이듯, 오늘의 기분으로 책을 파내는 AI 큐레이션이에요.</p>
+
+                <dl className="mt-3 space-y-1.5">
+                  {DIGGING_GUIDE.map(({ term, desc }) => (
+                    <div key={term} className="flex gap-2">
+                      <dt className="w-12 shrink-0 font-semibold text-gray-800">{term}</dt>
+                      <dd>{desc}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <div className="mt-3 space-y-1 rounded-xl bg-main/5 px-3 py-2 text-[11px] text-gray-600">
+                  <p>
+                    <b className="text-main">비회원</b> 하루 1번 · 추천 3권 미리보기
+                  </p>
+                  <p>
+                    <b className="text-main">회원</b> 무제한 · 추천 18권 전체
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </header>
         <div className="relative h-2">
           <div className={`bg-gray-300 rounded-full w-full h-full absolute left-0 top-0`} />

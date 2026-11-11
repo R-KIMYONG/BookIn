@@ -1,6 +1,6 @@
-import { DiggingDaily, DiggingReader, MatchBookType } from '@/shared/domain/digging/types';
+import { DiggingBook, DiggingDaily, DiggingReader } from '@/shared/domain/digging/types';
 
-export const STORAGE_KEY = 'digging_daily';
+export const STORAGE_KEY = 'digging_daily_v2';
 export const getTodayKST = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
 
 export const loadTodayDigging = (): DiggingDaily | null => {
@@ -8,7 +8,7 @@ export const loadTodayDigging = (): DiggingDaily | null => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as DiggingDaily;
+    const parsed = JSON.parse(raw);
     if (parsed.date !== getTodayKST()) return null;
 
     return parsed;
@@ -17,7 +17,7 @@ export const loadTodayDigging = (): DiggingDaily | null => {
   }
 };
 
-export const saveTodayDigging = (reader: DiggingReader, books: MatchBookType[]) => {
+export const saveTodayDigging = (reader: DiggingReader, books: DiggingBook[]) => {
   if (typeof window === 'undefined') return;
   try {
     const value: DiggingDaily = { date: getTodayKST(), reader, books };

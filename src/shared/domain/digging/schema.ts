@@ -1,5 +1,4 @@
 import { z } from 'zod/v4';
-import { DIGGING_GENRES } from './constants';
 
 export const DiggingSchema = z.object({
   readerType: z
@@ -23,5 +22,9 @@ export const DiggingSchema = z.object({
     .describe(
       '[재미] 취향을 유쾌하게 놀리거나 점쳐주는 한 방. 30자 내외, 캡처하고 싶게. 예: "당신, 새벽 감성에 약하죠?".'
     ),
-  categories: z.array(z.string()).describe('제공된 장르 목록에서 유저 취향에 맞는 것 2~3개를 그대로 골라 담기'),
+  keywords: z
+    .array(z.string())
+    .describe(
+      '서점 검색창에 그대로 칠 짧은 검색어 2~3개. 각각 1~3단어. 장르+주제/분위기 조합. 예: ["위로 에세이","관계 심리","새벽 감성"]. 실제 책 제목·작가 금지.'
+    ),
 });
