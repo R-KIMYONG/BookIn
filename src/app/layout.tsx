@@ -3,12 +3,12 @@ import './globals.css';
 import Header from '@/components/layout/header/Header';
 import Footer from '@/components/layout/Footer';
 import 'react-toastify/dist/ReactToastify.css';
-import { createClient } from '@/shared/lib/supabase/server';
 import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from '@/shared/providers/QueryProvider';
 import GlobalOverlays from './GlobalOverlays';
 import { Noto_Sans_KR, Noto_Sans_JP, Noto_Sans_SC } from 'next/font/google';
 import { Poppins } from 'next/font/google';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 const poppins = Poppins({ subsets: ['latin'], weight: ['600'], variable: '--font-poppins' });
 
 const notoSansKR = Noto_Sans_KR({
@@ -62,11 +62,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   return (
     <html

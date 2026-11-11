@@ -69,10 +69,8 @@ const CommentForm = ({
     }
 
     const newComment: SubmitItem = {
-      user_id: userId,
       content: cleanContent,
       book_id: bookId,
-      updated_at: new Date().toISOString(),
     };
 
     if (isEdit && targetValue.id) {

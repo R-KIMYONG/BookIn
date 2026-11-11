@@ -1,3 +1,4 @@
+import { ItemId } from '../book/ids';
 import { MypageModalType } from '../mypage/modal';
 import { MypageSectionType } from '../mypage/section';
 import { MyBooksTabType } from '../mypage/tab';
@@ -5,43 +6,43 @@ import { MyBooksFilter } from './filter';
 import { SearchField } from './search';
 import { MyBooksSort } from './sort';
 
+type BookmarkTag = {
+  id: string;
+  name: string;
+  slug: string;
+  color: string | null;
+};
+
+type BookmarkRowBook = {
+  title: string;
+  thumbnail_url: string;
+  author: string;
+  category_name: string;
+  book_stats: {
+    view_count: number;
+    like_count: number;
+    comment_count: number;
+  }[];
+};
+
+// supabase 타입 추론은 조인을 배열로 보지만 실제 응답은 객체 → 둘 다 받고 매핑에서 정규화
 export type BookmarkRow = {
-  book_id: string;
+  item_id: number;
   created_at: string;
   memo: string | null;
-  books: {
-    title: string;
-    thumbnail_url: string;
-    isbn13: string;
-    author: string;
-    category_id: number;
-    category_name: string;
-    book_stats: {
-      view_count: number;
-      like_count: number;
-      comment_count: number;
-    }[];
-  };
+  books: BookmarkRowBook | BookmarkRowBook[];
   tags: {
-    tag: {
-      id: string;
-      name: string;
-      slug: string;
-      color: string | null;
-    };
+    tag: BookmarkTag | BookmarkTag[];
   }[];
 };
 
 export type LikeRow = {
-  book_id: string;
+  item_id: number;
   created_at: string;
-  isbn13: string;
   books: {
     title: string;
-    isbn: string;
     thumbnail_url: string;
     author: string;
-    category_id: number;
     category_name: string;
     book_stats: {
       view_count: number;
@@ -52,13 +53,12 @@ export type LikeRow = {
 };
 
 export type CommentRow = {
-  book_id: string;
   comment_count: number;
   last_commented_at: string;
   books: {
+    item_id: number;
     title: string;
     thumbnail_url: string;
-    isbn13: string;
     book_stats: {
       view_count: number;
       like_count: number;
@@ -67,10 +67,9 @@ export type CommentRow = {
   }[];
 };
 export type MyBookBase = {
-  book_id: string;
+  itemId: ItemId;
   title: string;
   cover: string;
-  isbn13: string;
   total_like_count: number;
   total_view_count: number;
   total_comment_count: number;
@@ -84,7 +83,6 @@ export type CommentBook = MyBookBase & {
 export type LikeBook = MyBookBase & {
   created_at: string;
   author: string;
-  categoryId: number;
   categoryName: string;
 };
 
@@ -92,7 +90,6 @@ export type BookmarkBook = MyBookBase & {
   created_at: string;
   author: string;
   memo: string | null;
-  categoryId: number;
   categoryName: string;
   tags: {
     id: string;

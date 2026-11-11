@@ -23,7 +23,7 @@ export const useCommentMutation = (bookId: string, userId?: string | null) => {
   };
 
   const add = useMutation({
-    mutationFn: (input: SubmitItem) => createComment({ ...input, bookId, userId }),
+    mutationFn: (input: SubmitItem) => createComment({ ...input, bookId }),
     onMutate: async (newComment) => {
       await queryClient.cancelQueries({ queryKey: commentKeys.list(bookId, 1) });
 

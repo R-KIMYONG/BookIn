@@ -3,20 +3,23 @@ import BookListView from '@/components/common/BookListView';
 import EmptyState from '@/components/common/EmptyState';
 import Button from '@/components/common/ui/Button';
 import { useSearchNavigate } from '@/hooks/search/useSearchNavigate';
+import { TargetTypes } from '@/shared/constants/category';
+import { APP_QUERY_KEYS } from '@/shared/constants/urlParams';
 import { MINUTE } from '@/shared/constants/time';
-import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
+import { BookSummary, Paged } from '@/shared/domain/book/types';
+import { searchKeys } from '@/shared/domain/search/queryKeys';
 import { SearchOptionType } from '@/shared/domain/search/types';
 import getTotalPages from '@/shared/utils/pagination';
 import { useQuery } from '@tanstack/react-query';
 
-const SearchResultContainer = ({
-  keyword,
-  target,
-  searchQueryType,
-  categoryId,
-  page,
-}: SearchOptionType & { page: number }) => {
+type SearchResultContainerProps = SearchOptionType & {
+  target?: TargetTypes; // URL에 다시 담을 BookIn 값 (없으면 전체 검색)
+  page: number;
+};
+
+const SearchResultContainer = ({ keyword, target, category, sort, page }: SearchResultContainerProps) => {
   const { setSearchUrl } = useSearchNavigate();
+
   const {
     data: searchData,
     isPending,
@@ -25,24 +28,24 @@ const SearchResultContainer = ({
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: aladinKeys.search({ searchKeyWord: keyword, searchQueryType, page, target, categoryId }),
-    queryFn: async () => {
+    // 서버(page.tsx)가 같은 키로 미리 넣어둔 결과를 그대로 이어받음
+    queryKey: searchKeys.list({ query: keyword, category, sort, page }),
+    queryFn: async (): Promise<Paged<BookSummary>> => {
       const params = new URLSearchParams();
-      params.set('q', keyword);
-      params.set('target', target);
-      params.set('sq', searchQueryType);
-      params.set('ci', String(categoryId));
-      params.set('page', String(page));
-      const res = await fetch(`/api/aladin/search?${params}`);
-      if (!res.ok) throw Error('검색 fail');
+      params.set(APP_QUERY_KEYS.searchKeyWord, keyword);
+      if (target) params.set(APP_QUERY_KEYS.target, target);
+      params.set(APP_QUERY_KEYS.sort, sort);
+      params.set(APP_QUERY_KEYS.page, String(page));
 
-      const data = await res.json();
-      return data;
+      const res = await fetch(`/api/search?${params}`);
+      if (!res.ok) throw new Error('검색 결과를 불러오지 못했어요.');
+      return res.json();
     },
     staleTime: 5 * MINUTE,
     enabled: !!keyword,
   });
-  const searchResultTotalPage = searchData ? getTotalPages(searchData.totalResults, searchData.itemsPerPage) : 0;
+
+  const totalPages = searchData ? getTotalPages(searchData.totalCount, searchData.pageSize) : 0;
 
   const errorSlot = (
     <div className="border rounded-xl p-6 my-6">
@@ -61,15 +64,15 @@ const SearchResultContainer = ({
   return (
     <div className="px-1 sm:px-6 md:px-10 flex-1">
       <BookListView
-        list={searchData.items ?? []}
+        list={searchData?.items ?? []}
         page={page}
-        totalPages={searchResultTotalPage}
+        totalPages={totalPages}
         listDataPending={isPending}
         isFetching={isFetching}
         isError={isError}
         errorSlot={errorSlot}
         emptySlot={emptySlot}
-        onPageChange={(p) => setSearchUrl({ keyword, sq: searchQueryType, target, ci: categoryId, page: p })}
+        onPageChange={(p) => setSearchUrl({ keyword, target, sort, page: p })}
       />
     </div>
   );

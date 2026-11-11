@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+import { ItemId } from '@/shared/domain/book/ids';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { LikeCache } from '@/shared/domain/like/types';
 
-export const useLikeCache = (isbn13: string) => {
+export const useLikeCache = (itemId: ItemId) => {
   return useQuery<LikeCache>({
-    queryKey: likeKeys.detail(isbn13),
-    queryFn: async () => ({ isbn13, liked: false, liked_count: 0 }),
+    queryKey: likeKeys.detail(itemId),
+    queryFn: async () => ({ itemId, liked: false, liked_count: 0 }),
     enabled: false,
   });
 };

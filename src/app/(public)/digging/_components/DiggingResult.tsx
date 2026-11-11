@@ -4,7 +4,7 @@ import DiggingWrapper from './DiggingWrapper';
 import Button from '@/components/common/ui/Button';
 import { getDiggingResultBookList } from '@/shared/lib/digging/getDiggingResultBookList';
 import { useEffect, useState } from 'react';
-import { DiggingReader, MatchBookType } from '@/shared/domain/digging/types';
+import { DiggingBook, DiggingReader } from '@/shared/domain/digging/types';
 import DiggingBookCard from './DiggingBookCard';
 import { useMutation } from '@tanstack/react-query';
 import { loadTodayDigging, saveTodayDigging } from '@/shared/domain/digging/dailyStore';
@@ -13,6 +13,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import DiggingAnalyzingLoader from './DiggingAnalyzingLoader';
 import useCurrentUrl from '@/hooks/common/useCurrentUrl';
+import ErrorState from '@/components/common/ErrorState';
 
 type DiggingResultProps = {
   answers: string[];
@@ -23,7 +24,7 @@ type DiggingResultProps = {
 
 const DiggingResult = ({ answers, handleRestart, handleEdit, isLoggedIn }: DiggingResultProps) => {
   const [reader, setReader] = useState<DiggingReader | null>(null);
-  const [books, setBooks] = useState<MatchBookType[]>([]);
+  const [books, setBooks] = useState<DiggingBook[]>([]);
   const [usedToday, setUsedToday] = useState<boolean>(false);
   const [viewCount, setViewCount] = useState<number>(3);
   const [openSignup, setOpenSignup] = useState<boolean>(false);
@@ -40,8 +41,13 @@ const DiggingResult = ({ answers, handleRestart, handleEdit, isLoggedIn }: Diggi
     }
   }, [isLoggedIn]);
 
-  const { mutate: findBooks, isPending } = useMutation({
-    mutationFn: () => getDiggingResultBookList(answers),
+  const {
+    mutate: findBooks,
+    isPending,
+    isError,
+    error,
+  } = useMutation({
+    mutationFn: async () => await getDiggingResultBookList(answers),
     onSuccess: (data) => {
       setReader(data.reader);
       setBooks(data.DiggingBookList);
@@ -139,19 +145,25 @@ const DiggingResult = ({ answers, handleRestart, handleEdit, isLoggedIn }: Diggi
         </div>
       )}
 
+      {isError && !isPending && (
+        <div role="alert" className="mx-auto mt-6 max-w-md">
+          <ErrorState description={error.message} action={{ label: '다시 시도', onClick: () => findBooks() }} />
+        </div>
+      )}
+
       {books.length > 0 && (
         <div
           id="digging-report"
           className="mx-auto mt-6 max-w-md rounded-3xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8"
         >
           {/* 취향 판정 */}
-          <DiggingReaderReport reader={reader} />
+          <DiggingReaderReport reader={reader} books={books} />
 
           {/* 책 가로 레일 */}
           <div className="overflow-x-auto">
             <div className="grid grid-flow-col grid-rows-3 gap-3">
               {uniqueBooks.slice(0, viewCount).map((book, i) => (
-                <DiggingBookCard key={book.isbn13 ?? i} book={book} rank={i + 1} />
+                <DiggingBookCard key={book.itemId ?? i} book={book} rank={i + 1} />
               ))}
             </div>
           </div>

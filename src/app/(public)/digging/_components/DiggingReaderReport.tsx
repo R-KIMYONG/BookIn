@@ -1,7 +1,9 @@
-import { DiggingReader } from '@/shared/domain/digging/types';
+import { topGenres } from '@/shared/domain/digging/topGenres';
+import { DiggingBook, DiggingReader } from '@/shared/domain/digging/types';
 import { LibraryBig, MessageSquareQuote, Sparkles } from 'lucide-react';
 
-const DiggingReaderReport = ({ reader }: { reader: DiggingReader | null }) => {
+const DiggingReaderReport = ({ reader, books }: { reader: DiggingReader | null; books: DiggingBook[] }) => {
+  const genres = topGenres(books);
   return (
     <div className="w-full max-w-md  p-6 sm:p-8 flex flex-col gap-6 items-center">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-main/10">
@@ -34,7 +36,7 @@ const DiggingReaderReport = ({ reader }: { reader: DiggingReader | null }) => {
           <div className="h-[1px] flex-1 bg-gray-200" />
         </div>
         <div className="flex text-xs text-gray-400">
-          <p>{reader?.categories.join(' • ')}에서 골랐어요</p>
+          {genres.length > 0 && <p>{genres.join(' • ')}에서 골랐어요</p>}
         </div>
       </div>
     </div>

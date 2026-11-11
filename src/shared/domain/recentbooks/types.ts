@@ -1,8 +1,10 @@
+import { ItemId } from '@/shared/domain/book/ids';
+
 export type RecentBook = {
-  isbn13: string;
+  item_id: ItemId;
   viewed_at: string;
   books: {
-    isbn13: string;
+    item_id: ItemId;
     title: string;
     author: string | null;
     thumbnail_url: string | null;

@@ -9,16 +9,19 @@ import { useAuth } from '@/shared/context/AuthContext';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
+import { ItemId } from '@/shared/domain/book/ids';
 
 const BookmarkMemoContainer = () => {
-  const { isOpen, isbn, close } = useBookmarkMemoUrlState();
+  const { isOpen, itemId, close } = useBookmarkMemoUrlState();
   const { user } = useAuth();
-  const bookKey = (isbn ?? '').trim();
   const userId = user?.id ?? '';
 
-  const { data: bookmarkData, isPending, isError, error, refetch } = useBookmarkMemo(bookKey, userId, isOpen);
+  // 훅은 조건부로 부를 수 없어서, URL에 itemId가 없을 때는 0을 넣고 enabled로 막음 (isOpen이면 itemId가 반드시 있음)
+  const safeItemId = itemId ?? (0 as ItemId);
 
-  const mutation = useUpdateBookmarkMemo(userId, bookKey);
+  const { data: bookmarkData, isPending, isError, error, refetch } = useBookmarkMemo(safeItemId, userId, isOpen);
+
+  const mutation = useUpdateBookmarkMemo(userId, safeItemId);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -28,7 +31,7 @@ const BookmarkMemoContainer = () => {
       close();
     }
   }, [isOpen, userId, close]);
-  if (!isOpen || !bookKey) return null;
+  if (!isOpen || !itemId) return null;
   const initialMemoHtml = bookmarkData?.memo ?? null;
   const initialTags = bookmarkData?.tags ?? [];
   const loadError = isError ? (error instanceof Error ? error.message : '메모를 불러오지 못했습니다.') : null;

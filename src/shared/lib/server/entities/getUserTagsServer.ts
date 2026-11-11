@@ -1,11 +1,10 @@
 import 'server-only';
 import { createClient } from '../../supabase/server';
+import { getCurrentUser } from '../../auth/getCurrentUser';
 
 export const getUserTagsServer = async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return [];
 
   const { data, error } = await supabase

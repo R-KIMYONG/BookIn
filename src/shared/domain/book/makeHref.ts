@@ -1,12 +1,4 @@
-import { AladinBookInfo } from '@/shared/types/api';
+import { ItemId } from './ids';
 
-export const makeHref = (it: AladinBookInfo): string | undefined => {
-  const isbn13 = it.isbn13?.trim();
-  const isbn10 = it.isbn?.trim();
-  const itemId = it.itemId;
-
-  if (isbn13) return `/${isbn13}?type=isbn13`;
-  if (isbn10) return `/${isbn10}?type=isbn`;
-  if (itemId != null && String(itemId).trim()) return `/${itemId}?type=itemid`;
-  return undefined;
-};
+// 책 상세 경로. 식별자는 YES24 itemId 하나
+export const makeHref = (itemId: ItemId): string => `/${itemId}`;

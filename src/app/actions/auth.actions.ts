@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/shared/lib/supabase/server';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { clearTempSessionCookies, setTempSessionCookies } from '../../shared/lib/auth/sessionCookies';
@@ -121,8 +122,9 @@ export const signup = async (formData: FormData): Promise<ActionResult<{ user: U
     };
   }
 
-  // 이메일 중복 체크
-  const { data: emailExist, error: emailCheckError } = await supabase
+  // 이메일 중복 체크 (email 컬럼은 RLS 컬럼 권한으로 막혀 있어 관리자 클라이언트로 조회)
+  const supabaseAdmin = createAdminClient();
+  const { data: emailExist, error: emailCheckError } = await supabaseAdmin
     .from('users')
     .select('id')
     .eq('email', email)

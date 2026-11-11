@@ -22,14 +22,6 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
         const newBadge = isNew(book.created_at, NEW_DAYS);
         const memoExists = hasMemo(book.memo);
         const date = formatDateTime(book.created_at);
-        const bookInfo = {
-          isbn13: book.isbn13,
-          cover: book.cover,
-          title: book.title,
-          author: book.author,
-          categoryId: book.categoryId,
-          categoryName: book.categoryName,
-        };
         const tagNames = (book.tags ?? [])
           .map((tag) => {
             return {
@@ -41,9 +33,9 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
           })
           .filter(Boolean);
         return (
-          <li key={book.book_id}>
+          <li key={book.itemId}>
             <div className="relative">
-              <Link href={`/${book.isbn13}`} className="block">
+              <Link href={`/${book.itemId}`} className="block">
                 <div className="relative h-60 overflow-hidden rounded-md group">
                   <Image
                     src={book.cover?.trim() ? book.cover : '/images/noImg.png'}
@@ -60,7 +52,7 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
                     </span>
                   )}
                   <div className="absolute inset-0 z-0 bg-black/40 transition-colors duration-300 group-hover:bg-black/30" />
-                  <BookmarkButton bookInfo={bookInfo} style="absolute top-2 left-2" scope="mypage" />
+                  <BookmarkButton itemId={book.itemId} style="absolute top-2 left-2" scope="mypage" />
 
                   <div className="absolute bottom-16 left-3 right-3 z-10 text-white">
                     <p className="line-clamp-1 text-xs font-bold">{book.title}</p>
@@ -81,7 +73,7 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    open(book.isbn13, 'mypage');
+                    open(book.itemId, 'mypage');
                   }}
                   fullWidth
                   variant="ghost"
@@ -98,11 +90,11 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
             </div>
             <div className="mt-2 h-16 lg:h-10 text-xs flex">
               {tagNames.length > 0 ? (
-                <TagArea tagNames={tagNames} onMore={() => open(book.isbn13, 'mypage')} scope="mypage" />
+                <TagArea tagNames={tagNames} onMore={() => open(book.itemId, 'mypage')} scope="mypage" />
               ) : (
                 <span
                   className="text-gray-400 cursor-pointer hover:text-gray-500"
-                  onClick={() => open(book.isbn13, 'mypage')}
+                  onClick={() => open(book.itemId, 'mypage')}
                 >
                   태그를 추가해보세요
                 </span>

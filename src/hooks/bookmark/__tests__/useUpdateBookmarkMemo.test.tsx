@@ -7,6 +7,7 @@ import { useUpdateBookmarkMemo } from '../useUpdateBookmarkMemo';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
+import { ItemId } from '@/shared/domain/book/ids';
 
 describe('useUpdateBookmarkMemo훅 테스트', () => {
   let queryClient: QueryClient;
@@ -41,11 +42,11 @@ describe('useUpdateBookmarkMemo훅 테스트', () => {
     const prevMemo = 'memo-prev';
     const tags = [{ id: 'new', name: 'tag-new', color: 'white', slug: '시리즈' }];
     const prevTags = [{ id: 'prev', name: 'tag-prev', color: 'black', slug: '선물' }];
-    const bookKey = 'a123';
+    const bookKey = 123 as ItemId;
 
     const prevResult = {
       bookmarkId: 'bookmark-1',
-      isbn13: bookKey,
+      itemId: bookKey,
       memo: prevMemo,
       tags: prevTags,
       message: 'prev message',
@@ -94,7 +95,7 @@ describe('useUpdateBookmarkMemo훅 테스트', () => {
     const userId = 'user-1';
     const memo = 'memo-new';
     const tags = [{ id: 'new', name: 'tag-new', color: 'white', slug: '시리즈' }];
-    const bookKey = 'a123';
+    const bookKey = 123 as ItemId;
 
     const { result } = renderHook(() => useUpdateBookmarkMemo(userId, bookKey), { wrapper: queryWrapper });
 
@@ -124,7 +125,7 @@ describe('useUpdateBookmarkMemo훅 테스트', () => {
     const userId = '';
     const memo = 'memo-new';
     const tags = [{ id: 'new', name: 'tag-new', color: 'white', slug: '시리즈' }];
-    const bookKey = 'a123';
+    const bookKey = 123 as ItemId;
 
     const spy = vi.spyOn(queryClient, 'invalidateQueries');
     const { result } = renderHook(() => useUpdateBookmarkMemo(userId, bookKey), { wrapper: queryWrapper });

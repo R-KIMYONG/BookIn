@@ -6,7 +6,10 @@ export const getDiggingResultBookList = async (answers: string[]) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(answers),
   });
-  if (!res.ok) throw new Error('digging fetch fail');
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? '책을 찾는 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.');
+  }
 
   const diggingData: DiggingResultType = await res.json();
   return diggingData;

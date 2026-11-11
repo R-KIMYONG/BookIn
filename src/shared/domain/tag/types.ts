@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
+import { ItemId } from '@/shared/domain/book/ids';
 
 export type Tag = { id?: string; name: string; color: string | null; slug: string };
 export type BookmarkTagPickerProps = {
@@ -11,7 +12,7 @@ export type BookmarkTagPickerProps = {
 
 export type BookmarkMemoView = {
   bookmarkId: string;
-  isbn13: string;
+  itemId: ItemId;
   memo: string | null;
   tags: Tag[];
   message?: string;

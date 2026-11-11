@@ -1,52 +1,35 @@
-import { DropdownItem } from '@/components/common/ui/Dropdown/types';
+import { TargetTypes } from '@/shared/constants/category';
+import { SearchCategory, SearchSort } from '@/shared/lib/yes24/types';
 
-import { SearchQueryType } from '@/shared/domain/search/types';
+// ─── YES24 검색 (현재) ───
 
-export const SEARCH_TYPE_LABEL: Record<SearchQueryType, string> = {
-  Keyword: '제목or저자',
-  Title: '제목',
-  Author: '저자',
-  Publisher: '출판사',
+export const SEARCH_PLACEHOLDER = '책 제목 또는 저자를 입력하세요';
+
+// 정렬 이름 (결과 배지·검색창 공용)
+export const SEARCH_SORT_LABEL: Record<SearchSort, string> = {
+  RELATION: '정확도순',
+  DEFAULT: '인기도순',
+  RECENT: '신상품순',
+  REG_DTS: '등록일순',
 };
 
-export const SEARCH_TYPE_ITEMS: DropdownItem<SearchQueryType>[] = [
-  {
-    type: 'action',
-    label: SEARCH_TYPE_LABEL.Keyword,
-    value: 'Keyword',
-  },
-  {
-    type: 'action',
-    label: SEARCH_TYPE_LABEL.Title,
-    value: 'Title',
-  },
-  {
-    type: 'action',
-    label: SEARCH_TYPE_LABEL.Author,
-    value: 'Author',
-  },
-  {
-    type: 'action',
-    label: SEARCH_TYPE_LABEL.Publisher,
-    value: 'Publisher',
-  },
-];
+// 검색창에 노출할 정렬 (등록일순은 신상품순과 구분이 어려워 제외)
+export const SEARCH_SORT_OPTIONS: SearchSort[] = ['RELATION', 'DEFAULT', 'RECENT', 'REG_DTS'];
 
-export const SEARCH_QT_LIST = ['Keyword', 'Title', 'Author', 'Publisher'] as const;
-
-export const DEFAULT_SEARCH_QT = 'Keyword';
-
-export const SEARCH_QUERYTYPE_OPTION: Record<SearchQueryType, string> = {
-  Keyword: '책 제목 또는 저자를 입력하세요',
-  Title: '검색할 제목을 입력하세요',
-  Author: '검색할 저자를 입력하세요',
-  Publisher: '검색할 출판사를 입력하세요',
+// 실제 검색 범위 이름 (결과 배지용, YES24 값 기준)
+export const SEARCH_CATEGORY_LABEL: Record<SearchCategory, string> = {
+  ALL: '전체',
+  BOOK: '국내',
+  FOREIGN: '외국',
+  EBOOK: 'eBook',
 };
 
-export const SEARCH_MAX_RESULTS = 50;
-
-export const RANGE = [
-  { v: 'Book' as const, label: '국내' },
-  { v: 'Foreign' as const, label: '외국' },
-  { v: 'eBook' as const, label: 'eBook' },
+// 검색창 범위 버튼 (URL target 값 기준. v가 없으면 전체 검색)
+export const RANGE: { v: TargetTypes | undefined; label: string }[] = [
+  { v: undefined, label: '전체' },
+  { v: 'Book', label: '국내' },
+  { v: 'Foreign', label: '외국' },
+  { v: 'eBook', label: 'eBook' },
 ];
+
+export const SEARCH_INPUT_MAXLENGTH = 20;

@@ -4,6 +4,8 @@ import { MyBooksSort } from '@/shared/domain/mybooks/sort';
 import { LikeBook, LikeRow, MyBooksResult } from '@/shared/domain/mybooks/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '../../supabase/server';
+import { getCurrentUser } from '../../auth/getCurrentUser';
+import { parseItemId } from '@/shared/domain/book/ids';
 
 const getLikeIdsBySearch = async ({
   supabase,
@@ -12,7 +14,7 @@ const getLikeIdsBySearch = async ({
   searchField,
 }: {
   supabase: SupabaseClient;
-  userId: string | undefined;
+  userId: string;
   search: string;
   searchField: SearchField;
 }) => {
@@ -57,18 +59,16 @@ export const getLikeBooks = async ({
   searchField?: SearchField | null;
 }): Promise<MyBooksResult<LikeBook>> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const userId = user?.id;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
-
+  if (!userId) return { data: [], total: 0 };
   let likeQuery = supabase
     .from('likes')
     .select(
-      '*,books!inner(title,thumbnail_url,author,isbn13,category_id,category_name,book_stats(view_count,like_count,comment_count))',
+      'item_id,created_at,books!inner(title,author,thumbnail_url,category_name,book_stats(view_count,like_count,comment_count))',
       {
         count: 'exact',
       }
@@ -107,23 +107,24 @@ export const getLikeBooks = async ({
   const { data, count, error } = await likeQuery.range(from, to);
   if (error) throw error;
 
-  const likes = (data ?? []).map((item: LikeRow) => {
+  const likes = (data ?? []).flatMap((item: LikeRow): LikeBook[] => {
+    const itemId = parseItemId(item.item_id);
+    if (!itemId) return [];
     const bookInfo = Array.isArray(item.books) ? item.books[0] : item.books;
     const stats = Array.isArray(bookInfo?.book_stats) ? bookInfo?.book_stats[0] : bookInfo?.book_stats;
-
-    return {
-      book_id: item.book_id ?? '',
-      title: bookInfo.title ?? '',
-      cover: bookInfo.thumbnail_url ?? '/noImg.png',
-      created_at: item.created_at,
-      isbn13: item.isbn13 ?? bookInfo.isbn,
-      author: bookInfo.author ?? '',
-      categoryId: bookInfo.category_id,
-      categoryName: bookInfo.category_name,
-      total_view_count: stats?.view_count ?? 0,
-      total_like_count: stats?.like_count,
-      total_comment_count: stats?.comment_count ?? 0,
-    };
+    return [
+      {
+        itemId,
+        created_at: item.created_at,
+        title: bookInfo.title ?? '',
+        cover: bookInfo.thumbnail_url ?? '/images/noImg.png',
+        author: bookInfo.author ?? '',
+        categoryName: bookInfo.category_name,
+        total_view_count: stats?.view_count ?? 0,
+        total_like_count: stats?.like_count ?? 0,
+        total_comment_count: stats?.comment_count ?? 0,
+      },
+    ];
   });
   return {
     data: likes,

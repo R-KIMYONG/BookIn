@@ -2,7 +2,8 @@ import { UpdateSubmitItem } from '@/shared/domain/comment/types';
 
 export const updateComment = async (data: UpdateSubmitItem) => {
   const response = await fetch('/api/comment', {
-    method: 'PUT',
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   const result = await response.json();

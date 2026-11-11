@@ -1,8 +1,9 @@
 import { recentbookKeys } from '@/shared/domain/recentbooks/queryKeys';
+import { RecentBook } from '@/shared/domain/recentbooks/types';
 import { useQuery } from '@tanstack/react-query';
 
 export const useRecentBooks = () => {
-  return useQuery({
+  return useQuery<RecentBook[]>({
     queryKey: recentbookKeys.list(),
     queryFn: async () => {
       const response = await fetch(`/api/recent-books`);

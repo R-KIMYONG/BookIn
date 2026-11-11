@@ -1,5 +1,9 @@
 // 디깅 타입 정의 (직접 구현)
 // 참고: 질문뱅크용 타입(Dimension, DiggingOption, DiggingQuestion)은 현재 questionBank.ts에 함께 정의·export 되어 있음.
+
+import { RailBookView } from '../rails/types';
+import { RankedBook } from '../recommend/toRailBooks';
+
 // 답(DiggingAnswer)·결과(DiggingResult) 등 나머지 타입을 여기서 정의하면 됨.
 export {};
 export type MatchBookType = {
@@ -22,7 +26,9 @@ export type ReaderType = {
   categories: string[];
 };
 
-export type DiggingResultType = { reader: ReaderType; DiggingBookList: MatchBookType[] };
+export type DiggingResultType = { reader: ReaderType; DiggingBookList: DiggingBook[] };
+
+export type DiggingBook = RankedBook & { categoryName: string | null };
 
 export type DiggingReader = {
   readerType: string;
@@ -36,5 +42,5 @@ export type DiggingReader = {
 export type DiggingDaily = {
   date: string;
   reader: DiggingReader;
-  books: MatchBookType[];
+  books: DiggingBook[];
 };

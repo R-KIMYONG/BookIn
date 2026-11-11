@@ -1,9 +1,10 @@
 import { hashToken } from '@/shared/lib/crypto/hashToken';
-import { createClient } from '@/shared/lib/supabase/server';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (request: NextRequest) => {
-  const supabase = await createClient();
+  // 비로그인 경로 + password_reset_* 는 비공개 컬럼이라 관리자 클라이언트 사용
+  const supabase = createAdminClient();
 
   const token = request.nextUrl.searchParams.get('token');
 

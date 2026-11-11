@@ -3,6 +3,7 @@ import { createClient } from '../../supabase/server';
 import { RankedBook } from '@/shared/domain/ranking/types';
 import dayjs from '@/shared/lib/date/dayjs';
 import { rankingCalcChange } from '@/shared/domain/ranking/rankingCalcChange';
+import { toRankingBook } from '@/shared/domain/ranking/toRankingBook';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
@@ -15,6 +16,7 @@ export const getRankedBooks = async (): Promise<RankedBook[]> => {
   const { data: today, error } = await supabase
     .from('book_ranking')
     .select('*')
+    .gt('score', 0)
     .order('score', { ascending: false })
     .limit(50);
 
@@ -23,16 +25,18 @@ export const getRankedBooks = async (): Promise<RankedBook[]> => {
 
   const { data: snapshot, error: snapshotError } = await supabase
     .from('ranking_snapshots')
-    .select('isbn13,rank')
+    .select('item_id,rank')
     .eq('snapshot_date', yesterday);
 
   if (snapshotError) console.error('snapshot fetch 실패', snapshotError);
 
-  const yMap = new Map((snapshot ?? []).map((s) => [s.isbn13, s.rank]));
+  const yMap = new Map((snapshot ?? []).map((s) => [s.item_id, s.rank]));
 
-  const rankingList = (today ?? []).map((book, i) => {
+  const books = (today ?? []).map(toRankingBook).filter((book) => book !== null);
+
+  const rankingList = books.map((book, i) => {
     const todayRank = i + 1;
-    const yesterdayRank = yMap.get(book.isbn13);
+    const yesterdayRank = yMap.get(book.item_id);
     return {
       ...book,
       rank: todayRank,

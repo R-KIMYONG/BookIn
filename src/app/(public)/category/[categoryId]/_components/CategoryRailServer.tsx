@@ -1,18 +1,28 @@
 import BookRail from '@/app/(private)/mypage/_components/recommend/rail/BookRail';
-import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
-import { getRelatedBooks } from '@/shared/lib/rails/getRelatedBooks';
+import { getBookStatsByItemIds } from '@/shared/lib/server/entities/getBookStatsByItemIds';
 import { Sparkles } from 'lucide-react';
-import React from 'react';
+import { BookSummary } from '@/shared/domain/book/types';
+import { getCachedCategoryRail } from '@/shared/lib/recommend/buildCategoryRail';
 
-const CategoryRailServer = async ({ categoryPath, mall }: { categoryPath?: string; mall?: string }) => {
-  const related = await getRelatedBooks(undefined, categoryPath, mall);
-  const stats = await getBookStatsByIsbn(related.map((b) => b.isbn13));
-  const relatedView = related.map((b) => ({ ...b, stats: stats[b.isbn13] }));
+const RAIL_SIZE = 20;
+
+const CategoryRailServer = async ({ categoryId }: { categoryId: string }) => {
+  let books: BookSummary[] = [];
+  try {
+    books = await getCachedCategoryRail(categoryId, RAIL_SIZE);
+  } catch (error) {
+    console.error('카테고리 추천 실패:', error); // 레일이 실패해도 카테고리 목록은 보이게
+  }
+
+  if (books.length === 0) return null;
+  // 조회수·댓글수는 매번 최신으로
+  const stats = await getBookStatsByItemIds(books.map((book) => book.itemId));
+  const booksView = books.map((book) => ({ ...book, stats: stats[book.itemId] }));
   return (
     <BookRail
       icon={<Sparkles className="h-4 w-4" />}
       label="새로운 발견"
-      books={relatedView}
+      books={booksView}
       emptyMessage="관련 추천을 찾지 못했습니다."
     />
   );
