@@ -1,80 +1,35 @@
-'use client';
-
-import { useMemo, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import Button from '@/components/common/ui/Button';
-import QueryTypeTabs from '@/components/common/filters/QueryTypeTabs';
-import InvalidCategory from './InvalidCategory';
-import { Genre } from '@/shared/domain/category/types';
-import { classifyCategory } from '@/shared/domain/category/classifyCategory';
-import { TargetTypes } from '@/shared/constants/category';
-import { useBookListData } from '@/hooks/book/useBookListData';
+import { CategoryNode } from '@/shared/domain/category/types';
+import CategoryDropdown from './CategoryDropdown';
+import CategoryChips from './CategoryChips';
 
 type CategoryHeaderProps = {
-  categoryId: number;
-  koreanGenres: Genre[];
-  foreignGenres: Genre[];
-  ebookGenres: Genre[];
-  target: TargetTypes;
+  tree: CategoryNode[];
+  path: CategoryNode[];
 };
 
-const CategoryHeader = ({ categoryId, koreanGenres, foreignGenres, ebookGenres, target }: CategoryHeaderProps) => {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+// 클라이언트 컴포넌트에는 화면에 필요한 값만 전달 (children까지 넘기면 소분류가 HTML에 포함됨)
+const toOptions = (nodes: CategoryNode[]) => nodes.map(({ id, name }) => ({ id, name }));
 
-  const { isValidCategory, groupLabel, genreData } = useMemo(
-    () => classifyCategory({ categoryId, koreanGenres, foreignGenres, ebookGenres }),
-    [koreanGenres, foreignGenres, ebookGenres, categoryId]
-  );
-
-  const { queryType, setListUrl } = useBookListData({ target, categoryId });
-
-  if (!isValidCategory) return <InvalidCategory />;
-
-  const handleTabClick = (id: number) => {
-    const params = new URLSearchParams({ target, page: '1', qt: queryType });
-    startTransition(() => {
-      router.push(`/category/${id}?${params.toString()}`, { scroll: false });
-    });
-  };
+const CategoryHeader = ({ tree, path }: CategoryHeaderProps) => {
+  const [mall, mid, small] = path;
+  const chips = mid ? mid.children : mall.children;
 
   return (
-    <>
-      <p className="font-bold border-b text-center pb-3">{groupLabel}</p>
-
-      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-        <QueryTypeTabs
-          value={queryType}
-          onChange={(k) => setListUrl({ queryType: k, searchKeyWord: null, page: 1 })}
-          target={target}
-          disable={isPending}
-        />
-      </div>
-
-      <nav
-        role="tablist"
-        className="border rounded-lg px-3 w-fit h-fit py-3 flex gap-2 box-border flex-row items-start"
-      >
-        <ul className="flex gap-2 w-fit flex-wrap">
-          {genreData.map((tab, index) => {
-            const active = tab.id === categoryId;
-            return (
-              <Button
-                key={`${tab.id}-${tab.label}-${index}`}
-                size="xs"
-                variant={active ? 'primary' : 'secondary'}
-                label={tab.label}
-                disabled={isPending}
-                onClick={() => {
-                  if (active) return;
-                  handleTabClick(tab.id);
-                }}
-              />
-            );
-          })}
-        </ul>
+    <header className="flex flex-col gap-2">
+      <nav aria-label="카테고리 경로" className="-ml-1 flex items-center gap-1">
+        <CategoryDropdown current={mall} options={toOptions(tree)} />
+        {mid && (
+          <>
+            <span aria-hidden="true" className="text-sm text-gray-300">
+              ›
+            </span>
+            <CategoryDropdown current={mid} options={toOptions(mall.children)} />
+          </>
+        )}
       </nav>
-    </>
+      <h1 className="sr-only">{path[path.length - 1].name}</h1>
+      {chips.length > 0 && <CategoryChips chips={toOptions(chips)} allId={mid?.id} activeId={small?.id ?? mid?.id} />}
+    </header>
   );
 };
 

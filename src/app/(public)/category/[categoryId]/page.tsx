@@ -1,89 +1,68 @@
-import { Suspense } from 'react';
-import { getGenres } from '@/shared/domain/category/getGenres';
-import { DEFAULT_QT, QUERY_TYPE_LIST } from '@/shared/domain/aladin/constants';
-import { ALLOWED_TARGETS, TargetTypes } from '@/shared/constants/category';
-import SkeletonGrid from '@/components/common/SkeletonGrid';
+import { Suspense } from 'react';;
+import CategoryListSkeleton from './_components/CategoryListSkeleton';
 import CategoryHeader from './_components/CategoryHeader';
 import CategoryListWrapper from './_components/CategoryListWrapper';
-import { redirect } from 'next/navigation';
-import { classifyCategory } from '@/shared/domain/category/classifyCategory';
-import { QueryType } from '@/shared/domain/aladin/types';
 import CategoryRailServer from './_components/CategoryRailServer';
 import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
+import { getYes24CategoryTree } from '@/shared/lib/yes24/getYes24CategoryTree';
+import { findCategoryPath } from '@/shared/domain/category/tree';
+import { parseCategoryId } from '@/shared/domain/book/ids';
+import InvalidCategory from './_components/InvalidCategory';
+import { Metadata } from 'next';
+import { HOME_SECTIONS } from '@/shared/lib/yes24/constants';
+import { toPage } from '@/shared/lib/yes24/searchParams';
 
 export const maxDuration = 60;
 type CategoryPageProps = {
   params: Promise<{ categoryId: string }>;
-  searchParams: Promise<{ qt?: QueryType; page?: string; target?: TargetTypes }>;
+  searchParams: Promise<{ type?: string; page?: string }>;
+};
+
+export const generateMetadata = async ({ params }: CategoryPageProps): Promise<Metadata> => {
+  const { categoryId: rawCategoryId } = await params;
+  const categoryId = parseCategoryId(rawCategoryId);
+  if (!categoryId) return { title: '존재하지 않는 카테고리' };
+
+  const tree = await getYes24CategoryTree();
+  const path = findCategoryPath(tree, categoryId);
+  if (!path) return { title: '존재하지 않는 카테고리' };
+
+  return { title: path[path.length - 1].name };
 };
 
 const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
   const rawParams = await params;
   const rawSearchParams = await searchParams;
+  const categoryId = parseCategoryId(rawParams.categoryId);
 
-  const categoryId = Number(rawParams.categoryId);
+  if (!categoryId) return <InvalidCategory />;
 
-  const queryType = QUERY_TYPE_LIST.includes(rawSearchParams.qt as QueryType)
-    ? (rawSearchParams.qt as QueryType)
-    : DEFAULT_QT;
+  const categoryTree = await getYes24CategoryTree();
 
-  const genres = getGenres();
-  const {
-    defaultTarget: computedDefault,
-    genreData,
-    groupLabel,
-  } = classifyCategory({
-    categoryId,
-    koreanGenres: genres.koGenres,
-    foreignGenres: genres.foGenres,
-    ebookGenres: genres.ebGenres,
-  });
+  const path = findCategoryPath(categoryTree, categoryId);
 
-  if (!rawSearchParams.target) {
-    const redirectParams = new URLSearchParams({
-      target: computedDefault,
-      qt: rawSearchParams.qt ?? DEFAULT_QT,
-      page: rawSearchParams.page ?? '1',
-    });
-    redirect(`/category/${categoryId}?${redirectParams.toString()}`);
-  }
+  if (!path) return <InvalidCategory />;
 
-  const target = ALLOWED_TARGETS.includes(rawSearchParams.target as TargetTypes)
-    ? (rawSearchParams.target as TargetTypes)
-    : computedDefault;
+  const mallSection = HOME_SECTIONS.find((section) => section.categoryId === path[0].id);
+  if (!mallSection) return <InvalidCategory />;
 
-  const page = Number(rawSearchParams.page ?? 1);
+  const { tabs } = mallSection;
+  const listType = tabs.find((tab) => tab === rawSearchParams.type) ?? tabs[0];
+  const page = toPage(rawSearchParams.page ?? null);
 
-  // 레일 매칭용: DB category_name 경로 기준 (JSON 라벨과 표기가 다르면 path로 보정)
-  const genre = genreData.find((b) => b.id === categoryId);
-  const categoryPath = (genre?.path ?? genre?.label)?.replace(/\(eb\)$/, '');
-  // DB 몰 표기: 국내도서 / 외국도서 / 전자책 (groupLabel은 eBook만 다름)
-  const mall = groupLabel === 'eBook' ? '전자책' : groupLabel || undefined;
   return (
     <main className="px-1 sm:px-6 md:px-10 flex-1">
+      {/* <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4"> */}
       <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
-        <CategoryHeader
-          categoryId={categoryId}
-          koreanGenres={genres.koGenres}
-          foreignGenres={genres.foGenres}
-          ebookGenres={genres.ebGenres}
-          target={target}
-        />
-        <div className="w-full flex-1">
-          <Suspense key={`${categoryId}-${queryType}-${target}`} fallback={<SkeletonGrid count={20} />}>
-            <CategoryListWrapper
-              categoryId={categoryId}
-              queryType={queryType}
-              target={target}
-              page={page}
-              genreData={genreData}
-            />
-          </Suspense>
-        </div>
+        <CategoryHeader tree={categoryTree} path={path} />
+        {/* 헤더와 같은 컨테이너 안에 둬야 좌우 폭이 맞음 */}
+        <Suspense fallback={<CategoryListSkeleton tabs={tabs} active={listType} />}>
+          <CategoryListWrapper categoryId={categoryId} listType={listType} page={page} tabs={tabs} />
+        </Suspense>
       </section>
       <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
         <Suspense fallback={<RailsSkeleton col={1} />}>
-          <CategoryRailServer categoryPath={categoryPath} mall={mall} />
+          <CategoryRailServer categoryId={categoryId} />
         </Suspense>
       </section>
     </main>

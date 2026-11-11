@@ -1,72 +1,38 @@
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { getAladinList } from '@/shared/lib/aladin/getAladinList.server';
-import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
-import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
-import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
-import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
-import { likeKeys } from '@/shared/domain/like/queryKeys';
-import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { TargetTypes } from '@/shared/constants/category';
 import CategoryList from './CategoryList';
-import { QueryType } from '@/shared/domain/aladin/types';
-import { Genre } from '@/shared/domain/category/types';
-import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
-import { statsKeys } from '@/shared/domain/book/queryKeys';
-import { getLastPageServer } from '@/shared/lib/aladin/getLastPageServer';
+import { Yes24ListType } from '@/shared/lib/yes24/types';
+import { getYes24List } from '@/shared/lib/yes24/getYes24List';
+import { CATEGORY_LIST_SIZE, HOME_LIST_SIZE } from '@/shared/lib/yes24/constants';
+import { CategoryId } from '@/shared/domain/book/ids';
+import { bookListKeys } from '@/shared/domain/book/queryKeys';
+import { prefetchBookInteractions } from '@/shared/lib/server/entities/prefetchBookInteractions';
 
 type CategoryListWrapperProps = {
-  categoryId: number;
-  queryType: QueryType;
-  target: TargetTypes;
+  categoryId: CategoryId;
+  listType: Yes24ListType;
   page: number;
-  genreData: Genre[];
+  tabs: Yes24ListType[];
 };
 
-const CategoryListWrapper = async ({ categoryId, queryType, target, page, genreData }: CategoryListWrapperProps) => {
+const CategoryListWrapper = async ({ categoryId, listType, page, tabs }: CategoryListWrapperProps) => {
   const queryClient = new QueryClient();
 
-  const [listData, lastPage] = await Promise.all([
-    getAladinList({ queryType, page, target, categoryId }),
-    getLastPageServer({ queryType, target, categoryId }),
-  ]);
+  try {
+    const list = await getYes24List({ listType, categoryId, pageSize: CATEGORY_LIST_SIZE, page });
 
-  queryClient.setQueryData(aladinKeys.list({ queryType, page, target, categoryId }), listData);
-  queryClient.setQueryData(aladinKeys.lastPage({ queryType, target, categoryId }), lastPage);
+    queryClient.setQueryData(bookListKeys.list({ listType, categoryId, pageSize: CATEGORY_LIST_SIZE, page }), list);
 
-  const isbnList = (listData?.items ?? []).map((item) => item.isbn13);
-
-  if (isbnList.length > 0) {
-    const [likes, likeCounts, bookmarks, statsMap] = await Promise.all([
-      getLikesByIsbnList(isbnList),
-      getLikeCountsByIsbnList(isbnList),
-      getBookmarksByIsbnList(isbnList),
-      getBookStatsByIsbn(isbnList),
-    ]);
-
-    for (const isbn of isbnList) {
-      queryClient.setQueryData(likeKeys.detail(isbn), {
-        isbn13: isbn,
-        liked: likes[isbn] ?? false,
-        liked_count: likeCounts[isbn] ?? 0,
-      });
-      queryClient.setQueryData(bookmarkKeys.detail(isbn), {
-        isbn13: isbn,
-        bookmarked: bookmarks[isbn]?.bookmarked ?? false,
-        memoExists: bookmarks[isbn]?.memoExists ?? false,
-      });
-    }
-    queryClient.setQueryData(statsKeys.batch(isbnList), statsMap);
+    await prefetchBookInteractions(
+      queryClient,
+      list.items.map((book) => book.itemId)
+    );
+  } catch (error) {
+    console.error(`카테고리 목록 조회 실패 (${categoryId} / ${listType} / ${page}p)`, error);
   }
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CategoryList
-        categoryId={categoryId}
-        target={target}
-        genreData={genreData}
-        initialPage={page}
-        initialQueryType={queryType}
-        initialList={listData}
-      />
+      <CategoryList categoryId={categoryId} tabs={tabs} listType={listType} page={page} />
     </HydrationBoundary>
   );
 };

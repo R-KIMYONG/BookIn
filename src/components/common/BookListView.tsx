@@ -5,15 +5,14 @@ import Link from 'next/link';
 import AppPagination from '@/components/common/AppPagination';
 import CategoryItem from '@/components/home/CategoryItem';
 import SkeletonGrid from '@/components/common/SkeletonGrid';
+import Yes24Attribution from '@/components/common/Yes24Attribution';
 import { useBookStats } from '@/hooks/book/useBookStats';
-import { makeHref } from '@/shared/domain/book/makeHref';
-import { makeItemKey } from '@/shared/domain/book/makeItemKey';
-import { getBookKey } from '@/shared/domain/book/getBookKey';
-import { AladinBookInfo } from '@/shared/types/api';
 import { useMyStatus } from '@/hooks/book/useMyStatus';
+import { makeHref } from '@/shared/domain/book/makeHref';
+import { BookSummary } from '@/shared/domain/book/types';
 
 type BookListViewProps = {
-  list: AladinBookInfo[];
+  list: BookSummary[];
   page: number;
   totalPages: number;
   listDataPending: boolean;
@@ -35,9 +34,10 @@ const BookListView = ({
   emptySlot,
   onPageChange,
 }: BookListViewProps) => {
-  const isbnList = useMemo(() => list.map((b) => b.isbn13).filter(Boolean), [list]);
-  const { data: stats } = useBookStats(isbnList);
-  useMyStatus(isbnList);
+  const itemIds = useMemo(() => list.map((book) => book.itemId), [list]);
+  const { data: stats } = useBookStats(itemIds);
+  useMyStatus(itemIds);
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const dim = mounted && isFetching;
@@ -57,29 +57,15 @@ const BookListView = ({
         <div
           className={`w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ${dim ? 'opacity-60 ' : ''}transition-opacity`}
         >
-          {list.map((book, index) => {
-            const href = makeHref(book);
-            const key = makeItemKey(book, index);
-            const bookKey = getBookKey(book);
-            return href ? (
-              <Link href={href} key={key}>
-                <CategoryItem
-                  item={book}
-                  viewCount={bookKey ? (stats?.[bookKey]?.view_count ?? 0) : 0}
-                  commentCount={bookKey ? (stats?.[bookKey]?.comment_count ?? 0) : 0}
-                />
-              </Link>
-            ) : (
-              <div key={key} className="opacity-60 cursor-not-allowed" title="상세 페이지가 없어서 이동할 수 없어요">
-                <CategoryItem
-                  item={book}
-                  disabled
-                  viewCount={bookKey ? (stats?.[bookKey]?.view_count ?? 0) : 0}
-                  commentCount={bookKey ? (stats?.[bookKey]?.comment_count ?? 0) : 0}
-                />
-              </div>
-            );
-          })}
+          {list.map((book) => (
+            <Link href={makeHref(book.itemId)} key={book.itemId}>
+              <CategoryItem
+                item={book}
+                viewCount={stats?.[book.itemId]?.view_count ?? 0}
+                commentCount={stats?.[book.itemId]?.comment_count ?? 0}
+              />
+            </Link>
+          ))}
         </div>
       )}
 
@@ -89,6 +75,7 @@ const BookListView = ({
           <AppPagination totalPages={totalPages} page={page} isFetching={isFetching} onChange={onPageChange} />
         )}
       </div>
+      <Yes24Attribution />
     </>
   );
 };
