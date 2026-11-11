@@ -1,5 +1,3 @@
-import { ALADIN_MAX_PAGES } from '../constants/pagination';
-
 const getTotalPages = (totalResults: number, perPage: number) => {
   const safePerPage = Number.isFinite(perPage) && perPage && perPage > 0 ? perPage : 20;
 
@@ -7,7 +5,7 @@ const getTotalPages = (totalResults: number, perPage: number) => {
 
   const rawTotalPages = Math.max(1, Math.ceil(safeTotalResults / safePerPage));
 
-  return Math.min(ALADIN_MAX_PAGES, rawTotalPages);
+  return rawTotalPages;
 };
 
 export default getTotalPages;
