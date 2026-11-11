@@ -1,5 +1,6 @@
 import BookStats from '@/components/book/BookStats';
 import { formatAuthor } from '@/shared/domain/book/formatAuthor';
+import { makeHref } from '@/shared/domain/book/makeHref';
 import { RailBookView } from '@/shared/domain/rails/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,17 +12,8 @@ type BookRailsCardProps = {
 const BookRailsCard = ({ book }: BookRailsCardProps) => {
   const coverSrc = book.cover?.startsWith('http') ? book.cover : '/images/noImg.png';
   const match = typeof book.similarity === 'number' ? Math.round(book.similarity * 100) : null;
-
-  const bookInfo = {
-    isbn13: book.isbn13,
-    title: book.title,
-    cover: book.cover,
-    author: book.author,
-    categoryId: book.categoryId,
-    categoryName: book.categoryName,
-  };
   return (
-    <Link href={`/${bookInfo.isbn13}?type=isbn13`}>
+    <Link href={makeHref(book.itemId)}>
       <article className="group w-36 shrink-0 sm:w-40">
         <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-gray-100 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
           <Image

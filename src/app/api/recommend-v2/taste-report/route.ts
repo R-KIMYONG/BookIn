@@ -33,7 +33,7 @@ export const GET = async () => {
   const persona = buildPersona(genres, total);
 
   if (total >= TASTE_UNLOCK) {
-    const { data: userRow } = await supabase
+    const { data: userRow } = await supabaseAdmin
       .from('users')
       .select('persona_id,persona_title')
       .eq('id', user.id)

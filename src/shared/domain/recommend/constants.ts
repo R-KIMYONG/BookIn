@@ -1,7 +1,4 @@
-import { QueryType } from '../aladin/types';
-
 export const AI_MODEL = 'claude-haiku-4-5';
-export const POOL_QUERIES: QueryType[] = ['Bestseller', 'ItemNewAll', 'ItemNewSpecial', 'BlogBest'];
 export const tasteAnalysisPrompt = (
   nickname: string
 ) => `너는 '독서 관상가'다. 사람이 어떤 책에 어떻게 반응했는지(독서 지문)만 보고, 그 사람이 어떤 사람인지 재치있게 꿰뚫는 캐릭터다. 점집 같은 소름함 + 다정한 친구 톤으로 ${nickname}님을 분석한다.
