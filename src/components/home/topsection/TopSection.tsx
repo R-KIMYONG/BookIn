@@ -11,9 +11,12 @@ import { useBookStats } from '@/hooks/book/useBookStats';
 const TopSection = () => {
   const { data: viewBooks = [] } = useTopViewBooks();
   const { data: rankedBooks = [] } = useRankedBooks();
-  const viewIsbns = useMemo(() => viewBooks.map((b) => b.isbn13).filter(Boolean), [viewBooks]);
-  useBookStats(viewIsbns);
-  useMyStatus(viewIsbns);
+  const viewItemIds = useMemo(() => viewBooks.map((b) => b.item_id), [viewBooks]);
+  useBookStats(viewItemIds);
+  useMyStatus(viewItemIds);
+
+  if (viewBooks.length === 0 && rankedBooks.length === 0) return null;
+
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
       <div className="mb-4">
@@ -24,7 +27,7 @@ const TopSection = () => {
         <p className="text-xs sm:text-sm text-gray-500 mt-1">독자들이 가장 많이 보고 반응한 책들을 모았어요</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4 lg:gap-6 ">
-        <TopViewSlide books={viewBooks} />
+        {viewBooks.length > 0 && <TopViewSlide books={viewBooks} />}
         <RankingBoard books={rankedBooks} />
       </div>
     </section>

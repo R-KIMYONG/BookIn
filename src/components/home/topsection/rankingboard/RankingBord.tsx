@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { ChevronRight, Trophy } from 'lucide-react';
+import { makeHref } from '@/shared/domain/book/makeHref';
 import { RankedBook } from '@/shared/domain/ranking/types';
 import RankingModal from './RankingModal';
 import Button from '@/components/common/ui/Button';
@@ -35,9 +36,9 @@ const RankingBoard = ({ books }: { books: RankedBook[] }) => {
           const rank = i + 1;
           const isTop3 = rank <= 3;
           return (
-            <li key={book.isbn13}>
+            <li key={book.item_id}>
               <Link
-                href={`/${book.isbn13}?type=isbn13`}
+                href={makeHref(book.item_id)}
                 className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 transition-colors group"
               >
                 <RankChangeBadge change={book.change} />

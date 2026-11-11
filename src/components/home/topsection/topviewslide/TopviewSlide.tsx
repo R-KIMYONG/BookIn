@@ -104,7 +104,7 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
           style={{ transform: `translateX(calc(-${slideIndex * 100}% - ${dragOffset}px))` }}
         >
           {cloneSlides.map((book, index) => (
-            <SlideCard key={book.book.isbn13 + index} book={book.book} rank={book.rank} active />
+            <SlideCard key={`${book.book.item_id}-${index}`} book={book.book} rank={book.rank} active />
           ))}
         </div>
       </div>
@@ -134,7 +134,10 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
                     className={`${slideIndex === i + 1 && 'fill-black text-black transition-colors'}`}
                   />
                 }
-                onClick={() => selectSlideDot(i)}
+                onClick={() => {
+                  selectSlideDot(i);
+                  setIsPlaying(false);
+                }}
               />
             ))}
           </div>

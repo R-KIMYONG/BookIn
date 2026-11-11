@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { X, Trophy } from 'lucide-react';
+import { makeHref } from '@/shared/domain/book/makeHref';
 import { RankedBook } from '@/shared/domain/ranking/types';
 import { rankBadge } from '@/shared/domain/ranking/rankBadge';
 import RankChangeBadge from './RankChangeBadge';
@@ -50,9 +51,9 @@ const RankingModal = ({ isOpen, onClose, books }: RankingModalProps) => {
           {top50.map((book, i) => {
             const rank = i + 1;
             return (
-              <li key={book.isbn13}>
+              <li key={book.item_id}>
                 <Link
-                  href={`/${book.isbn13}?type=isbn13`}
+                  href={makeHref(book.item_id)}
                   onClick={onClose}
                   className="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50 transition-colors group"
                 >

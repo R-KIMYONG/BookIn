@@ -1,6 +1,7 @@
 import BookmarkButton from '@/components/book/BookmarkButton';
 import BookStats from '@/components/book/BookStats';
 import LikeButton from '@/components/book/LikeButton';
+import { makeHref } from '@/shared/domain/book/makeHref';
 import { TopViewType } from '@/shared/domain/ranking/types';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
@@ -9,14 +10,6 @@ import Link from 'next/link';
 const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; active: boolean }) => {
   const coverSrc = book.thumbnail_url?.startsWith('http') ? book.thumbnail_url : '/images/noImg.png';
 
-  const bookInfo = {
-    isbn13: book.isbn13,
-    title: book.title,
-    cover: coverSrc,
-    author: book.author,
-    categoryId: book.categoryId,
-    categoryName: book.categoryName,
-  };
   return (
     <div className="relative w-full shrink-0 h-full overflow-hidden rounded-2xl">
       {/* 글라스 배경: 블러 표지 + 다크 틴트 (대비 보장) */}
@@ -49,8 +42,8 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
             className="object-cover rounded-xl shadow-xl ring-1 ring-white/10"
           />
           <div className="absolute bottom-2 inset-x-2 z-20 flex items-center justify-between text-xs">
-            <LikeButton bookInfo={bookInfo} />
-            <BookmarkButton bookInfo={bookInfo} scope="home" />
+            <LikeButton itemId={book.item_id} />
+            <BookmarkButton itemId={book.item_id} scope="home" />
           </div>
         </div>
 
@@ -69,7 +62,7 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
             <p className="text-[11px] text-white/80 line-clamp-1">{book.author}</p>
             <BookStats viewCount={book.view_count} commentCount={book.comment_count} size="lg" className="text-white" />
             <Link
-              href={`/${book.isbn13}?type=isbn13`}
+              href={makeHref(book.item_id)}
               aria-hidden={!active}
               tabIndex={active ? 0 : -1}
               className="mt-1 self-start"
@@ -96,8 +89,8 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
               className="object-cover rounded-xl shadow-xl ring-1 ring-white/10"
             />
             <div className="absolute bottom-2 z-20 flex gap-1 items-center text-xs justify-between w-full px-4">
-              <LikeButton bookInfo={bookInfo} />
-              <BookmarkButton bookInfo={bookInfo} scope="home" />
+              <LikeButton itemId={book.item_id} />
+              <BookmarkButton itemId={book.item_id} scope="home" />
             </div>
           </div>
         </div>
@@ -109,7 +102,7 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
           <p className="text-sm text-white/80 line-clamp-1">{book.author}</p>
           <BookStats viewCount={book.view_count} commentCount={book.comment_count} size="lg" className="text-white" />
           <Link
-            href={`/${book.isbn13}?type=isbn13`}
+            href={makeHref(book.item_id)}
             aria-hidden={!active}
             tabIndex={active ? 0 : -1}
             className="mt-4 self-start"
