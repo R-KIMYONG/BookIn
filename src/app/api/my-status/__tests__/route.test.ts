@@ -5,127 +5,79 @@ vi.mock('@/shared/lib/supabase/server', () => {
   return { createClient: vi.fn() };
 });
 
+const fakeSupabaseWith = (likes: unknown, bookmarks: unknown) => ({
+  auth: {
+    getUser: () => ({ data: { user: { id: 'user-1' } } }),
+  },
+  from: (table: string) => ({
+    select: () => ({
+      eq: () => ({
+        in: async () => {
+          if (table === 'likes') return { data: likes };
+          if (table === 'bookmarks') return { data: bookmarks };
+        },
+      }),
+    }),
+  }),
+});
+
 describe('api/my-status route test', () => {
   afterEach(() => vi.restoreAllMocks());
-  it('빈배열로 Request로 넘길 시 빈배열 반환여부 테스트', async () => {
-    const req = { url: 'http://localhost:3000/api/my-status' } as any; //ids없이 그냥 넘기기
+  it('ids 없이 요청하면 빈 배열', async () => {
+    const fakeSupabase = { auth: { getUser: () => ({ data: { user: null } }) } };
+    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    const req = { url: 'http://localhost:3000/api/my-status' } as any;
 
     const res = await GET(req);
 
-    const result = await res.json();
-
-    expect(result).toEqual([]);
+    expect(await res.json()).toEqual([]);
   });
 
-  it('auth 인증 실패 시 기대된 값으로 반환여부 테스트', async () => {
+  it('로그인 안 했으면 401과 전부 false', async () => {
     const fakeSupabase = {
       auth: {
-        getUser: () => {
-          return {
-            data: { user: null },
-            error: { message: '인증오류' },
-          };
-        },
+        getUser: () => ({ data: { user: null }, error: { message: '인증오류' } }),
       },
     };
 
     vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
-    const req = { url: 'http://localhost:3000/api/my-status?ids=a,b,c' } as any;
+    const req = { url: 'http://localhost:3000/api/my-status?ids=1,2,3' } as any;
     const res = await GET(req);
 
-    const result = await res.json();
     expect(res.status).toBe(401);
-
-    expect(result).toEqual(
-      expect.arrayContaining([{ isbn13: 'a', liked: false, bookmarked: false, memoExists: false }])
+    expect(await res.json()).toEqual(
+      expect.arrayContaining([{ itemId: 1, liked: false, bookmarked: false, memoExists: false }])
     );
   });
 
-  it('route 요청 성공 시 기대값 일치 여부 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return {
-            data: { user: 'user-1' },
-          };
-        },
-      },
-      from: (table: string) => {
-        return {
-          select: () => {
-            return {
-              eq: () => {
-                return {
-                  in: async () => {
-                    if (table === 'likes') return { data: [{ isbn13: 'a' }] };
-                    if (table === 'bookmarks') return { data: [{ isbn13: 'a', memo: '<p>메모</p>' }] };
-                  },
-                };
-              },
-            };
-          },
-        };
-      },
-    };
+  it('좋아요·북마크·메모 상태를 itemId별로 합친다 (잘못된 id는 걸러짐)', async () => {
+    vi.mocked(createClient).mockResolvedValue(
+      fakeSupabaseWith([{ item_id: 1 }], [{ item_id: 1, memo: '<p>메모</p>' }]) as any
+    );
 
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
-
-    const req = { url: 'http://localhost:3000/api/my-status?ids=a,b,c' } as any;
+    const req = { url: 'http://localhost:3000/api/my-status?ids=1,2,3,abc' } as any;
 
     const res = await GET(req);
 
-    const result = await res.json();
-
     expect(res.status).toBe(200);
-
-    expect(result).toMatchObject([
-      { isbn13: 'a', liked: true, bookmarked: true, memoExists: true },
-      { isbn13: 'b', liked: false, bookmarked: false, memoExists: false },
-      { isbn13: 'c', liked: false, bookmarked: false, memoExists: false },
+    expect(await res.json()).toEqual([
+      { itemId: 1, liked: true, bookmarked: true, memoExists: true },
+      { itemId: 2, liked: false, bookmarked: false, memoExists: false },
+      { itemId: 3, liked: false, bookmarked: false, memoExists: false },
     ]);
   });
-  it('route 요청 실패 시 기대값 일치 여부 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return {
-            data: { user: 'user-1' },
-          };
-        },
-      },
-      from: (table: string) => {
-        return {
-          select: () => {
-            return {
-              eq: () => {
-                return {
-                  in: async () => {
-                    if (table === 'likes') return { data: null };
-                    if (table === 'bookmarks') return { data: [{ isbn13: 'a', memo: '<p>메모</p>' }] };
-                  },
-                };
-              },
-            };
-          },
-        };
-      },
-    };
 
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+  it('likes 조회 결과가 없으면 liked는 전부 false', async () => {
+    vi.mocked(createClient).mockResolvedValue(fakeSupabaseWith(null, [{ item_id: 1, memo: '<p>메모</p>' }]) as any);
 
-    const req = { url: 'http://localhost:3000/api/my-status?ids=a,b' } as any;
+    const req = { url: 'http://localhost:3000/api/my-status?ids=1,2' } as any;
 
     const res = await GET(req);
 
     expect(res.status).toBe(200);
-
-    const result = await res.json();
-
-    //likes테이블요청된 isbn13값이 없으니 전부 false 
-    //isbn13 : a 가 bookmarks 테이블에 조회된거니까 isbn13 : a 만 있음
-    expect(result).toEqual([
-      { isbn13: 'a', liked: false, bookmarked: true, memoExists: true },  
-      { isbn13: 'b', liked: false, bookmarked: false, memoExists: false },
+    expect(await res.json()).toEqual([
+      { itemId: 1, liked: false, bookmarked: true, memoExists: true },
+      { itemId: 2, liked: false, bookmarked: false, memoExists: false },
     ]);
   });
 });

@@ -1,3 +1,4 @@
+import { parseItemId } from '@/shared/domain/book/ids';
 import { VK_COOKIE } from '@/shared/domain/detail/constants';
 import { getRecentBooks } from '@/shared/lib/server/entities/getRecentBooks';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
@@ -13,7 +14,11 @@ export const GET = async () => {
 
 export const DELETE = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
-  const isbn13 = searchParams.get('isbn13');
+  const rawItemId = searchParams.get('itemId');
+  const itemId = parseItemId(rawItemId);
+  // 값이 있는데 잘못됐으면 전체 삭제로 넘어가지 않게 막음
+  if (rawItemId !== null && !itemId) return NextResponse.json({ error: 'invalid itemId' }, { status: 400 });
+
   const supabase = await createClient();
 
   const {
@@ -32,7 +37,7 @@ export const DELETE = async (request: NextRequest) => {
   if (user) query = query.eq('user_id', user.id);
   else if (deviceKey) query = query.eq('device_key', deviceKey);
 
-  if (isbn13) query = query.eq('isbn13', isbn13);
+  if (itemId) query = query.eq('item_id', itemId);
 
   const { error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

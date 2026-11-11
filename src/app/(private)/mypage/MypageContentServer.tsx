@@ -10,15 +10,11 @@ import { normalizeMyBooksKey } from '@/shared/domain/mybooks/normalizeMyBooksKey
 import { fetchMyBooksServer } from '@/hooks/mybooks/fetchMyBooksServer';
 import { DEFAULT_PAGE_SIZE } from '@/shared/constants/pagination';
 import { SORT_DEFAULT } from '@/shared/domain/mybooks/sort';
-import { BookmarkInfo } from '@/shared/domain/bookmark/types';
-import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
-import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
-import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
-import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { BookmarkBook } from '@/shared/domain/mybooks/types';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { getUserTagsServer } from '@/shared/lib/server/entities/getUserTagsServer';
 import { MypageProps } from '@/shared/domain/mypage/types';
+import { prefetchBookInteractions } from '@/shared/lib/server/entities/prefetchBookInteractions';
 
 const MypageContentServer = async ({
   page,
@@ -69,47 +65,16 @@ const MypageContentServer = async ({
           tagId,
         }),
     });
-    const isbnList = result.data.map((v) => v.isbn13);
-    let likes: Record<string, boolean> = {};
+    const itemIds = result.data.map((v) => v.itemId);
 
-    let likeCounts: Record<string, number> = {};
+    await prefetchBookInteractions(queryClient, itemIds);
 
-    let bookmarks: Record<string, BookmarkInfo> = {};
-
-    if (tab === 'like') {
-      [likes, likeCounts] = await Promise.all([getLikesByIsbnList(isbnList), getLikeCountsByIsbnList(isbnList)]);
-    }
-
-    if (tab === 'bookmark') {
-      bookmarks = await getBookmarksByIsbnList(isbnList);
-    }
-    for (const isbn of isbnList) {
-      if (tab === 'like') {
-        queryClient.setQueryData(likeKeys.detail(isbn), {
-          isbn13: isbn,
-          liked: likes[isbn] ?? false,
-          liked_count: likeCounts[isbn] ?? 0,
-        });
-      }
-
-      if (tab === 'bookmark') {
-        const book = (result.data as BookmarkBook[]).find((b) => b.isbn13 === isbn);
-        queryClient.setQueryData(bookmarkKeys.detail(isbn), {
-          isbn13: isbn,
-          bookmarked: bookmarks[isbn]?.bookmarked ?? false,
-          memoExists: !!book?.memo,
-        });
-      }
-    }
     if (tab === 'bookmark' && userId) {
       for (const book of result.data as BookmarkBook[]) {
-        queryClient.setQueryData(bookmarkKeys.tags.detail(userId, book.isbn13), { tags: book.tags ?? [] });
+        queryClient.setQueryData(bookmarkKeys.tags.detail(userId, book.itemId), { tags: book.tags ?? [] });
       }
     }
-    await queryClient.prefetchQuery({
-      queryKey: bookmarkKeys.tags.user(),
-      queryFn: getUserTagsServer,
-    });
+    await queryClient.prefetchQuery({ queryKey: bookmarkKeys.tags.user(), queryFn: getUserTagsServer });
   }
 
   return (

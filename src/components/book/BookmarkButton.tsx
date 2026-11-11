@@ -3,7 +3,7 @@ import { useBookmark } from '@/hooks/bookmark/useBookmark';
 import { toast } from 'react-toastify';
 import Button from '../common/ui/Button';
 import { BookmarkMemoScope } from '@/shared/domain/bookmark/types';
-import { BookInfo } from '@/shared/types/bookInfo';
+import { ItemId } from '@/shared/domain/book/ids';
 import BookmarkSavedToast from '../bookmark/BookmarkSavedToast';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useBookmarkMemoUrlState } from '@/hooks/url/useBookmarkMemoUrlState';
@@ -11,15 +11,15 @@ import { useBookmarkCache } from '@/hooks/bookmark/useBookmarkCache';
 
 type BookmarkButtonProps = {
   style?: string;
-  bookInfo: BookInfo;
+  itemId: ItemId;
   scope: BookmarkMemoScope;
 };
 
-const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
-  const { toggle, isLoading } = useBookmark(bookInfo);
+const BookmarkButton = ({ style, itemId, scope }: BookmarkButtonProps) => {
+  const { toggle, isLoading } = useBookmark(itemId);
   const { open } = useBookmarkMemoUrlState();
 
-  const { data } = useBookmarkCache(bookInfo.isbn13);
+  const { data } = useBookmarkCache(itemId);
   const bookmarked = data?.bookmarked ?? false;
   const handleClick = (e: React.MouseEvent) => {
     if (isLoading) return;
@@ -29,7 +29,7 @@ const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
 
     toggle(bookmarked, {
       onSuccess: (result) => {
-        const toastId = `bookmark-memo-suggest-${bookInfo.isbn13}`;
+        const toastId = `bookmark-memo-suggest-${itemId}`;
         if (!result.bookmarked) {
           toast.dismiss(toastId);
           return;
@@ -40,7 +40,7 @@ const BookmarkButton = ({ style, bookInfo, scope }: BookmarkButtonProps) => {
           <BookmarkSavedToast
             onMemoClick={() => {
               toast.dismiss(toastId);
-              open(bookInfo.isbn13, scope);
+              open(itemId, scope);
             }}
           />,
           { toastId, autoClose: 5000, closeButton: true }

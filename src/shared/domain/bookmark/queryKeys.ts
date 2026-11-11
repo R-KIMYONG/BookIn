@@ -1,9 +1,11 @@
+import { ItemId } from '../book/ids';
+
 export const bookmarkKeys = {
   all: ['bookmark'] as const,
-  detail: (isbn: string) => [bookmarkKeys.all, isbn] as const,
-  memo: (userId: string, isbn: string) => ['bookmarkMemo', userId, isbn] as const,
+  detail: (itemId: ItemId) => [bookmarkKeys.all, itemId] as const,
+  memo: (userId: string, itemId: ItemId) => ['bookmarkMemo', userId, itemId] as const,
   tags: {
     user: () => ['bookmarkTags', 'user'] as const,
-    detail: (userId: string | null, isbn: string) => ['bookmarkTags', 'detail', userId, isbn] as const,
+    detail: (userId: string | null, itemId: ItemId) => ['bookmarkTags', 'detail', userId, itemId] as const,
   },
 };

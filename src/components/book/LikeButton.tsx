@@ -2,7 +2,7 @@
 import { useLike } from '@/hooks/like/useLike';
 import { useRef } from 'react';
 import Button from '../common/ui/Button';
-import { BookInfo } from '@/shared/types/bookInfo';
+import { ItemId } from '@/shared/domain/book/ids';
 import cn from '@/shared/utils/cn';
 import { Heart } from 'lucide-react';
 import { useLikeCache } from '@/hooks/like/useLikeCache';
@@ -10,11 +10,11 @@ import { formatCount } from '@/shared/utils/formatCount';
 
 type LikeButtonProps = {
   style?: string;
-  bookInfo: BookInfo;
+  itemId: ItemId;
 };
 
-const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
-  const { toggle, isLoading } = useLike(bookInfo);
+const LikeButton = ({ style, itemId }: LikeButtonProps) => {
+  const { toggle, isLoading } = useLike(itemId);
   const lockRef = useRef(false);
   const handleClick = (e: React.MouseEvent) => {
     if (lockRef.current || isLoading) return;
@@ -29,7 +29,7 @@ const LikeButton = ({ style, bookInfo }: LikeButtonProps) => {
       },
     });
   };
-  const { data } = useLikeCache(bookInfo.isbn13);
+  const { data } = useLikeCache(itemId);
   const liked = data?.liked ?? false;
   const count = data?.liked_count ?? 0;
   return (

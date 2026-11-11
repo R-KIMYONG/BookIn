@@ -1,13 +1,15 @@
+import { parseItemId } from '@/shared/domain/book/ids';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+// ?itemId=123 → { tags } (내가 이 책 북마크에 단 태그)
 export const GET = async (request: NextRequest) => {
   const supabase = await createClient();
 
   const { searchParams } = new URL(request.url);
 
-  const isbn13 = (searchParams.get('isbn13') ?? '').trim();
-  if (!isbn13) return NextResponse.json({ error: 'isbn13 값이 필요합니다.' }, { status: 400 });
+  const itemId = parseItemId(searchParams.get('itemId'));
+  if (!itemId) return NextResponse.json({ error: '올바른 itemId가 필요합니다.' }, { status: 400 });
 
   const {
     data: { user },
@@ -19,7 +21,7 @@ export const GET = async (request: NextRequest) => {
     .from('bookmarks')
     .select('id')
     .eq('user_id', user.id)
-    .eq('isbn13', isbn13)
+    .eq('item_id', itemId)
     .maybeSingle();
 
   if (bookmarkDataError) return NextResponse.json({ error: '북마크 조회에 실패했습니다.' }, { status: 500 });

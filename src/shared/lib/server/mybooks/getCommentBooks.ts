@@ -4,6 +4,8 @@ import { MyBooksSort } from '@/shared/domain/mybooks/sort';
 import { CommentBook, CommentRow, MyBooksResult } from '@/shared/domain/mybooks/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '../../supabase/server';
+import { getCurrentUser } from '../../auth/getCurrentUser';
+import { parseItemId } from '@/shared/domain/book/ids';
 
 const getCommentIdsBySearch = async ({
   supabase,
@@ -12,7 +14,7 @@ const getCommentIdsBySearch = async ({
   searchField,
 }: {
   supabase: SupabaseClient;
-  userId: string | undefined;
+  userId: string;
   search: string;
   searchField: SearchField;
 }) => {
@@ -68,19 +70,17 @@ export const getCommentBooks = async ({
   searchField?: SearchField | null;
 }): Promise<MyBooksResult<CommentBook>> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const userId = user?.id;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  if (!userId) return { data: [], total: 0 };
 
   let commentQuery = supabase
     .from('user_book_comments')
     .select(
-      'book_id,comment_count,last_commented_at, books(title,thumbnail_url,isbn13, book_stats(view_count,like_count,comment_count))',
+      'comment_count,last_commented_at,books!inner(item_id,title,thumbnail_url,book_stats(view_count,like_count,comment_count))',
       {
         count: 'exact',
       }
@@ -120,21 +120,25 @@ export const getCommentBooks = async ({
 
   if (error) throw error;
 
-  const commentBooks = (data ?? []).map((item: CommentRow) => {
+  const commentBooks = (data ?? []).flatMap((item: CommentRow): CommentBook[] => {
     const bookInfo = Array.isArray(item.books) ? item.books[0] : item.books;
+    const itemId = parseItemId(bookInfo?.item_id);
+    if (!itemId) return [];
+
     const stats = Array.isArray(bookInfo?.book_stats) ? bookInfo?.book_stats[0] : bookInfo?.book_stats;
 
-    return {
-      book_id: item.book_id,
-      title: bookInfo?.title ?? '',
-      cover: bookInfo?.thumbnail_url ?? '/images/noImg.png',
-      comment_count: item.comment_count,
-      last_commented_at: item.last_commented_at,
-      isbn13: bookInfo?.isbn13 ?? '',
-      total_like_count: stats?.like_count ?? 0,
-      total_view_count: stats?.view_count ?? 0,
-      total_comment_count: stats?.comment_count ?? 0,
-    };
+    return [
+      {
+        itemId,
+        title: bookInfo?.title ?? '',
+        cover: bookInfo?.thumbnail_url ?? '/images/noImg.png',
+        comment_count: item.comment_count,
+        last_commented_at: item.last_commented_at,
+        total_like_count: stats?.like_count ?? 0,
+        total_view_count: stats?.view_count ?? 0,
+        total_comment_count: stats?.comment_count ?? 0,
+      },
+    ];
   });
 
   return {

@@ -5,6 +5,8 @@ import { MyBooksSort } from '@/shared/domain/mybooks/sort';
 import { BookmarkBook, BookmarkRow, MyBooksResult } from '@/shared/domain/mybooks/types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '../../supabase/server';
+import { getCurrentUser } from '../../auth/getCurrentUser';
+import { parseItemId } from '@/shared/domain/book/ids';
 
 const getBookmarkIdsBySearch = async ({
   supabase,
@@ -13,7 +15,7 @@ const getBookmarkIdsBySearch = async ({
   searchField,
 }: {
   supabase: SupabaseClient;
-  userId: string | undefined;
+  userId: string;
   search: string;
   searchField: SearchField;
 }) => {
@@ -57,7 +59,7 @@ const getBookmarkTagIdsFilter = async ({
   tagId,
 }: {
   supabase: SupabaseClient;
-  userId: string | undefined;
+  userId: string;
   tagId: string;
 }) => {
   const { data } = await supabase
@@ -94,19 +96,17 @@ export const getBookmarkBooks = async ({
   tagId?: string | null;
 }): Promise<MyBooksResult<BookmarkBook>> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const userId = user?.id;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  if (!userId) return { data: [], total: 0 };
 
   let bookmarkQuery = supabase
     .from('bookmarks')
     .select(
-      '*,books!inner(title,thumbnail_url,isbn13,author,category_id,category_name,book_stats(view_count,like_count,comment_count)),tags:bookmark_tag_links(tag:bookmark_tags(id,name,slug,color))',
+      'item_id,created_at,memo,books!inner(title,thumbnail_url,author,category_name,book_stats(view_count,like_count,comment_count)),tags:bookmark_tag_links(tag:bookmark_tags(id,name,slug,color))',
       { count: 'exact' }
     )
     .eq('user_id', userId);
@@ -164,23 +164,28 @@ export const getBookmarkBooks = async ({
 
   const { data, count, error } = await bookmarkQuery.range(from, to);
   if (error) throw error;
-  const bookmarks = (data ?? []).map((item: BookmarkRow) => {
-    const stats = Array.isArray(item?.books.book_stats) ? item?.books.book_stats[0] : item?.books.book_stats;
-    return {
-      book_id: item.book_id,
-      created_at: item.created_at,
-      cover: item.books.thumbnail_url ?? '/noImg.png',
-      title: item.books.title,
-      isbn13: item.books.isbn13,
-      author: item.books.author,
-      categoryId: item.books.category_id,
-      categoryName: item.books.category_name,
-      memo: item.memo ?? null,
-      tags: (item.tags ?? []).map((l: any) => l.tag).filter(Boolean),
-      total_like_count: stats?.like_count ?? 0,
-      total_view_count: stats?.view_count ?? 0,
-      total_comment_count: stats?.comment_count ?? 0,
-    };
+  const bookmarks = (data ?? []).flatMap((item: BookmarkRow): BookmarkBook[] => {
+    const itemId = parseItemId(item.item_id);
+    if (!itemId) return [];
+
+    const bookInfo = Array.isArray(item.books) ? item.books[0] : item.books;
+    const stats = Array.isArray(bookInfo.book_stats) ? bookInfo.book_stats[0] : bookInfo.book_stats;
+
+    return [
+      {
+        itemId,
+        created_at: item.created_at,
+        cover: bookInfo.thumbnail_url ?? '/images/noImg.png',
+        title: bookInfo.title,
+        author: bookInfo.author,
+        categoryName: bookInfo.category_name,
+        memo: item.memo ?? null,
+        tags: (item.tags ?? []).flatMap((l) => l.tag ?? []),
+        total_like_count: stats?.like_count ?? 0,
+        total_view_count: stats?.view_count ?? 0,
+        total_comment_count: stats?.comment_count ?? 0,
+      },
+    ];
   });
   return {
     data: bookmarks,

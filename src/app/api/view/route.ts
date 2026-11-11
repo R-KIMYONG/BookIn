@@ -7,6 +7,7 @@ import { hashIdentifier } from '@/shared/lib/crypto/hashIdentifier';
 import { getClientIp } from '@/shared/lib/network/getClientIp';
 import { VK_COOKIE } from '@/shared/domain/detail/constants';
 import { getTopViewBooks } from '@/shared/lib/server/entities/getTopViewBooks';
+import { parseItemId } from '@/shared/domain/book/ids';
 
 export const GET = async () => {
   const books = await getTopViewBooks();
@@ -15,8 +16,9 @@ export const GET = async () => {
 };
 
 export const POST = async (request: NextRequest) => {
-  const { isbn13 } = await request.json();
-  if (!isbn13) return NextResponse.json({ error: 'isbn13 required' }, { status: 400 });
+  const body = await request.json();
+  const itemId = parseItemId(body.itemId);
+  if (!itemId) return NextResponse.json({ error: 'itemId required' }, { status: 400 });
 
   const supabase = await createClient();
   // 로그인 유저 확인 (선택, user_id는 nullable)
@@ -38,8 +40,8 @@ export const POST = async (request: NextRequest) => {
     });
   }
 
-  // 3) isbn13 → book_id (트리거가 book_id로 book_stats를 찾으니 필요)
-  const { data: book } = await supabase.from('books').select('id').eq('isbn13', isbn13).maybeSingle();
+  // 3) itemId → book_id (트리거가 book_id로 book_stats를 찾으니 필요). books 행은 디테일 페이지가 먼저 저장함
+  const { data: book } = await supabase.from('books').select('id').eq('item_id', itemId).maybeSingle();
   if (!book) return NextResponse.json({ ok: false, reason: 'book not found' });
 
   const ip = getClientIp(request);
@@ -56,7 +58,7 @@ export const POST = async (request: NextRequest) => {
   const { data: softMatch } = await admin
     .from('book_views')
     .select('id')
-    .eq('isbn13', isbn13)
+    .eq('item_id', itemId)
     .eq('view_date', todayKST)
     .eq('composite_hash', compositeHash)
     .limit(1);
@@ -65,7 +67,7 @@ export const POST = async (request: NextRequest) => {
 
   const { error } = await admin.from('book_views').insert({
     book_id: book.id,
-    isbn13,
+    item_id: itemId,
     device_key: deviceKey,
     user_id: user?.id ?? null,
     ip_hash: hashIdentifier(ip),

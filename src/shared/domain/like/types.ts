@@ -1,15 +1,17 @@
+import { ItemId } from '@/shared/domain/book/ids';
+
 export type LikeCache = {
-  isbn13: string;
+  itemId: ItemId;
   liked: boolean;
   liked_count: number;
 };
 
 export type LikeResponseUserType = {
-  isbn13: string;
+  itemId: ItemId;
   liked: boolean;
 };
 
 export type LikeResponseCountType = {
-  isbn13: string;
+  itemId: ItemId;
   liked_count: number;
 };

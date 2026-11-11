@@ -12,8 +12,8 @@ const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
         const date = formatDateTime(book.last_commented_at);
         const isAboveFold = index < 6;
         return (
-          <li key={book.book_id}>
-            <Link href={`/${book.isbn13}`}>
+          <li key={book.itemId}>
+            <Link href={`/${book.itemId}`}>
               <div className="h-60 relative overflow-hidden rounded-md group">
                 <Image
                   src={book.cover?.trim() ? book.cover : '/images/noImg.png'}

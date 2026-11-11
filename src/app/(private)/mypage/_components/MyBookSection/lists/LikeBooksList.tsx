@@ -12,17 +12,9 @@ const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
       {data.map((book, index) => {
         const isAboveFold = index < 6;
         const date = formatDateTime(book.created_at);
-        const bookInfo = {
-          isbn13: book.isbn13,
-          cover: book.cover,
-          title: book.title,
-          author: book.author,
-          categoryId: book.categoryId,
-          categoryName: book.categoryName,
-        };
         return (
-          <li key={book.book_id}>
-            <Link href={`/${book.isbn13}`}>
+          <li key={book.itemId}>
+            <Link href={`/${book.itemId}`}>
               <div className="h-60 relative overflow-hidden rounded-md group">
                 <Image
                   src={book.cover?.trim() ? book.cover : '/images/noImg.png'}
@@ -35,7 +27,7 @@ const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
                 />
 
                 <div className="absolute inset-0 z-0 bg-black/40 transition-colors duration-300 group-hover:bg-black/30" />
-                <LikeButton bookInfo={bookInfo} style="absolute top-2 left-2" />
+                <LikeButton itemId={book.itemId} style="absolute top-2 left-2" />
               </div>
             </Link>
             <div className="mt-2 h-14 px-2 text-xs">

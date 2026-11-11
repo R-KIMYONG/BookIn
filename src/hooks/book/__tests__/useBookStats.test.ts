@@ -4,28 +4,29 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { useBookStats } from '../useBookStats';
 import { createWrapper } from '@/test/testQueryClient';
+import { ItemId } from '@/shared/domain/book/ids';
 
 describe('useBookStats 훅 테스트', () => {
-  it('isbn목록을 쿼리스트링으로 보내고 stats를 받는다', async () => {
+  it('itemId 목록을 쿼리스트링으로 보내고 stats를 받는다', async () => {
+    let requestedIds;
     server.use(
       http.get('/api/book-stats', async ({ request }) => {
-        const isbnList = new URL(request.url).searchParams.get('ids');
-
-        expect(isbnList).toBe('a,b');
+        requestedIds = new URL(request.url).searchParams.get('ids');
 
         return HttpResponse.json({
-          a: { view_count: 1, comment_count: 1, like_count: 1 },
-          b: { view_count: 2, comment_count: 2, like_count: 2 },
+          1: { view_count: 1, comment_count: 1, like_count: 1 },
+          2: { view_count: 2, comment_count: 2, like_count: 2 },
         });
       })
     );
 
-    const { result } = renderHook(() => useBookStats(['a', 'b']), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useBookStats([1, 2] as ItemId[]), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(requestedIds).toBe('1,2');
     expect(result.current.data).toEqual({
-      a: { view_count: 1, comment_count: 1, like_count: 1 },
-      b: { view_count: 2, comment_count: 2, like_count: 2 },
+      1: { view_count: 1, comment_count: 1, like_count: 1 },
+      2: { view_count: 2, comment_count: 2, like_count: 2 },
     });
   });
 
