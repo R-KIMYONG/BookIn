@@ -1,3 +1,4 @@
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
@@ -14,7 +15,9 @@ export const GET = async () => {
 
     if (!user) return NextResponse.json(null, { status: 200 });
 
-    const { data, error } = await supabase
+    // email 은 공개 컬럼이 아니라서 본인 확인 후 관리자 클라이언트로 조회
+    const supabaseAdmin = createAdminClient();
+    const { data, error } = await supabaseAdmin
       .from('users')
       .select('id,email,nickname,avatar,created_at')
       .eq('id', user.id)

@@ -1,4 +1,5 @@
 import { createClient } from '@/shared/lib/supabase/server';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { hashToken } from '@/shared/lib/crypto/hashToken';
@@ -13,6 +14,7 @@ export const PATCH = async (request: NextRequest) => {
   //3. public.users테이블에 pending정보를 업데이트
   //4. 이후 인증메일을 발송(변경할 이메일 + redirectURL껴서 보내면됨)
   const supabase = await createClient();
+  const supabaseAdmin = createAdminClient();
   const body = await request.json();
   const newEmail = String(body?.email ?? '')
     .trim()
@@ -36,7 +38,7 @@ export const PATCH = async (request: NextRequest) => {
       return NextResponse.json({ message: '현재 사용 중인 이메일과 같습니다.' }, { status: 400 });
 
     //동일이메일 존재여부 확인하기위해 가져온 데이터
-    const { data: existingUser, error: existingUserError } = await supabase
+    const { data: existingUser, error: existingUserError } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('email', newEmail)
@@ -56,7 +58,7 @@ export const PATCH = async (request: NextRequest) => {
     });
     const confirmUrl = `${origin}/api/auth/email-callback?${params.toString()}`;
     //이메일 대기상태 컬럼을 업데이트
-    const { error: publicError } = await supabase
+    const { error: publicError } = await supabaseAdmin
       .from('users')
       .update({
         pending_email: newEmail,
@@ -77,7 +79,7 @@ export const PATCH = async (request: NextRequest) => {
       });
     } catch (error) {
       //오류나면 update한 데이터를 reset
-      const { error: clearPendingError } = await clearEmailChangeState(supabase, user.id);
+      const { error: clearPendingError } = await clearEmailChangeState(supabaseAdmin, user.id);
 
       if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
 
@@ -110,7 +112,7 @@ export const DELETE = async () => {
   if (userError || !user)
     return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
-  const { error: clearPendingError } = await clearEmailChangeState(supabase, user.id);
+  const { error: clearPendingError } = await clearEmailChangeState(createAdminClient(), user.id);
 
   if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
 

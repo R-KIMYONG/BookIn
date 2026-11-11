@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/shared/lib/supabase/server';
 import { hashToken } from '@/shared/lib/crypto/hashToken';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { clearEmailChangeState } from '@/shared/lib/supabase/users';
@@ -21,9 +20,10 @@ export const GET = async (request: Request) => {
     return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
   }
 
-  const supabase = await createClient();
+  // 메일 링크로 들어오므로 세션이 없을 수 있음 → 토큰 검증 자체가 본인 확인, 조회·갱신은 관리자 클라이언트
+  const supabaseAdmin = createAdminClient();
 
-  const { data: pendingData, error: pendingDataError } = await supabase
+  const { data: pendingData, error: pendingDataError } = await supabaseAdmin
     .from('users')
     .select('id,pending_email,pending_email_expires_at,email_change_token_hash')
     .eq('id', userId)
@@ -42,7 +42,7 @@ export const GET = async (request: Request) => {
 
   // 만료된 경우
   if (!expireAt || expireAt <= now) {
-    const { error: clearPendingError } = await clearEmailChangeState(supabase, userId);
+    const { error: clearPendingError } = await clearEmailChangeState(supabaseAdmin, userId);
     if (clearPendingError) {
       console.error('clearPendingEmail error:', clearPendingError);
     }
@@ -57,8 +57,6 @@ export const GET = async (request: Request) => {
     return NextResponse.redirect(`${origin}/auth-code-error?reason=invalid`);
   }
 
-  const supabaseAdmin = createAdminClient();
-
   const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
     email: pendingData.pending_email,
     email_confirm: true,
@@ -68,7 +66,7 @@ export const GET = async (request: Request) => {
     return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
   }
 
-  const { error: publicUpdateError } = await supabase
+  const { error: publicUpdateError } = await supabaseAdmin
     .from('users')
     .update({
       email: pendingData.pending_email, //변경할 이메일을 최종반영처리 나머지 정보를 reset

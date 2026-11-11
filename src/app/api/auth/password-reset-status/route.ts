@@ -1,4 +1,4 @@
-import { createClient } from '@/shared/lib/supabase/server';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { clearPasswordResetState } from '@/shared/lib/supabase/users';
 import { NextResponse } from 'next/server';
 
@@ -11,7 +11,8 @@ export const GET = async (req: Request) => {
     return NextResponse.json({ message: 'email required' }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  // 비로그인 경로 + password_reset_* 는 비공개 컬럼이라 관리자 클라이언트 사용
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from('users')
