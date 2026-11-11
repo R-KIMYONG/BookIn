@@ -1,13 +1,12 @@
 import { SubmitItem } from '@/shared/domain/comment/types';
 
-export const createComment = async (input: SubmitItem & { bookId: string; userId?: string | null }) => {
+export const createComment = async (input: SubmitItem & { bookId: string }) => {
   const response = await fetch('/api/comment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       ...input,
       book_id: input.bookId,
-      user_id: input.userId,
     }),
   });
 

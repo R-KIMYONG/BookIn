@@ -3,6 +3,10 @@ import { Tables } from '@/shared/types/supabase';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchComments } from '@/shared/lib/comment/fetchComments';
+import { scheduleRailsRebuild } from '@/shared/lib/recommend/scheduleRailsRebuild';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
+
+export const maxDuration = 30;
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -35,30 +39,38 @@ export const POST = async (request: NextRequest) => {
   } catch {
     return NextResponse.json({ message: '요청 데이터를 읽을 수 없습니다.' }, { status: 400 });
   }
-  const { content, book_id, user_id } = body;
+  const { content, book_id } = body;
   const cleanContent = sanitizeHtmlServer(content || '');
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 });
 
-  if (!user_id || !book_id)
-    return NextResponse.json({ message: '댓글 작성에 필요한 정보가 누락되었습니다.' }, { status: 400 });
+  if (!book_id) return NextResponse.json({ message: '댓글 작성에 필요한 정보가 누락되었습니다.' }, { status: 400 });
 
   const { error: commentInsertError } = await supabase
     .from('comments')
-    .insert({ content: cleanContent, book_id, user_id, updated_at: now });
+    .insert({ content: cleanContent, book_id, user_id: user.id, updated_at: now });
   if (commentInsertError) return NextResponse.json({ message: '댓글 작성중 오류가 발생했습니다.' }, { status: 500 });
 
+  scheduleRailsRebuild(user.id);
   return NextResponse.json({ message: '댓글이 등록되었습니다.' }, { status: 201 });
 };
-export const PUT = async (request: NextRequest) => {
+export const PATCH = async (request: NextRequest) => {
   const supabase = await createClient();
   const now = new Date().toISOString();
   try {
     const updateComment = await request.json();
-    const { id, content, user_id, book_id } = updateComment;
+
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 });
+    const { id, content } = updateComment;
     const cleanContent = sanitizeHtmlServer(content || '');
     if (!id) return NextResponse.json({ message: '수정할 댓글 정보를 찾을 수 없습니다.' }, { status: 400 });
 
-    if (!user_id || !book_id)
-      return NextResponse.json({ error: '댓글 수정에 필요한 정보가 누락되었습니다.' }, { status: 400 });
+    const { data: target } = await supabase.from('comments').select('user_id').eq('id', id).single();
+
+    if (!target) return NextResponse.json({ message: '수정할 댓글을 찾을 수 없습니다.' }, { status: 404 });
+
+    if (target.user_id !== user.id) return NextResponse.json({ message: '수정할 권한이 없습니다.' }, { status: 403 });
 
     const { error: commentUpdateError } = await supabase
       .from('comments')
@@ -83,7 +95,7 @@ export const DELETE = async (request: NextRequest) => {
   try {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
-    if (!id) return NextResponse.json({ error: '삭제할 댓글 정보를 찾을 수 없습니다.' }, { status: 400 });
+    if (!id) return NextResponse.json({ message: '삭제할 댓글 정보를 찾을 수 없습니다.' }, { status: 400 });
 
     const { data: targetComment, error: targetError } = await supabase
       .from('comments')
@@ -91,9 +103,7 @@ export const DELETE = async (request: NextRequest) => {
       .eq('id', id)
       .single();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
 
     if (targetError || !targetComment?.user_id || !targetComment?.book_id) {
       console.error(targetError);
@@ -111,7 +121,7 @@ export const DELETE = async (request: NextRequest) => {
 
       return NextResponse.json({ message: '댓글 삭제 중 오류가 발생했습니다.' }, { status: 500 });
     }
-
+    scheduleRailsRebuild(user.id);
     return NextResponse.json({ message: '댓글이 삭제되었습니다.' }, { status: 200 });
   } catch (error) {
     console.error(error);
