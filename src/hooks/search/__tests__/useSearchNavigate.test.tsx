@@ -4,6 +4,7 @@ import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSearchNavigate } from '../useSearchNavigate';
 import { useRouter } from 'next/navigation';
+import { SEARCH_DEFAULT_SORT } from '@/shared/lib/yes24/constants';
 
 vi.mock('next/navigation', () => {
   return { useRouter: vi.fn() };
@@ -29,17 +30,22 @@ describe('useSearchNavigate hook test', () => {
     vi.mocked(useRouter).mockReturnValue(mockPush as any);
     const { result } = renderHook(() => useSearchNavigate(), { wrapper: queryWrapper });
 
-    const urlPath = {
-      keyword: 'test_keyword',
-      sq: 'Title',
-      target: 'Book',
-      ci: '123',
-    };
-
-    result.current.setSearchUrl(urlPath as any);
+    result.current.setSearchUrl({ keyword: 'test_keyword', target: 'Book', sort: 'RECENT', page: 2 });
 
     expect(mockPush.push).toHaveBeenCalled();
-    expect(mockPush.push).toHaveBeenCalledWith('/search?q=test_keyword&sq=Title&target=Book&ci=123');
+    expect(mockPush.push).toHaveBeenCalledWith('/search?q=test_keyword&target=Book&sort=RECENT&page=2');
+  });
+
+  it('기본 정렬·1페이지·target 없음이면 URL에 붙이지 않는다', () => {
+    const mockPush = {
+      push: vi.fn(),
+    };
+    vi.mocked(useRouter).mockReturnValue(mockPush as any);
+    const { result } = renderHook(() => useSearchNavigate(), { wrapper: queryWrapper });
+
+    result.current.setSearchUrl({ keyword: 'test_keyword', sort: SEARCH_DEFAULT_SORT, page: 1 });
+
+    expect(mockPush.push).toHaveBeenCalledWith('/search?q=test_keyword');
   });
 
   it('keyword 없으면 Push 안함', () => {

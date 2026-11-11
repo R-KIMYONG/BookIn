@@ -1,27 +1,27 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Button from '../ui/Button';
-import { SearchQueryType } from '@/shared/domain/search/types';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { Search, X } from 'lucide-react';
 import {
-  DEFAULT_SEARCH_QT,
   RANGE,
-  SEARCH_QT_LIST,
-  SEARCH_QUERYTYPE_OPTION,
-  SEARCH_TYPE_LABEL,
+  SEARCH_INPUT_MAXLENGTH,
+  SEARCH_PLACEHOLDER,
+  SEARCH_SORT_LABEL,
+  SEARCH_SORT_OPTIONS,
 } from '@/shared/domain/search/constants';
-import { DEFAULT_TARGET, TargetTypes } from '@/shared/constants/category';
-import { HEADER_GROUPS } from '@/shared/domain/header/constants';
+import { TargetTypes } from '@/shared/constants/category';
 import { useSearchNavigate } from '@/hooks/search/useSearchNavigate';
+import { SEARCH_DEFAULT_SORT } from '@/shared/lib/yes24/constants';
+import { SearchSort } from '@/shared/lib/yes24/types';
+import { toast } from 'react-toastify';
 
-const SearchBar = ({ genres }: { genres: typeof HEADER_GROUPS }) => {
+const SearchBar = () => {
   const { setSearchUrl } = useSearchNavigate();
   const [keyword, setKeyword] = useState<string>('');
-  const [sq, setSq] = useState<SearchQueryType>(DEFAULT_SEARCH_QT);
-  const [target, setTarget] = useState<TargetTypes>(DEFAULT_TARGET);
-  const [ci, setCi] = useState<number>(0);
+  const [sort, setSort] = useState<SearchSort>(SEARCH_DEFAULT_SORT);
+  const [target, setTarget] = useState<TargetTypes | undefined>(undefined); // undefined = 전체
 
   const [openPanel, setOpenPanel] = useState<boolean>(false);
 
@@ -29,12 +29,9 @@ const SearchBar = ({ genres }: { genres: typeof HEADER_GROUPS }) => {
 
   const handleReset = () => {
     setKeyword('');
-    setCi(0);
-    setSq(DEFAULT_SEARCH_QT);
-    setTarget(DEFAULT_TARGET);
+    setSort(SEARCH_DEFAULT_SORT);
+    setTarget(undefined);
   };
-
-  const gen = target ? (genres.find((g) => g.key === target)?.items ?? []) : [];
 
   useEffect(() => {
     if (!openPanel) return;
@@ -64,7 +61,7 @@ const SearchBar = ({ genres }: { genres: typeof HEADER_GROUPS }) => {
       showToast(RESULT_CODE.VALIDATION_REQUIRED_SEARCHKEYWORD);
       return;
     }
-    setSearchUrl({ keyword, sq, target, ci });
+    setSearchUrl({ keyword, target, sort });
     setOpenPanel(false);
   };
 
@@ -79,11 +76,17 @@ const SearchBar = ({ genres }: { genres: typeof HEADER_GROUPS }) => {
             name="q"
             autoComplete="off"
             value={keyword}
-            maxLength={20}
-            placeholder={SEARCH_QUERYTYPE_OPTION[sq]}
+            maxLength={SEARCH_INPUT_MAXLENGTH}
+            placeholder={SEARCH_PLACEHOLDER}
             onFocus={() => setOpenPanel(true)}
             onClick={() => setOpenPanel(true)}
-            onChange={(e) => setKeyword(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setKeyword(next);
+              if (next.length === SEARCH_INPUT_MAXLENGTH) {
+                toast.warn('최대 20자까지 입력가능합니다.', { toastId: 'search-input-maxlength', autoClose: false });
+              }
+            }}
             className="min-w-0 flex-1 bg-transparent pl-1 text-base placeholder-gray-400 outline-none placeholder:text-sm"
           />
         </div>
@@ -92,20 +95,6 @@ const SearchBar = ({ genres }: { genres: typeof HEADER_GROUPS }) => {
         {openPanel && (
           <div className="absolute left-0 top-full z-50 mt-2 w-full sm:w-[340px] space-y-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
             <X size={15} className="absolute right-3 top-3 cursor-pointer" onClick={() => setOpenPanel(false)} />
-            {/* 검색 필드 */}
-            <section>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-400">검색 필드</p>
-              <div className="flex flex-wrap gap-2">
-                {SEARCH_QT_LIST.map((sqItem) => (
-                  <Button
-                    key={sqItem}
-                    label={SEARCH_TYPE_LABEL[sqItem]}
-                    onClick={() => setSq(sqItem)}
-                    variant={sq === sqItem ? 'primary' : 'ghost'}
-                  />
-                ))}
-              </div>
-            </section>
 
             {/* 범위 */}
             <section>
@@ -116,34 +105,28 @@ const SearchBar = ({ genres }: { genres: typeof HEADER_GROUPS }) => {
                     key={label}
                     label={label}
                     type="button"
-                    onClick={() => {
-                      setTarget(v);
-                      setCi(0);
-                    }}
+                    onClick={() => setTarget(v)}
                     variant={target === v ? 'primary' : 'ghost'}
                   />
                 ))}
               </div>
             </section>
 
-            {/* 세부: 범위 선택 시에만 */}
-            {target && (
-              <section>
-                <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-400">세부 카테고리</p>
-                <select
-                  value={ci}
-                  onChange={(e) => setCi(Number(e.target.value))}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-700"
-                >
-                  <option value={0}>세부 선택 (전체)</option>
-                  {gen.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.label}
-                    </option>
-                  ))}
-                </select>
-              </section>
-            )}
+            {/* 정렬 */}
+            <section>
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-400">정렬</p>
+              <div className="flex flex-wrap gap-2">
+                {SEARCH_SORT_OPTIONS.map((option) => (
+                  <Button
+                    key={option}
+                    label={SEARCH_SORT_LABEL[option]}
+                    type="button"
+                    onClick={() => setSort(option)}
+                    variant={sort === option ? 'primary' : 'ghost'}
+                  />
+                ))}
+              </div>
+            </section>
 
             {/* 푸터: 초기화 / 검색 */}
             <div className="flex justify-end gap-2 border-t border-gray-100 pt-3">

@@ -1,24 +1,21 @@
 import HeaderLogo from './HeaderLogo';
 import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
-import { createClient } from '@/shared/lib/supabase/server';
 import { SESSION_EXPIRES_AT } from '@/shared/domain/auth/constants';
 import SearchBarContainer from './SearchBarContainer';
 import CategoryDrawer from './CategoryDrawer';
 import { HeaderTopBar } from './HeaderTopBar';
 import HeaderDiggingMenu from './HeaderDiggingMenu';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 const Header = async () => {
   const cookieStore = await cookies();
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const tempExpiresAtStr = cookieStore.get(SESSION_EXPIRES_AT)?.value ?? null;
   const tempSessionExpiresAt = tempExpiresAtStr ? Number(tempExpiresAtStr) : null;
-
+  
   const isLoggedIn = !!user;
   return (
     <HeaderTopBar>
