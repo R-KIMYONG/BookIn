@@ -9,5 +9,5 @@ export type CommentListResult = {
   total: number;
 };
 
-export type SubmitItem = Pick<Tables<'comments'>, 'user_id' | 'content' | 'book_id' | 'updated_at'>;
+export type SubmitItem = Pick<Tables<'comments'>, 'content' | 'book_id'>;
 export type UpdateSubmitItem = SubmitItem & Pick<Tables<'comments'>, 'id'>;

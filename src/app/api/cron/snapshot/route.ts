@@ -13,7 +13,8 @@ export const GET = async (request: NextRequest) => {
 
   const { data: ranking, error: rankErr } = await admin
     .from('book_ranking')
-    .select('isbn13, score')
+    .select('book_id, item_id, score')
+    .gt('score', 0)
     .order('score', { ascending: false })
     .limit(100);
 
@@ -22,18 +23,23 @@ export const GET = async (request: NextRequest) => {
     return NextResponse.json({ ok: true, message: 'no ranking data' });
   }
 
-  const rows = ranking
-    .filter((book) => book.isbn13 !== null)
-    .map((book, i) => ({
-      snapshot_date: todayKST,
-      isbn13: book.isbn13!,
-      rank: i + 1,
-      score: book.score ?? 0,
-    }));
+  const rows = ranking.flatMap((book, i) =>
+    book.book_id !== null && book.item_id !== null
+      ? [
+          {
+            snapshot_date: todayKST,
+            book_id: book.book_id,
+            item_id: book.item_id,
+            rank: i + 1,
+            score: book.score ?? 0,
+          },
+        ]
+      : []
+  );
 
   const { error: upsertErr } = await admin
     .from('ranking_snapshots')
-    .upsert(rows, { onConflict: 'snapshot_date,isbn13' });
+    .upsert(rows, { onConflict: 'snapshot_date,item_id' });
 
   if (upsertErr) return NextResponse.json({ error: upsertErr.message }, { status: 500 });
 

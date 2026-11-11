@@ -1,15 +1,17 @@
+import { parseItemId } from '@/shared/domain/book/ids';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 const toSlug = (name: string) => name.trim().toLowerCase().replace(/\s+/g, '-');
 
+// ?itemId=123 → { bookmarkId, itemId, memo, tags }
 export const GET = async (request: NextRequest) => {
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
 
-  const isbn13 = String(searchParams.get('isbn13') ?? '').trim();
+  const itemId = parseItemId(searchParams.get('itemId'));
 
-  if (!isbn13) return NextResponse.json({ messgae: 'isbn13 값이 필요합니다.' }, { status: 400 });
+  if (!itemId) return NextResponse.json({ message: '올바른 itemId가 필요합니다.' }, { status: 400 });
 
   const {
     data: { user },
@@ -19,9 +21,9 @@ export const GET = async (request: NextRequest) => {
 
   const { data, error } = await supabase
     .from('bookmarks')
-    .select('id,memo,isbn13,tags:bookmark_tag_links(tag:bookmark_tags(id,name,slug,color))')
+    .select('id,memo,item_id,tags:bookmark_tag_links(tag:bookmark_tags(id,name,slug,color))')
     .eq('user_id', user.id)
-    .eq('isbn13', isbn13)
+    .eq('item_id', itemId)
     .maybeSingle();
 
   if (error) {
@@ -35,7 +37,7 @@ export const GET = async (request: NextRequest) => {
 
   const result = {
     bookmarkId: data.id,
-    isbn13: data.isbn13,
+    itemId: data.item_id,
     memo: data.memo ?? null,
     tags,
   };
@@ -43,16 +45,17 @@ export const GET = async (request: NextRequest) => {
   return NextResponse.json(result, { status: 200 });
 };
 
+// body: { itemId, memo, tags }
 export const PATCH = async (request: NextRequest) => {
   const supabase = await createClient();
 
   const body = await request.json();
-  const isbn13 = String(body?.isbn13 ?? '').trim();
+  const itemId = parseItemId(body?.itemId);
 
   const memo = body?.memo === null ? null : String(body?.memo ?? '').trim();
   const tagsRaw: { name: string; slug: string; color: string | null }[] = Array.isArray(body.tags) ? body.tags : [];
 
-  if (!isbn13) return NextResponse.json({ error: 'isbn13 값이 필요합니다.' }, { status: 400 });
+  if (!itemId) return NextResponse.json({ error: '올바른 itemId가 필요합니다.' }, { status: 400 });
 
   const {
     data: { user },
@@ -64,8 +67,8 @@ export const PATCH = async (request: NextRequest) => {
     .from('bookmarks')
     .update({ memo })
     .eq('user_id', user.id)
-    .eq('isbn13', isbn13)
-    .select('id,isbn13,memo')
+    .eq('item_id', itemId)
+    .select('id,item_id,memo')
     .maybeSingle();
   if (memoUpdateError) {
     console.error('bookmark memo update error:', memoUpdateError);
@@ -118,7 +121,7 @@ export const PATCH = async (request: NextRequest) => {
   return NextResponse.json(
     {
       bookmarkId,
-      isbn13: memoUpdate.isbn13,
+      itemId: memoUpdate.item_id,
       memo: memoUpdate.memo,
       tags: tagsData,
       message: '메모가 저장되었습니다.',

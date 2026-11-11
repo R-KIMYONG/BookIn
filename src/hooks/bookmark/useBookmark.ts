@@ -3,46 +3,41 @@ import { BookmarkCache } from '@/shared/domain/bookmark/types';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
 import { toggleBookmark } from '@/shared/lib/bookmark/toggleBookmark';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { BookInfo } from '@/shared/types/bookInfo';
+import { ItemId } from '@/shared/domain/book/ids';
 import { useAuth } from '@/shared/context/AuthContext';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
 
-export const useBookmark = (bookInfo: BookInfo) => {
+export const useBookmark = (itemId: ItemId) => {
   const queryClient = useQueryClient();
-  const isbn13 = bookInfo?.isbn13.trim();
+  const queryKey = bookmarkKeys.detail(itemId);
   const { user } = useAuth();
-  if (!isbn13) {
-    throw new Error('isbn13 is required');
-  }
 
-  const mutation = useMutation({
-    mutationFn: (bookmarked) => toggleBookmark(bookInfo, bookmarked),
+  const mutation = useMutation<BookmarkCache, Error, boolean, { prev: BookmarkCache }>({
+    mutationFn: (bookmarked) => toggleBookmark(itemId, bookmarked),
 
     // optimistic update
-    onMutate: async (bookmarked: boolean) => {
-      const isbn13 = bookInfo?.isbn13?.trim();
-      if (!isbn13) return;
-      await queryClient.cancelQueries({ queryKey: bookmarkKeys.detail(isbn13) });
+    onMutate: async (bookmarked) => {
+      await queryClient.cancelQueries({ queryKey });
 
-      const prev = queryClient.getQueryData<BookmarkCache>(bookmarkKeys.detail(isbn13)) ?? {
-        isbn13: isbn13,
+      const prev = queryClient.getQueryData<BookmarkCache>(queryKey) ?? {
+        itemId,
         bookmarked: false,
         memoExists: false,
       };
       const nextBookmarked = !bookmarked;
       const next: BookmarkCache = {
-        isbn13: isbn13,
+        itemId,
         bookmarked: nextBookmarked,
         memoExists: nextBookmarked ? prev.memoExists : false,
       };
-      queryClient.setQueryData(bookmarkKeys.detail(isbn13), next);
+      queryClient.setQueryData(queryKey, next);
 
       return { prev };
     },
-    onSuccess: (fresh: BookmarkCache) => {
-      queryClient.setQueryData(bookmarkKeys.detail(isbn13), fresh);
+    onSuccess: (fresh) => {
+      queryClient.setQueryData(queryKey, fresh);
 
       queryClient.invalidateQueries({ queryKey: bookmarkKeys.all });
       queryClient.invalidateQueries({ queryKey: recommendationsKey.rail() });
@@ -51,15 +46,15 @@ export const useBookmark = (bookInfo: BookInfo) => {
     onError: (_err, _vars, context) => {
       console.error('[bookmark][mutation-error]', { _err, context });
       if (context?.prev) {
-        queryClient.setQueryData(bookmarkKeys.detail(isbn13), context.prev);
+        queryClient.setQueryData(queryKey, context.prev);
       }
     },
     onSettled: () => {
       if (!user?.id) return;
       queryClient.invalidateQueries({ queryKey: myBooksKeys.all });
-      queryClient.removeQueries({ queryKey: bookmarkKeys.memo(user.id, isbn13) });
-      queryClient.invalidateQueries({ queryKey: bookmarkKeys.tags.detail(user.id, isbn13) });
-      queryClient.invalidateQueries({ queryKey: bookmarkKeys.detail(isbn13) });
+      queryClient.removeQueries({ queryKey: bookmarkKeys.memo(user.id, itemId) });
+      queryClient.invalidateQueries({ queryKey: bookmarkKeys.tags.detail(user.id, itemId) });
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 

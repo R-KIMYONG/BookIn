@@ -1,20 +1,20 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LikeCache } from '@/shared/domain/like/types';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
-import { BookInfo } from '@/shared/types/bookInfo';
+import { ItemId } from '@/shared/domain/book/ids';
 import { toggleLike } from '@/shared/lib/like/toggleLike';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { useAuth } from '@/shared/context/AuthContext';
 import { showToast } from '@/shared/lib/message/showToast';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
-export const useLike = (bookInfo: BookInfo) => {
+export const useLike = (itemId: ItemId) => {
   const queryClient = useQueryClient();
-  const queryKey = likeKeys.detail(bookInfo.isbn13);
+  const queryKey = likeKeys.detail(itemId);
 
   const { user } = useAuth();
   const mutation = useMutation({
-    mutationFn: () => toggleLike({ bookInfo }),
+    mutationFn: () => toggleLike(itemId),
 
     // optimistic update
     onMutate: async () => {
@@ -23,13 +23,13 @@ export const useLike = (bookInfo: BookInfo) => {
       const prev = queryClient.getQueryData<LikeCache>(queryKey);
 
       const current: LikeCache = {
-        isbn13: bookInfo.isbn13,
+        itemId,
         liked: prev?.liked ?? false,
         liked_count: prev?.liked_count ?? 0,
       };
 
-      const next = {
-        isbn13: bookInfo.isbn13,
+      const next: LikeCache = {
+        itemId,
         liked: !current.liked,
         liked_count: current.liked ? Math.max(0, current.liked_count - 1) : current.liked_count + 1,
       };
@@ -40,7 +40,7 @@ export const useLike = (bookInfo: BookInfo) => {
     },
     onSuccess: (fresh) => {
       queryClient.setQueryData(queryKey, (old?: LikeCache) => ({
-        isbn13: bookInfo.isbn13,
+        itemId,
         liked: fresh.liked,
         liked_count: fresh.liked_count ?? old?.liked_count ?? 0,
       }));

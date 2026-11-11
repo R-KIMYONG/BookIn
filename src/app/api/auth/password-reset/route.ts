@@ -2,13 +2,14 @@ import { hashToken } from '@/shared/lib/crypto/hashToken';
 import { clearPasswordResetState } from '@/shared/lib/supabase/users';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import { RESEND_COOLDOWN_MS, RESET_PASSWORD_EXPIRES_MS } from '@/shared/constants/auth';
-import { createClient } from '@/shared/lib/supabase/server';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { sendPasswordResetMail } from '@/shared/lib/mail/sendPasswordResetMail';
 
 export const POST = async (request: NextRequest) => {
-  const supabase = await createClient();
+  // 비로그인 경로 + password_reset_* 는 비공개 컬럼이라 관리자 클라이언트 사용
+  const supabase = createAdminClient();
 
   const { email } = await request.json();
 

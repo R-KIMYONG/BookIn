@@ -3,6 +3,7 @@
     {
       "path": "/api/cron/snapshot",
       "schedule": "0 15 * * *"
-    }
+    },
+    { "path": "/api/cron/sync-categories", "schedule": "0 18 1 * *" }
   ]
 }

@@ -1,11 +1,8 @@
-import { TargetTypes } from '@/shared/constants/category';
-import { SEARCH_QT_LIST } from './constants';
+import { SearchCategory, SearchSort } from '@/shared/lib/yes24/types';
 
-export type SearchQueryType = (typeof SEARCH_QT_LIST)[number];
-
+// 실제로 YES24에 요청한 검색 조건
 export type SearchOptionType = {
   keyword: string;
-  target: TargetTypes;
-  searchQueryType: SearchQueryType;
-  categoryId: number;
+  category: SearchCategory;
+  sort: SearchSort;
 };

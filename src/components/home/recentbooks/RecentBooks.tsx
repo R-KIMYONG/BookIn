@@ -1,5 +1,6 @@
 'use client';
 import { useRecentBooks } from '@/hooks/recentbooks/useRecentBooks';
+import { ItemId } from '@/shared/domain/book/ids';
 import { RecentBook } from '@/shared/domain/recentbooks/types';
 import { BookOpen, Clock } from 'lucide-react';
 import RecentBookCard from './RecentBookCard';
@@ -16,11 +17,11 @@ const RecentBooks = () => {
 
   const deleteRecentBook = useDeleteRecentBooks();
 
-  const handleDelete = async (isbn13?: string) => {
+  const handleDelete = async (itemId?: ItemId) => {
     await toastMutationPromise(
-      deleteRecentBook.mutateAsync(isbn13, {
+      deleteRecentBook.mutateAsync(itemId, {
         onSuccess: () => {
-          if (!isbn13) setIsOpen(false);
+          if (!itemId) setIsOpen(false);
         },
       }),
       {
@@ -41,7 +42,8 @@ const RecentBooks = () => {
       {/* 가로 스크롤 */}
       {data.length === 0 ? (
         <EmptyState
-          className="py-10 bg-gray-50 rounded-2xl"
+          // 카드 줄·스켈레톤과 같은 높이 (로딩 후 비어 있어도 화면이 튀지 않게)
+          className="py-10 bg-gray-50 rounded-2xl !min-h-[221px] sm:!min-h-[247px]"
           icon={<BookOpen className="w-10 h-10 text-gray-300" />}
           title="아직 본 책이 없어요"
           description="관심 있는 책을 둘러보세요"
@@ -51,7 +53,7 @@ const RecentBooks = () => {
         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide">
           {data.map((item: RecentBook) =>
             item.books ? (
-              <div key={item.isbn13} className="snap-start shrink-0 w-[120px] sm:w-[140px]">
+              <div key={item.item_id} className="snap-start shrink-0 w-[120px] sm:w-[140px]">
                 <RecentBookCard book={item.books} created_at={item.viewed_at} onDelete={handleDelete} />
               </div>
             ) : null
@@ -66,7 +68,7 @@ const RecentBooks = () => {
         confirmColor="danger"
         confirmLabel="삭제"
         cancelLabel="취소"
-        onConfirm={handleDelete}
+        onConfirm={() => handleDelete()}
         onClose={() => setIsOpen(false)}
       />
     </section>

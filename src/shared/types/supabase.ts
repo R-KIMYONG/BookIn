@@ -14,45 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      book_catalog: {
+      book_category_catalog: {
         Row: {
-          author: string | null
-          category_id: number | null
+          category_id: string
           category_name: string
-          created_at: string | null
-          description: string | null
           embedding: string | null
-          id: string
-          isbn13: string | null
-          item_id: string
-          thumbnail_url: string | null
-          title: string
+          full_path: string
+          updated_at: string
         }
         Insert: {
-          author?: string | null
-          category_id?: number | null
+          category_id: string
           category_name: string
-          created_at?: string | null
-          description?: string | null
           embedding?: string | null
-          id?: string
-          isbn13?: string | null
-          item_id: string
-          thumbnail_url?: string | null
-          title: string
+          full_path: string
+          updated_at?: string
         }
         Update: {
-          author?: string | null
-          category_id?: number | null
+          category_id?: string
           category_name?: string
-          created_at?: string | null
-          description?: string | null
           embedding?: string | null
-          id?: string
-          isbn13?: string | null
-          item_id?: string
-          thumbnail_url?: string | null
-          title?: string
+          full_path?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -61,7 +43,7 @@ export type Database = {
           book_id: string
           comment_count: number
           created_at: string
-          isbn13: string | null
+          item_id: number
           like_count: number
           updated_at: string
           view_count: number
@@ -70,7 +52,7 @@ export type Database = {
           book_id: string
           comment_count?: number
           created_at?: string
-          isbn13?: string | null
+          item_id: number
           like_count?: number
           updated_at?: string
           view_count?: number
@@ -79,12 +61,19 @@ export type Database = {
           book_id?: string
           comment_count?: number
           created_at?: string
-          isbn13?: string | null
+          item_id?: number
           like_count?: number
           updated_at?: string
           view_count?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "book_stats_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: true
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
+          },
           {
             foreignKeyName: "book_stats_book_id_fkey"
             columns: ["book_id"]
@@ -102,7 +91,7 @@ export type Database = {
           hidden: boolean
           id: string
           ip_hash: string | null
-          isbn13: string
+          item_id: number
           user_agent_hash: string | null
           user_id: string | null
           view_date: string
@@ -115,7 +104,7 @@ export type Database = {
           hidden?: boolean
           id?: string
           ip_hash?: string | null
-          isbn13: string
+          item_id: number
           user_agent_hash?: string | null
           user_id?: string | null
           view_date?: string
@@ -128,13 +117,20 @@ export type Database = {
           hidden?: boolean
           id?: string
           ip_hash?: string | null
-          isbn13?: string
+          item_id?: number
           user_agent_hash?: string | null
           user_id?: string | null
           view_date?: string
           viewed_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "book_views_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
+          },
           {
             foreignKeyName: "book_views_book_id_fkey"
             columns: ["book_id"]
@@ -227,7 +223,7 @@ export type Database = {
           book_id: string
           created_at: string
           id: string
-          isbn13: string
+          item_id: number
           memo: string | null
           user_id: string
         }
@@ -235,7 +231,7 @@ export type Database = {
           book_id: string
           created_at?: string
           id?: string
-          isbn13: string
+          item_id: number
           memo?: string | null
           user_id: string
         }
@@ -243,11 +239,18 @@ export type Database = {
           book_id?: string
           created_at?: string
           id?: string
-          isbn13?: string
+          item_id?: number
           memo?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "bookmarks_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
+          },
           {
             foreignKeyName: "bookmarks_book_id_fkey"
             columns: ["book_id"]
@@ -267,33 +270,45 @@ export type Database = {
       books: {
         Row: {
           author: string | null
-          category_id: number | null
+          category_id: string | null
           category_name: string | null
           created_at: string
           id: string
-          isbn13: string
+          isbn13: string | null
+          item_id: number
+          pub_date: string | null
+          publisher: string | null
           thumbnail_url: string | null
           title: string
+          updated_at: string
         }
         Insert: {
           author?: string | null
-          category_id?: number | null
+          category_id?: string | null
           category_name?: string | null
           created_at?: string
           id?: string
-          isbn13: string
+          isbn13?: string | null
+          item_id: number
+          pub_date?: string | null
+          publisher?: string | null
           thumbnail_url?: string | null
           title: string
+          updated_at?: string
         }
         Update: {
           author?: string | null
-          category_id?: number | null
+          category_id?: string | null
           category_name?: string | null
           created_at?: string
           id?: string
-          isbn13?: string
+          isbn13?: string | null
+          item_id?: number
+          pub_date?: string | null
+          publisher?: string | null
           thumbnail_url?: string | null
           title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -323,6 +338,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "comments_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
+          },
           {
             foreignKeyName: "comments_book_id_fkey"
             columns: ["book_id"]
@@ -359,24 +381,31 @@ export type Database = {
           book_id: string
           created_at: string
           id: string
-          isbn13: string
+          item_id: number
           user_id: string
         }
         Insert: {
           book_id: string
           created_at?: string
           id?: string
-          isbn13: string
+          item_id: number
           user_id: string
         }
         Update: {
           book_id?: string
           created_at?: string
           id?: string
-          isbn13?: string
+          item_id?: number
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "likes_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
+          },
           {
             foreignKeyName: "likes_book_id_fkey"
             columns: ["book_id"]
@@ -395,27 +424,45 @@ export type Database = {
       }
       ranking_snapshots: {
         Row: {
+          book_id: string
           created_at: string
-          isbn13: string
+          item_id: number
           rank: number
           score: number
           snapshot_date: string
         }
         Insert: {
+          book_id: string
           created_at?: string
-          isbn13: string
+          item_id: number
           rank: number
           score: number
           snapshot_date: string
         }
         Update: {
+          book_id?: string
           created_at?: string
-          isbn13?: string
+          item_id?: number
           rank?: number
           score?: number
           snapshot_date?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ranking_snapshots_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
+          },
+          {
+            foreignKeyName: "ranking_snapshots_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_book_comments: {
         Row: {
@@ -444,11 +491,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "comment_books_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "user_book_comments_book_id_fkey"
+            columns: ["book_id"]
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: "book_ranking"
+            referencedColumns: ["book_id"]
           },
           {
             foreignKeyName: "user_book_comments_book_id_fkey"
@@ -457,44 +504,10 @@ export type Database = {
             referencedRelation: "books"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      user_recommendations: {
-        Row: {
-          created_at: string
-          id: string
-          input_snapshot: Json | null
-          recommendations: Json | null
-          regen_count: number
-          regen_date: string
-          taste_summary: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          input_snapshot?: Json | null
-          recommendations?: Json | null
-          regen_count?: number
-          regen_date: string
-          taste_summary?: string | null
-          user_id?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          input_snapshot?: Json | null
-          recommendations?: Json | null
-          regen_count?: number
-          regen_date?: string
-          taste_summary?: string | null
-          user_id?: string
-        }
-        Relationships: [
           {
-            foreignKeyName: "user_recommendations_user_id_fkey"
+            foreignKeyName: "user_book_comments_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -506,6 +519,7 @@ export type Database = {
           label: string | null
           rails_created_at: string | null
           reacted_count: number
+          rebuild_requested_at: string | null
           recommendations: Json | null
           taste_created_at: string | null
           taste_summary: Json | null
@@ -516,6 +530,7 @@ export type Database = {
           label?: string | null
           rails_created_at?: string | null
           reacted_count?: number
+          rebuild_requested_at?: string | null
           recommendations?: Json | null
           taste_created_at?: string | null
           taste_summary?: Json | null
@@ -526,6 +541,7 @@ export type Database = {
           label?: string | null
           rails_created_at?: string | null
           reacted_count?: number
+          rebuild_requested_at?: string | null
           recommendations?: Json | null
           taste_created_at?: string | null
           taste_summary?: Json | null
@@ -597,10 +613,12 @@ export type Database = {
       book_ranking: {
         Row: {
           author: string | null
-          category_id: number | null
+          book_id: string | null
+          category_id: string | null
           category_name: string | null
           comment_count: number | null
           isbn13: string | null
+          item_id: number | null
           like_count: number | null
           score: number | null
           thumbnail_url: string | null
@@ -614,6 +632,7 @@ export type Database = {
       delete_user: { Args: { user_id: string }; Returns: undefined }
       get_last_reacted_at: { Args: { p_user_id: string }; Returns: string }
       get_reacted_count: { Args: { p_user_id: string }; Returns: number }
+      get_reacted_item_ids: { Args: { p_user_id: string }; Returns: number[] }
       get_signal_mix: {
         Args: { p_user_id: string }
         Returns: {
@@ -633,62 +652,36 @@ export type Database = {
       get_top_anchor: {
         Args: { p_user_id: string }
         Returns: {
-          category_id: number
+          category_id: string
           category_name: string
-          isbn13: string
+          item_id: number
           title: string
         }[]
       }
-      match_book: {
+      match_category: {
         Args: {
-          categories?: string[]
-          match_count: number
-          query_embedding: string
-        }
-        Returns: {
-          author: string
-          category_id: number
-          category_name: string
-          isbn13: string
-          item_id: string
-          similarity: number
-          thumbnail_url: string
-          title: string
-        }[]
-      }
-      match_book_for_user: {
-        Args: {
-          match_count?: number
-          p_anchor_isbn13?: string
-          p_user_id: string
-        }
-        Returns: {
-          author: string
-          category_id: number
-          category_name: string
-          isbn13: string
-          item_id: string
-          similarity: number
-          thumbnail_url: string
-          title: string
-        }[]
-      }
-      match_book_similar: {
-        Args: {
-          match_count?: number
-          p_category?: string
-          p_isbn13?: string
+          p_category_ids: string[]
           p_mall?: string
+          p_match_count: number
         }
         Returns: {
-          author: string
-          category_id: number
+          category_id: string
           category_name: string
-          isbn13: string
-          item_id: string
+          full_path: string
           similarity: number
-          thumbnail_url: string
-          title: string
+        }[]
+      }
+      match_leaf_category: {
+        Args: {
+          p_match_count?: number
+          p_parent_id: string
+          p_query_embedding: string
+        }
+        Returns: {
+          category_id: string
+          category_name: string
+          full_path: string
+          similarity: number
         }[]
       }
     }

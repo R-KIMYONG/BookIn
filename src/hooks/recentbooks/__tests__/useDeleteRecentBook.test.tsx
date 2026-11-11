@@ -6,6 +6,9 @@ import { server } from '@/test/msw/server';
 import { http, HttpResponse } from 'msw';
 import { recentbookKeys } from '@/shared/domain/recentbooks/queryKeys';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { ItemId } from '@/shared/domain/book/ids';
+
+const ITEM_ID = 123 as ItemId;
 
 describe('useDeleteRecentBook훅 테스트', () => {
   it('성공하면 DELETE 요청을 보내고 recent-books를 무효화한다', async () => {
@@ -19,17 +22,17 @@ describe('useDeleteRecentBook훅 테스트', () => {
     let deleteTarget;
     server.use(
       http.delete('/api/recent-books', async ({ request }) => {
-        deleteTarget = new URL(request.url).searchParams.get('isbn13');
+        deleteTarget = new URL(request.url).searchParams.get('itemId');
         return HttpResponse.json({ ok: true });
       })
     );
     const { result } = renderHook(() => useDeleteRecentBooks(), { wrapper });
 
-    act(() => result.current.mutate('a'));
+    act(() => result.current.mutate(ITEM_ID));
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(deleteTarget).toBe('a');
+    expect(deleteTarget).toBe(String(ITEM_ID));
 
     expect(spy).toHaveBeenCalledWith({ queryKey: recentbookKeys.list() });
   });
@@ -51,7 +54,7 @@ describe('useDeleteRecentBook훅 테스트', () => {
 
     const { result } = renderHook(() => useDeleteRecentBooks(), { wrapper });
 
-    act(() => result.current.mutate('a'));
+    act(() => result.current.mutate(ITEM_ID));
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.message).toBe('최근 본 책 삭제실패');
@@ -77,7 +80,7 @@ describe('useDeleteRecentBook훅 테스트', () => {
 
     const onSuccessTestFn = vi.fn();
     act(() =>
-      result.current.mutate('a', {
+      result.current.mutate(ITEM_ID, {
         onSuccess: (data, variables, context) => {
           onSuccessTestFn(data, variables, context);
         },
@@ -87,6 +90,6 @@ describe('useDeleteRecentBook훅 테스트', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(onSuccessTestFn).toHaveBeenCalled();
-    expect(onSuccessTestFn.mock.calls[0]).toStrictEqual([undefined, 'a', undefined]);
+    expect(onSuccessTestFn.mock.calls[0]).toStrictEqual([undefined, ITEM_ID, undefined]);
   });
 });

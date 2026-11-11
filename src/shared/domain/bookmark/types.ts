@@ -1,5 +1,7 @@
+import { ItemId } from '@/shared/domain/book/ids';
+
 export type BookmarkCache = {
-  isbn13: string;
+  itemId: ItemId;
   bookmarked: boolean;
   memoExists: boolean;
 };

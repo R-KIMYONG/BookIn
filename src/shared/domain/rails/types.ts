@@ -1,12 +1,13 @@
 import { StatsRow } from '@/hooks/book/useBookStats';
-import { BookInfo } from '@/shared/types/bookInfo';
-export type RailBook = BookInfo & { similarity?: number; itemId: string };
+import { ItemId } from '../book/ids';
+import { BookSummary } from '../book/types';
+export type RailBook = BookSummary & { similarity?: number };
 
 export type TopanchorType = {
   title: string;
-  isbn13: string;
-  category_id: number;
-  category_name: string;
+  itemId: ItemId;
+  category_id: string | null;
+  category_name: string | null;
 };
 
 export type RailResult = {

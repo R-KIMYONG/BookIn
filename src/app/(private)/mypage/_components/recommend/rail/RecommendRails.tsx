@@ -49,15 +49,15 @@ const RecommendRails = () => {
     },
   });
 
-  const isbnList = useMemo(
+  const itemIds = useMemo(
     () =>
-      data ? [...new Set([...data.trending.books, ...data.sniping, ...data.anchor.books].map((b) => b.isbn13))] : [],
+      data ? [...new Set([...data.trending.books, ...data.sniping, ...data.anchor.books].map((b) => b.itemId))] : [],
     [data]
   );
+  const { data: statsMap } = useBookStats(itemIds);
 
-  const { data: statsMap } = useBookStats(isbnList);
   const attach = useCallback(
-    (books: RailBook[]) => books.map((book) => ({ ...book, stats: statsMap?.[book.isbn13] })),
+    (books: RailBook[]) => books.map((book) => ({ ...book, stats: statsMap?.[book.itemId] })),
     [statsMap]
   );
 

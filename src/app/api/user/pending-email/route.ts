@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/shared/lib/supabase/server';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
 
 export const GET = async () => {
   try {
@@ -12,7 +13,8 @@ export const GET = async () => {
 
     if (authError || !user) return NextResponse.json({ message: '인증되지 않은 사용자입니다.' }, { status: 401 });
 
-    const { data, error } = await supabase
+    const supabaseAdmin = createAdminClient();
+    const { data, error } = await supabaseAdmin
       .from('users')
       .select('pending_email, pending_email_expires_at')
       .eq('id', user.id)

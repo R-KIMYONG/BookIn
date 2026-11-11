@@ -32,12 +32,12 @@ const MyBooksSection = () => {
 
   const tagName = userTags?.find((t) => t.id === tagId)?.name ?? null;
 
-  const isbnList = useMemo(() => {
-    return result?.data.map((item) => item.isbn13) ?? [];
+  const itemIds = useMemo(() => {
+    return result?.data.map((item) => item.itemId) ?? [];
   }, [result?.data]);
 
-  useBookStats(tab === 'like' ? isbnList : []);
-  useMyStatus(isbnList);
+  useBookStats(tab === 'like' ? itemIds : []);
+  useMyStatus(tab === 'comment' ? [] : itemIds);
   const { emptyStateTitle, emptyStateDescription } = getMyBooksEmptyMessage({
     tab,
     search,

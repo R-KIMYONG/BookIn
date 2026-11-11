@@ -1,98 +1,56 @@
 import EmptyState from '@/components/common/EmptyState';
-import { DEFAULT_TARGET, TARGET_LIST, TargetTypes } from '@/shared/constants/category';
-import { aladinKeys } from '@/shared/domain/aladin/queryKeys';
-import { statsKeys } from '@/shared/domain/book/queryKeys';
-import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { likeKeys } from '@/shared/domain/like/queryKeys';
-import { DEFAULT_SEARCH_QT, SEARCH_QT_LIST } from '@/shared/domain/search/constants';
-import { SearchQueryType } from '@/shared/domain/search/types';
-import { getAladinSearch } from '@/shared/lib/aladin/getAladinSearch.server';
-import { getBookStatsByIsbn } from '@/shared/lib/aladin/getBookStatsByIsbn';
-import { getBookmarksByIsbnList } from '@/shared/lib/server/entities/getBookmarksByIsbnList';
-import { getLikeCountsByIsbnList } from '@/shared/lib/server/entities/getLikeCountsByIsbnList';
-import { getLikesByIsbnList } from '@/shared/lib/server/entities/getLikesByIsbnList';
+import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
+import { searchKeys } from '@/shared/domain/search/queryKeys';
+import { getYes24Search } from '@/shared/lib/yes24/getYes24Search';
+import { toPage, toSearchCategory, toSearchSort } from '@/shared/lib/yes24/searchParams';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 import SearchResultContainer from './_components/SearchResultContainer';
 import SearchOptionView from './_components/SearchOptionView';
+import { prefetchBookInteractions } from '@/shared/lib/server/entities/prefetchBookInteractions';
 import { Suspense } from 'react';
 import SearchRailServer from './_components/SearchRailServer';
 import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
-import { getBookKey } from '@/shared/domain/book/getBookKey';
 
-const searchPage = async ({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string; page?: string; target?: TargetTypes; sq?: SearchQueryType; ci: string }>;
-}) => {
+type SearchPageParams = {
+  q?: string;
+  page?: string;
+  target?: string;
+  sort?: string;
+};
+
+const searchPage = async ({ searchParams }: { searchParams: Promise<SearchPageParams> }) => {
   const rawSearchParams = await searchParams;
 
-  const queryClient = new QueryClient();
-
-  const keyword = rawSearchParams.q?.trim() ?? '';
-
-  if (!keyword)
-    return <EmptyState title={`검색어를 입력하세요`} description="검색어나 검색 옵션을 다시 확인해 주세요." />;
-
-  const rawPage = Number(rawSearchParams.page ?? '1');
-  const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
-
-  const rawTarget = rawSearchParams.target?.trim() as TargetTypes;
-  const target = TARGET_LIST.includes(rawTarget) ? rawTarget : DEFAULT_TARGET;
-
-  const categoryId = Number(rawSearchParams.ci?.trim()) || 0;
-
-  const rawSearchQueryType = (rawSearchParams.sq ?? DEFAULT_SEARCH_QT).trim() as SearchQueryType;
-  const searchQueryType = SEARCH_QT_LIST.includes(rawSearchQueryType) ? rawSearchQueryType : DEFAULT_SEARCH_QT;
-
-  const searchList = await getAladinSearch({ keyword, page, target, categoryId, searchQueryType });
-
-  queryClient.setQueryData(
-    aladinKeys.search({ searchKeyWord: keyword, searchQueryType, page, target, categoryId }),
-    searchList
-  );
-
-  const isbnList = (searchList?.items ?? []).map((item) => item.isbn13?.trim() || item.isbn?.trim()).filter(Boolean);
-  const itemListSet = [...new Set([...isbnList])];
-
-  if (itemListSet.length > 0) {
-    const [likes, likeCounts, bookmarks, statsMap] = await Promise.all([
-      getLikesByIsbnList(itemListSet),
-      getLikeCountsByIsbnList(itemListSet),
-      getBookmarksByIsbnList(itemListSet),
-      getBookStatsByIsbn(itemListSet),
-    ]);
-
-    for (const isbn of itemListSet) {
-      queryClient.setQueryData(likeKeys.detail(isbn), {
-        isbn13: isbn,
-        liked: likes[isbn] ?? false,
-        liked_count: likeCounts[isbn] ?? 0,
-      });
-      queryClient.setQueryData(bookmarkKeys.detail(isbn), {
-        isbn13: isbn,
-        bookmarked: bookmarks[isbn]?.bookmarked ?? false,
-        memoExists: bookmarks[isbn]?.memoExists ?? false,
-      });
-    }
-    queryClient.setQueryData(statsKeys.batch(itemListSet), statsMap);
-    queryClient.setQueryData(
-      likeKeys.countBatch(itemListSet),
-      itemListSet.map((isbn) => ({ isbn13: isbn, liked_count: likeCounts[isbn] ?? 0 }))
-    );
+  const query = rawSearchParams.q?.trim() ?? '';
+  if (!query) {
+    return <EmptyState title="검색어를 입력하세요" description="검색어나 검색 옵션을 다시 확인해 주세요." />;
   }
+
+  // YES24 호출용 (URL 값 → 검증된 YES24 값)
+  const category = toSearchCategory(rawSearchParams.target ?? null);
+  const sort = toSearchSort(rawSearchParams.sort ?? null);
+  const page = toPage(rawSearchParams.page ?? null);
+
+  // 페이지 이동 시 URL에 다시 담을 BookIn 값 (없으면 전체 검색)
+  const rawTarget = rawSearchParams.target?.trim();
+  const target = rawTarget && TARGET_LIST.includes(rawTarget as TargetTypes) ? (rawTarget as TargetTypes) : undefined;
+
+  const queryClient = new QueryClient();
+  const searchResult = await getYes24Search({ query, category, sort, page });
+  queryClient.setQueryData(searchKeys.list({ query, category, sort, page }), searchResult);
+
+  const itemIds = searchResult.items.map((book) => book.itemId);
+
+  await prefetchBookInteractions(queryClient, itemIds);
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <SearchOptionView keyword={keyword} target={target} searchQueryType={searchQueryType} categoryId={categoryId} />
-      <SearchResultContainer
-        keyword={keyword}
-        target={target}
-        searchQueryType={searchQueryType}
-        categoryId={categoryId}
-        page={page}
-      />
-      <section className="px-1 sm:px-6 md:px-10 mt-8">
+      <SearchOptionView keyword={query} category={category} sort={sort} />
+      <SearchResultContainer keyword={query} target={target} category={category} sort={sort} page={page} />
+      {/* 추천은 계산이 오래 걸릴 수 있어 따로 스트리밍 → 검색 결과가 먼저 보임 */}
+      <section className="mt-10 px-1 sm:px-6 md:px-10">
         <Suspense fallback={<RailsSkeleton col={1} />}>
-          <SearchRailServer itemListSet={itemListSet} categoryId={categoryId} />
+          <SearchRailServer resultItemIds={itemIds} />
         </Suspense>
       </section>
     </HydrationBoundary>
