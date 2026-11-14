@@ -46,6 +46,11 @@ export const POST = async (request: NextRequest) => {
 
   if (!book_id) return NextResponse.json({ message: '댓글 작성에 필요한 정보가 누락되었습니다.' }, { status: 400 });
 
+  const { data: book } = await supabase.from('books').select('adult').eq('id', book_id).maybeSingle();
+
+  if (!book) return NextResponse.json({ message: '책 정보를 찾을 수 없습니다.' }, { status: 404 });
+  if (book.adult) return NextResponse.json({ message: '청소년 이용불가 도서예요.' }, { status: 403 });
+
   const { error: commentInsertError } = await supabase
     .from('comments')
     .insert({ content: cleanContent, book_id, user_id: user.id, updated_at: now });
