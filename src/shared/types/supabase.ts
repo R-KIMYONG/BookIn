@@ -269,6 +269,7 @@ export type Database = {
       }
       books: {
         Row: {
+          adult: boolean
           author: string | null
           category_id: string | null
           category_name: string | null
@@ -283,6 +284,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          adult?: boolean
           author?: string | null
           category_id?: string | null
           category_name?: string | null
@@ -297,6 +299,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          adult?: boolean
           author?: string | null
           category_id?: string | null
           category_name?: string | null
