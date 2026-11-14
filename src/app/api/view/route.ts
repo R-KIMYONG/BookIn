@@ -41,7 +41,7 @@ export const POST = async (request: NextRequest) => {
 
   // 3) itemId → book_id (트리거가 book_id로 book_stats를 찾으니 필요). books 행은 디테일 페이지가 먼저 저장함
   const { data: book } = await supabase.from('books').select('id, adult').eq('item_id', itemId).maybeSingle();
-  if (!book) return NextResponse.json({ ok: false, reason: 'book not found' }, { status: 403 });
+  if (!book) return NextResponse.json({ ok: false, reason: 'book not found' }, { status: 404 });
   if (book.adult) return NextResponse.json({ ok: false, reason: 'adult book' }, { status: 403 });
 
   const ip = getClientIp(request);
