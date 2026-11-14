@@ -1,15 +1,11 @@
 import EmptyState from '@/components/common/EmptyState';
 import { TARGET_LIST, TargetTypes } from '@/shared/constants/category';
-import { searchKeys } from '@/shared/domain/search/queryKeys';
-import { getYes24Search } from '@/shared/lib/yes24/getYes24Search';
 import { toPage, toSearchCategory, toSearchSort } from '@/shared/lib/yes24/searchParams';
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import SearchResultContainer from './_components/SearchResultContainer';
 import SearchOptionView from './_components/SearchOptionView';
-import { prefetchBookInteractions } from '@/shared/lib/server/entities/prefetchBookInteractions';
 import { Suspense } from 'react';
-import SearchRailServer from './_components/SearchRailServer';
-import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
+import SearchResultServer from './_components/SearchResultServer';
+import SearchResultSkeleton from './_components/SearchResultSkeleton';
+export const maxDuration = 60;
 
 type SearchPageParams = {
   q?: string;
@@ -35,25 +31,13 @@ const searchPage = async ({ searchParams }: { searchParams: Promise<SearchPagePa
   const rawTarget = rawSearchParams.target?.trim();
   const target = rawTarget && TARGET_LIST.includes(rawTarget as TargetTypes) ? (rawTarget as TargetTypes) : undefined;
 
-  const queryClient = new QueryClient();
-  const searchResult = await getYes24Search({ query, category, sort, page });
-  queryClient.setQueryData(searchKeys.list({ query, category, sort, page }), searchResult);
-
-  const itemIds = searchResult.items.map((book) => book.itemId);
-
-  await prefetchBookInteractions(queryClient, itemIds);
-
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <>
       <SearchOptionView keyword={query} category={category} sort={sort} />
-      <SearchResultContainer keyword={query} target={target} category={category} sort={sort} page={page} />
-      {/* 추천은 계산이 오래 걸릴 수 있어 따로 스트리밍 → 검색 결과가 먼저 보임 */}
-      <section className="mt-10 px-1 sm:px-6 md:px-10">
-        <Suspense fallback={<RailsSkeleton col={1} />}>
-          <SearchRailServer resultItemIds={itemIds} />
-        </Suspense>
-      </section>
-    </HydrationBoundary>
+      <Suspense key={`${query}|${category}|${sort}|${page}`} fallback={<SearchResultSkeleton />}>
+        <SearchResultServer keyword={query} target={target} category={category} sort={sort} page={page} />
+      </Suspense>
+    </>
   );
 };
 

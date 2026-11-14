@@ -4,6 +4,7 @@ import { sliceAll } from '@/shared/lib/rails/sliceAll';
 import { rebuildUserRails } from '@/shared/lib/recommend/rebuildUserRails';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { NextResponse } from 'next/server';
+export const maxDuration = 60;
 
 export const GET = async () => {
   const supabaseAdmin = createAdminClient();
