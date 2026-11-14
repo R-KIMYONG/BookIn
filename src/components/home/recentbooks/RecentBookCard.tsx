@@ -5,6 +5,7 @@ import Button from '@/components/common/ui/Button';
 import { X } from 'lucide-react';
 import { ItemId } from '@/shared/domain/book/ids';
 import { makeHref } from '@/shared/domain/book/makeHref';
+import { toCoverSrc } from '@/shared/domain/book/toCoverSrc';
 
 type RecentBookCardProps = {
   book: {
@@ -18,7 +19,7 @@ type RecentBookCardProps = {
 };
 
 const RecentBookCard = ({ book, created_at, onDelete }: RecentBookCardProps) => {
-  const coverSrc = book.thumbnail_url?.startsWith('http') ? book.thumbnail_url : '/images/noImg.png';
+  const coverSrc = toCoverSrc(book.thumbnail_url);
 
   return (
     <Link href={makeHref(book.item_id)} className="block group">

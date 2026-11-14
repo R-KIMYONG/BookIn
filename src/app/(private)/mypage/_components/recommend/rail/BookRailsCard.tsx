@@ -1,19 +1,19 @@
+import BookLink from '@/components/book/BookLink';
 import BookStats from '@/components/book/BookStats';
 import { formatAuthor } from '@/shared/domain/book/formatAuthor';
-import { makeHref } from '@/shared/domain/book/makeHref';
+import { toCoverSrc } from '@/shared/domain/book/toCoverSrc';
 import { RailBookView } from '@/shared/domain/rails/types';
 import Image from 'next/image';
-import Link from 'next/link';
 
 type BookRailsCardProps = {
   book: RailBookView;
 };
 
 const BookRailsCard = ({ book }: BookRailsCardProps) => {
-  const coverSrc = book.cover?.startsWith('http') ? book.cover : '/images/noImg.png';
+  const coverSrc = toCoverSrc(book.cover);
   const match = typeof book.similarity === 'number' ? Math.round(book.similarity * 100) : null;
   return (
-    <Link href={makeHref(book.itemId)}>
+    <BookLink itemId={book.itemId} adult={book.adult}>
       <article className="group w-36 shrink-0 sm:w-40">
         <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-gray-100 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
           <Image
@@ -42,7 +42,7 @@ const BookRailsCard = ({ book }: BookRailsCardProps) => {
           <BookStats viewCount={book.stats?.view_count ?? 0} commentCount={book.stats?.comment_count ?? 0} />
         </div>
       </article>
-    </Link>
+    </BookLink>
   );
 };
 

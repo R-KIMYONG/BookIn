@@ -1,13 +1,12 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { DiggingBook } from '@/shared/domain/digging/types';
-import { makeHref } from '@/shared/domain/book/makeHref';
+import { toCoverSrc } from '@/shared/domain/book/toCoverSrc';
+import BookLink from '@/components/book/BookLink';
 
 const DiggingBookCard = ({ book, rank }: { book: DiggingBook; rank: number }) => {
-  const cover = book.cover?.startsWith('http') ? book.cover : '/images/noImg.png';
+  const cover = toCoverSrc(book.cover);
   const genre = book.categoryName ?? '';
-  const href = makeHref(book.itemId);
   const card = (
     <article className="w-full group flex gap-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition hover:border-main/30 hover:shadow-md">
       <div className="relative aspect-[3/4] w-20 shrink-0 overflow-hidden rounded-xl bg-gray-50">
@@ -36,14 +35,10 @@ const DiggingBookCard = ({ book, rank }: { book: DiggingBook; rank: number }) =>
     </article>
   );
 
-  return href ? (
-    <Link href={href} className="block w-72">
+  return (
+    <BookLink itemId={book.itemId} adult={book.adult} className="block w-72">
       {card}
-    </Link>
-  ) : (
-    <div className="cursor-not-allowed opacity-60" title="상세 페이지가 없어요">
-      {card}
-    </div>
+    </BookLink>
   );
 };
 
