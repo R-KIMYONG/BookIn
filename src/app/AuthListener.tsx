@@ -6,6 +6,7 @@ import { useAuth } from '@/shared/context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { likeKeys } from '@/shared/domain/like/queryKeys';
 import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
+import { clearPersonalQueries } from '@/shared/lib/query/clearPersonalQueries';
 
 export const AuthListener = () => {
   const { setUser } = useAuth();
@@ -27,9 +28,7 @@ export const AuthListener = () => {
 
         case 'SIGNED_OUT':
           setUser(null);
-          queryClient.removeQueries({ queryKey: likeKeys.all });
-          queryClient.removeQueries({ queryKey: bookmarkKeys.all });
-          queryClient.removeQueries({ queryKey: ['myStatus'] });
+          clearPersonalQueries(queryClient);
           break;
       }
     });

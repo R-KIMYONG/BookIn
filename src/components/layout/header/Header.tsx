@@ -3,10 +3,13 @@ import HeaderAuth from './HeaderAuth.server';
 import { cookies } from 'next/headers';
 import { SESSION_EXPIRES_AT } from '@/shared/domain/auth/constants';
 import SearchBarContainer from './SearchBarContainer';
-import CategoryDrawer from './CategoryDrawer';
 import { HeaderTopBar } from './HeaderTopBar';
 import HeaderDiggingMenu from './HeaderDiggingMenu';
 import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
+import CategoryDrawerServer from './CategoryDrawerServer';
+import { Suspense } from 'react';
+import CategoryDrawer from './CategoryDrawer';
+import AuthSync from '@/components/session/AuthSync';
 
 const Header = async () => {
   const cookieStore = await cookies();
@@ -15,7 +18,7 @@ const Header = async () => {
 
   const tempExpiresAtStr = cookieStore.get(SESSION_EXPIRES_AT)?.value ?? null;
   const tempSessionExpiresAt = tempExpiresAtStr ? Number(tempExpiresAtStr) : null;
-  
+
   const isLoggedIn = !!user;
   return (
     <HeaderTopBar>
@@ -26,10 +29,12 @@ const Header = async () => {
           <HeaderAuth isLoggedIn={isLoggedIn} tempSessionExpiresAt={tempSessionExpiresAt} />
         </div>
       </div>
-
+      <AuthSync userId={user?.id ?? null} />
       {/* 2단 */}
       <div className="flex h-12 items-center gap-3 border-t border-white/10 px-4 md:gap-6 md:px-10">
-        <CategoryDrawer />
+        <Suspense fallback={<CategoryDrawer />}>
+          <CategoryDrawerServer />
+        </Suspense>
 
         <HeaderDiggingMenu />
         <div className="min-w-0 flex-1 sm:max-w-72">
