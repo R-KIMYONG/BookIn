@@ -1,17 +1,13 @@
 import { buildPersona } from '@/shared/domain/taste/buildPersona';
 import { TASTE_UNLOCK } from '@/shared/domain/taste/constants';
 import { ReportType } from '@/shared/domain/taste/types';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
-import { createClient } from '@/shared/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export const GET = async () => {
-  const supabase = await createClient();
   const supabaseAdmin = createAdminClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return NextResponse.json({ error: '로그인 필요합니다.' }, { status: 401 });
 

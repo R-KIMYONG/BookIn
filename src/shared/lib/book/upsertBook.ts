@@ -12,6 +12,7 @@ export const upsertBook = async (book: UpsertBookInput): Promise<string> => {
     .upsert(
       {
         item_id: book.itemId,
+        adult: book.adult,
         isbn13: book.isbn13,
         title: book.title,
         author: book.author,

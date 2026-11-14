@@ -4,6 +4,7 @@ import { BookSummary } from '@/shared/domain/book/types';
 import BookmarkButton from '../book/BookmarkButton';
 import BookStats from '../book/BookStats';
 import LikeButton from '../book/LikeButton';
+import { toCoverSrc } from '@/shared/domain/book/toCoverSrc';
 
 type CategoryItemProps = {
   item: BookSummary;
@@ -13,9 +14,7 @@ type CategoryItemProps = {
 };
 
 const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemProps) => {
-  const coverSrc = item.cover?.startsWith('http') ? item.cover : '/images/noImg.png';
-
-  //청불 처리 필요
+  const coverSrc = toCoverSrc(item.cover);
   //settings hydration으로 해야됨
   return (
     <article
@@ -31,10 +30,12 @@ const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemP
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 200px"
         />
 
-        <div className="absolute bottom-2 z-20 flex gap-1 items-center text-xs text-white justify-between w-full px-4">
-          <LikeButton itemId={item.itemId} />
-          <BookmarkButton itemId={item.itemId} scope="home" />
-        </div>
+        {!item.adult && (
+          <div className="absolute bottom-2 z-20 flex gap-1 items-center text-xs text-white justify-between w-full px-4">
+            <LikeButton itemId={item.itemId} />
+            <BookmarkButton itemId={item.itemId} scope="home" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
       </div>
 

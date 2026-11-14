@@ -12,6 +12,7 @@ import { makeHref } from '@/shared/domain/book/makeHref';
 import { HOME_LIST_SIZE, HOME_SECTIONS } from '@/shared/lib/yes24/constants';
 import ListTypeTabs from '@/components/common/ui/ListTypeTabs';
 import { useBookList } from '@/hooks/book/useBookList';
+import BookLink from '@/components/book/BookLink';
 
 type HomeBookSectionProps = {
   section: (typeof HOME_SECTIONS)[number];
@@ -61,13 +62,13 @@ const HomeBookSection = ({ section }: HomeBookSectionProps) => {
           className={`flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible lg:grid-cols-5 lg:gap-8 ${isFetching ? 'opacity-60 ' : ''}transition-opacity`}
         >
           {books.map((book) => (
-            <Link href={makeHref(book.itemId)} key={book.itemId} className="w-36 shrink-0 sm:w-auto">
+            <BookLink key={book.itemId} itemId={book.itemId} adult={book.adult} className="w-36 shrink-0 sm:w-auto">
               <CategoryItem
                 item={book}
                 viewCount={stats?.[book.itemId]?.view_count ?? 0}
                 commentCount={stats?.[book.itemId]?.comment_count ?? 0}
               />
-            </Link>
+            </BookLink>
           ))}
         </div>
       )}

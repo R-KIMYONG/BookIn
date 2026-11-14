@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { AUTH_CHANNEL, AuthChangedMessage } from '@/shared/domain/auth/channel';
 
 const EmailConfirmedPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const bc = new BroadcastChannel('bookin-auth');
-    bc.postMessage({ type: 'INVALIDATE_USERINFO' });
+    const bc = new BroadcastChannel(AUTH_CHANNEL);
+    bc.postMessage({ type: 'INVALIDATE_USERINFO' } satisfies AuthChangedMessage);
     bc.close();
 
     const t = setTimeout(() => {

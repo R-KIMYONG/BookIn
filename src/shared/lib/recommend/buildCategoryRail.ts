@@ -35,6 +35,6 @@ const buildCategoryRail = async (categoryId: string, limit: number): Promise<Boo
 };
 
 // 누가 봐도 같은 결과 → 분류별 하루 캐시. 실패하면 throw → 캐시 안 되고 다음 방문 때 다시 계산
-export const getCachedCategoryRail = unstable_cache(buildCategoryRail, ['category-rail-v3'], {
+export const getCachedCategoryRail = unstable_cache(buildCategoryRail, ['category-rail-v4'], {
   revalidate: 60 * 60 * 24,
 });

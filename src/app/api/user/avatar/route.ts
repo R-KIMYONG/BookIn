@@ -1,3 +1,4 @@
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -5,12 +6,9 @@ export const PATCH = async (req: NextRequest) => {
   const supabase = await createClient();
   const maxFileSize = 5 * 1024 * 1024;
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user)
-    return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
+
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
   const formData = await req.formData();
   const imgFile = formData.get('imgFile');

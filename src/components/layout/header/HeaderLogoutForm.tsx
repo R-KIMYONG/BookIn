@@ -6,10 +6,8 @@ import Button from '@/components/common/ui/Button';
 import { showToast } from '@/shared/lib/message/showToast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/shared/context/AuthContext';
-import { likeKeys } from '@/shared/domain/like/queryKeys';
-import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
-import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
 import { LogOut } from 'lucide-react';
+import { clearPersonalQueries } from '@/shared/lib/query/clearPersonalQueries';
 
 const HeaderLogoutForm = () => {
   const pathname = usePathname();
@@ -21,10 +19,7 @@ const HeaderLogoutForm = () => {
 
     if (result.ok) {
       //개인화된 캐시만 지우고 공개 데이터는 유지
-      queryClient.removeQueries({ queryKey: likeKeys.all });
-      queryClient.removeQueries({ queryKey: bookmarkKeys.all });
-      queryClient.removeQueries({ queryKey: ['myStatus'] });
-      queryClient.removeQueries({ queryKey: recommendationsKey.all });
+      clearPersonalQueries(queryClient);
       router.replace(result.data.redirectTo);
       setUser(null);
     }

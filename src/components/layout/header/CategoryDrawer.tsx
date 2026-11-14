@@ -1,9 +1,10 @@
 'use client';
 import Button from '@/components/common/ui/Button';
 import MenuIcon from '@/components/icons/MenuIcon';
-import { useCategoryTree } from '@/hooks/category/useCategoryTree';
+import { categoryTreeQueryOptions, useCategoryTree } from '@/hooks/category/useCategoryTree';
 import { CategoryNode } from '@/shared/domain/category/types';
 import { getCategoryIcon } from '@/shared/domain/header/getCategoryIcon';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,6 +20,11 @@ const CategoryDrawer = () => {
   const [tab, setTab] = useState(TABS[0].key);
   const [selectedMid, setSelectedMid] = useState<CategoryNode | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
+
+  const queryClient = useQueryClient();
+
+  const prefetchTree = () => queryClient.prefetchQuery(categoryTreeQueryOptions);
+
   useEffect(() => setMounted(true), []);
 
   const { data: tree, isPending, isError, refetch } = useCategoryTree(openSideBar);
@@ -48,7 +54,7 @@ const CategoryDrawer = () => {
 
   return (
     <>
-      <MenuIcon onClick={() => setOpenSidebar(true)} />
+      <MenuIcon onClick={() => setOpenSidebar(true)} onIntent={prefetchTree} />
       {openSideBar &&
         mounted &&
         createPortal(

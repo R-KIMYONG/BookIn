@@ -1,5 +1,6 @@
 import { parseItemId } from '@/shared/domain/book/ids';
 import { MyStatus } from '@/shared/domain/book/types';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -18,9 +19,7 @@ export const GET = async (request: NextRequest) => {
     .filter((id) => id !== null);
   if (itemIds.length === 0) return NextResponse.json([]);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) {
     const empty: MyStatus[] = itemIds.map((itemId) => ({ itemId, liked: false, bookmarked: false, memoExists: false }));
     return NextResponse.json(empty, { status: 401 });

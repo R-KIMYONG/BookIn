@@ -38,14 +38,14 @@ export const GET = async (request: NextRequest) => {
 export const POST = async (request: NextRequest) => {
   const supabase = await createClient();
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
 
   const body = await request.json().catch(() => null);
   const itemId = parseItemId(body?.itemId);
-  if (!itemId) return NextResponse.json({ error: 'Invalid itemId' }, { status: 400 });
+  if (!itemId) return NextResponse.json({ error: '올바른 itemId가 필요합니다.' }, { status: 400 });
 
-  const bookId = await ensureBook(itemId);
-  if (!bookId) return NextResponse.json({ error: 'Book not found' }, { status: 404 });
+  const book = await ensureBook(itemId);
+  if (!book) return NextResponse.json({ error: '책 정보를 찾을 수 없습니다.' }, { status: 404 });
 
   const { data: existing } = await supabase
     .from('likes')
@@ -60,8 +60,8 @@ export const POST = async (request: NextRequest) => {
     scheduleRailsRebuild(user.id);
     return NextResponse.json({ itemId, liked: false } satisfies LikeResponseUserType);
   }
-
-  const { error } = await supabase.from('likes').insert({ user_id: user.id, book_id: bookId, item_id: itemId });
+  if (book.adult) return NextResponse.json({ error: '청소년 이용불가 도서예요.' }, { status: 403 });
+  const { error } = await supabase.from('likes').insert({ user_id: user.id, book_id: book.id, item_id: itemId });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   scheduleRailsRebuild(user.id);

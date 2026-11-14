@@ -72,12 +72,14 @@ export const POST = async (request: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
 
-  const bookId = await ensureBook(itemId);
-  if (!bookId) return NextResponse.json({ error: '책 정보를 찾을 수 없습니다.' }, { status: 404 });
+  const book = await ensureBook(itemId);
+  if (!book) return NextResponse.json({ error: '책 정보를 찾을 수 없습니다.' }, { status: 404 });
+
+  if (book.adult) return NextResponse.json({ error: '청소년 이용불가 도서예요.' }, { status: 403 });
 
   const { error: bookmarkError } = await supabase.from('bookmarks').insert({
     user_id: user.id,
-    book_id: bookId,
+    book_id: book.id,
     item_id: itemId,
   });
 

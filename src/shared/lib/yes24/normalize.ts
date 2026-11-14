@@ -1,6 +1,7 @@
 import { BookDetail, BookSummary } from '@/shared/domain/book/types';
 import { Yes24Item } from './types';
 import { parseItemId } from '@/shared/domain/book/ids';
+import { ADULT_COVER } from '@/shared/domain/book/constants';
 
 export const toPubDate = (raw: string): string | null => {
   if (!raw) return null;
@@ -29,16 +30,17 @@ export const toIsbn13 = (raw: string | null): string | null => {
 
 export const toBookSummary = (item: Yes24Item): BookSummary | null => {
   const itemId = parseItemId(item.itemId);
-
+  const adult = item.adultYn === 'Y';
   if (!itemId) return null;
 
   return {
     itemId,
+    adult,
     isbn13: toIsbn13(item.isbn13),
     title: item.title,
     author: item.author,
     publisher: item.publisher,
-    cover: item.cover,
+    cover: adult ? ADULT_COVER : item.cover,
     pubDate: toPubDate(item.publishDate),
     link: item.link,
   };

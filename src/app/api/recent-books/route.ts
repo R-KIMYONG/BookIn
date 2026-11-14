@@ -1,8 +1,8 @@
 import { parseItemId } from '@/shared/domain/book/ids';
 import { VK_COOKIE } from '@/shared/domain/detail/constants';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { getRecentBooks } from '@/shared/lib/server/entities/getRecentBooks';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
-import { createClient } from '@/shared/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -19,11 +19,7 @@ export const DELETE = async (request: NextRequest) => {
   // 값이 있는데 잘못됐으면 전체 삭제로 넘어가지 않게 막음
   if (rawItemId !== null && !itemId) return NextResponse.json({ error: 'invalid itemId' }, { status: 400 });
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const cookiesStore = await cookies();
   const deviceKey = cookiesStore.get(VK_COOKIE)?.value;
