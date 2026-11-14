@@ -8,6 +8,7 @@ import {
 } from '@/shared/domain/taste/fingerprint';
 import { RecV2Schema } from '@/shared/domain/taste/schema';
 import { ReportType } from '@/shared/domain/taste/types';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { getTopAnchors } from '@/shared/lib/rails/getTopAnchors';
 import { getRecommendations } from '@/shared/lib/server/entities/getRecommendations';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
@@ -17,11 +18,8 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { NextResponse } from 'next/server';
 
 export const GET = async () => {
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return NextResponse.json({ error: '로그인 필요합니다.' }, { status: 401 });
 
@@ -37,9 +35,7 @@ export const POST = async () => {
   const supabase = await createClient();
   const supabaseAdmin = createAdminClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser()
 
   if (!user) return NextResponse.json({ error: '로그인 필요합니다.' }, { status: 401 });
 

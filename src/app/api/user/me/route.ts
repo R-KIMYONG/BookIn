@@ -1,17 +1,10 @@
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
-import { createClient } from '@/shared/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export const GET = async () => {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError) return NextResponse.json({ message: '인증 정보를 확인할 수 없습니다.' }, { status: 401 });
+    const user = await getCurrentUser();
 
     if (!user) return NextResponse.json(null, { status: 200 });
 

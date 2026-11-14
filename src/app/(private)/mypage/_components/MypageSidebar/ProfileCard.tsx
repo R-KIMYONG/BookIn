@@ -1,3 +1,4 @@
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { formatDate } from '@/shared/lib/date/formatDate';
 import { createClient } from '@/shared/lib/supabase/server';
 import { Settings } from 'lucide-react';
@@ -6,9 +7,7 @@ import Link from 'next/link';
 
 const ProfileCard = async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return null;
 

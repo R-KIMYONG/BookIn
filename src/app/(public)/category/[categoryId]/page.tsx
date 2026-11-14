@@ -1,4 +1,4 @@
-import { Suspense } from 'react';;
+import { Suspense } from 'react';
 import CategoryListSkeleton from './_components/CategoryListSkeleton';
 import CategoryHeader from './_components/CategoryHeader';
 import CategoryListWrapper from './_components/CategoryListWrapper';
@@ -52,16 +52,17 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
 
   return (
     <main className="px-1 sm:px-6 md:px-10 flex-1">
-      {/* <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4"> */}
       <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
         <CategoryHeader tree={categoryTree} path={path} />
-        {/* 헤더와 같은 컨테이너 안에 둬야 좌우 폭이 맞음 */}
-        <Suspense fallback={<CategoryListSkeleton tabs={tabs} active={listType} />}>
+        <Suspense
+          key={`${categoryId}|${listType}|${page}`}
+          fallback={<CategoryListSkeleton tabs={tabs} active={listType} />}
+        >
           <CategoryListWrapper categoryId={categoryId} listType={listType} page={page} tabs={tabs} />
         </Suspense>
       </section>
       <section className="w-full max-w-7xl mx-auto mt-6 flex flex-col px-4 sm:px-6 gap-4">
-        <Suspense fallback={<RailsSkeleton col={1} />}>
+        <Suspense key={categoryId} fallback={<RailsSkeleton col={1} />}>
           <CategoryRailServer categoryId={categoryId} />
         </Suspense>
       </section>

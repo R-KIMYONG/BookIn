@@ -8,6 +8,7 @@ import { getClientIp } from '@/shared/lib/network/getClientIp';
 import { VK_COOKIE } from '@/shared/domain/detail/constants';
 import { getTopViewBooks } from '@/shared/lib/server/entities/getTopViewBooks';
 import { parseItemId } from '@/shared/domain/book/ids';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 export const GET = async () => {
   const books = await getTopViewBooks();
@@ -22,9 +23,7 @@ export const POST = async (request: NextRequest) => {
 
   const supabase = await createClient();
   // 로그인 유저 확인 (선택, user_id는 nullable)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   // device_key: 로그인 여부 무관 항상 httpOnly 쿠키
   const cookieStore = await cookies();

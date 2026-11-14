@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/shared/lib/supabase/server';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 export const GET = async () => {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError) {
-      return NextResponse.json({ message: '인증 실패' }, { status: 401 });
-    }
+    const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json([], { status: 200 });

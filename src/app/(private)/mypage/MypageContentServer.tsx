@@ -4,7 +4,6 @@ import MypageContent from './_components/MypageContent';
 import { MYPAGE_DEFAULT_SECTION } from '@/shared/domain/mypage/section';
 import { getRecommendations } from '@/shared/lib/server/entities/getRecommendations';
 import { recommendationsKey } from '@/shared/domain/recommend/queryKeys';
-import { createClient } from '@/shared/lib/supabase/server';
 import { myBooksKeys } from '@/shared/domain/mybooks/queryKeys';
 import { normalizeMyBooksKey } from '@/shared/domain/mybooks/normalizeMyBooksKey';
 import { fetchMyBooksServer } from '@/hooks/mybooks/fetchMyBooksServer';
@@ -15,6 +14,7 @@ import { bookmarkKeys } from '@/shared/domain/bookmark/queryKeys';
 import { getUserTagsServer } from '@/shared/lib/server/entities/getUserTagsServer';
 import { MypageProps } from '@/shared/domain/mypage/types';
 import { prefetchBookInteractions } from '@/shared/lib/server/entities/prefetchBookInteractions';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 const MypageContentServer = async ({
   page,
@@ -26,11 +26,7 @@ const MypageContentServer = async ({
   tagId,
   section,
 }: MypageProps) => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const userId = user?.id;
 
   const queryClient = new QueryClient();

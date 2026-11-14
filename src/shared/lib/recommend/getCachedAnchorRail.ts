@@ -9,6 +9,6 @@ import { buildAnchorRail } from './buildAnchorRail';
 // 실패(YES24·Voyage 오류)는 throw → 캐시되지 않고 다음 방문 때 다시 시도
 export const getCachedAnchorRail = unstable_cache(
   (anchorItemId: ItemId, limit: number) => buildAnchorRail({ anchorItemId, limit }),
-  ['anchor-rail-v4'], // 계산 방식을 바꾸면 버전을 올려 옛 캐시(예: 고치기 전의 빈 결과)를 무시
+  ['anchor-rail-v5'], // 계산 방식을 바꾸면 버전을 올려 옛 캐시(예: 고치기 전의 빈 결과)를 무시
   { revalidate: 60 * 60 * 24 }
 );

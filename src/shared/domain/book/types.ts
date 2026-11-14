@@ -2,6 +2,7 @@ import { ItemId } from './ids';
 
 // 카드, 목록, 레일 공통
 export type BookSummary = Readonly<{
+  adult: boolean;
   itemId: ItemId;
   isbn13: string | null;
   title: string;

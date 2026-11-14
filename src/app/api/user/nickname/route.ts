@@ -1,4 +1,5 @@
 import { MAX_LENGTH_NICKNME } from '@/shared/constants/user';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -13,13 +14,9 @@ export const PATCH = async (request: NextRequest) => {
     if (nickname.length > MAX_LENGTH_NICKNME)
       return NextResponse.json({ message: `닉네임은 ${MAX_LENGTH_NICKNME}자 이하만 가능합니다.` }, { status: 400 });
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
 
-    if (userError || !user)
-      return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요' }, { status: 401 });
+    if (!user) return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요' }, { status: 401 });
 
     const { data: existNickname, error: nicknameError } = await supabase
       .from('users')

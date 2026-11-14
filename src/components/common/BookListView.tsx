@@ -1,15 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import AppPagination from '@/components/common/AppPagination';
 import CategoryItem from '@/components/home/CategoryItem';
 import SkeletonGrid from '@/components/common/SkeletonGrid';
 import Yes24Attribution from '@/components/common/Yes24Attribution';
 import { useBookStats } from '@/hooks/book/useBookStats';
 import { useMyStatus } from '@/hooks/book/useMyStatus';
-import { makeHref } from '@/shared/domain/book/makeHref';
 import { BookSummary } from '@/shared/domain/book/types';
+import BookLink from '../book/BookLink';
 
 type BookListViewProps = {
   list: BookSummary[];
@@ -58,13 +57,13 @@ const BookListView = ({
           className={`w-full grid grid-cols-2 gap-6 lg:gap-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ${dim ? 'opacity-60 ' : ''}transition-opacity`}
         >
           {list.map((book) => (
-            <Link href={makeHref(book.itemId)} key={book.itemId}>
+            <BookLink key={book.itemId} itemId={book.itemId} adult={book.adult}>
               <CategoryItem
                 item={book}
                 viewCount={stats?.[book.itemId]?.view_count ?? 0}
                 commentCount={stats?.[book.itemId]?.comment_count ?? 0}
               />
-            </Link>
+            </BookLink>
           ))}
         </div>
       )}

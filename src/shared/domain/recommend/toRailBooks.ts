@@ -5,6 +5,7 @@ export type RankedBook = BookSummary & { similarity: number };
 
 // 결과는 저장될 수 있으므로 책소개 원문(description) 등은 빼고 화면용 필드만 (약관: 책소개 저장 금지)
 export const toSummary = (book: BookDetail): BookSummary => ({
+  adult: book.adult,
   itemId: book.itemId,
   isbn13: book.isbn13,
   title: book.title,

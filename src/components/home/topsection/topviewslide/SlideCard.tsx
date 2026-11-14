@@ -2,13 +2,14 @@ import BookmarkButton from '@/components/book/BookmarkButton';
 import BookStats from '@/components/book/BookStats';
 import LikeButton from '@/components/book/LikeButton';
 import { makeHref } from '@/shared/domain/book/makeHref';
+import { toCoverSrc } from '@/shared/domain/book/toCoverSrc';
 import { TopViewType } from '@/shared/domain/ranking/types';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; active: boolean }) => {
-  const coverSrc = book.thumbnail_url?.startsWith('http') ? book.thumbnail_url : '/images/noImg.png';
+  const coverSrc = toCoverSrc(book.thumbnail_url);
 
   return (
     <div className="relative w-full shrink-0 h-full overflow-hidden rounded-2xl">

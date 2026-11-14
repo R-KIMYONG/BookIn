@@ -1,17 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/shared/lib/supabase/server';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 export const GET = async () => {
   try {
-    const supabase = await createClient();
+    const user = await getCurrentUser();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) return NextResponse.json({ message: '인증되지 않은 사용자입니다.' }, { status: 401 });
+    if (!user) return NextResponse.json({ message: '인증되지 않은 사용자입니다.' }, { status: 401 });
 
     const supabaseAdmin = createAdminClient();
     const { data, error } = await supabaseAdmin

@@ -11,6 +11,7 @@ import { getYes24Detail } from '@/shared/lib/yes24/getYes24Detail';
 import { parseItemId } from '@/shared/domain/book/ids';
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
+import AdultBlocked from './_components/AdultBlocked';
 
 export const maxDuration = 60;
 
@@ -41,6 +42,8 @@ const MainDetail = async ({
       />
     );
   }
+
+  if (book.adult) return <AdultBlocked title={book.title} link={book.link} />;
 
   let bookId: string | null = null;
 

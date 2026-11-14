@@ -1,6 +1,7 @@
 import { isValidPassword } from '@/shared/utils/validation/isPassword';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 export const PATCH = async (req: NextRequest) => {
   let password: string;
@@ -20,14 +21,9 @@ export const PATCH = async (req: NextRequest) => {
     return NextResponse.json({ message: '비밀번호 형식이 맞지않습니다.' }, { status: 400 });
 
   const supabase = await createClient();
+  const user = await getCurrentUser();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user)
-    return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
+  if (!user) return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
   const { error } = await supabase.auth.updateUser({
     password,
@@ -56,14 +52,9 @@ export const POST = async (req: NextRequest) => {
   if (typeof password !== 'string' || !password.trim())
     return NextResponse.json({ message: '현재 비밀번호를 입력해주세요.' }, { status: 400 });
 
-  const supabase = await createClient();
+  const user = await getCurrentUser();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user || !user.email)
+  if (!user || !user.email)
     return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

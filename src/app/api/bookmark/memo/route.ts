@@ -1,4 +1,5 @@
 import { parseItemId } from '@/shared/domain/book/ids';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { createClient } from '@/shared/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -13,9 +14,7 @@ export const GET = async (request: NextRequest) => {
 
   if (!itemId) return NextResponse.json({ message: '올바른 itemId가 필요합니다.' }, { status: 400 });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return NextResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 });
 
@@ -57,9 +56,7 @@ export const PATCH = async (request: NextRequest) => {
 
   if (!itemId) return NextResponse.json({ error: '올바른 itemId가 필요합니다.' }, { status: 400 });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 });
 
