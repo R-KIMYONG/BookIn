@@ -7,13 +7,13 @@ import { clearEmailChangeState } from '@/shared/lib/supabase/users';
 import { isValidEmail } from '@/shared/utils/validation/isEmail';
 import { sendEmailChangeMail } from '@/shared/lib/mail/sendEmailChangeMail';
 import { HOUR } from '@/shared/constants/time';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 export const PATCH = async (request: NextRequest) => {
   //1. 변경할 이메일 request에서 확보
   //2. 확보된 변경할 이메일을 검증
   //3. public.users테이블에 pending정보를 업데이트
   //4. 이후 인증메일을 발송(변경할 이메일 + redirectURL껴서 보내면됨)
-  const supabase = await createClient();
   const supabaseAdmin = createAdminClient();
   const body = await request.json();
   const newEmail = String(body?.email ?? '')
@@ -21,13 +21,9 @@ export const PATCH = async (request: NextRequest) => {
     .toLowerCase();
 
   try {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
 
-    if (!user || userError)
-      return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
+    if (!user) return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
     if (!newEmail) return NextResponse.json({ message: '변경할 이메일을 입력해주세요.' }, { status: 400 });
 
@@ -104,13 +100,9 @@ export const DELETE = async () => {
   //2. public.users테입르의 pending정보를 reset
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (userError || !user)
-    return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
+  if (!user) return NextResponse.json({ message: '세션이 만료되었습니다. 다시 로그인 해주세요.' }, { status: 401 });
 
   const { error: clearPendingError } = await clearEmailChangeState(createAdminClient(), user.id);
 
