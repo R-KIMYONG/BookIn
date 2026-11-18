@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { hashToken } from '@/shared/lib/crypto/hashToken';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { clearEmailChangeState } from '@/shared/lib/supabase/users';
+import { toSafeRedirect } from '@/shared/domain/auth/redirect';
 
 export const GET = async (request: Request) => {
   // 사용자가 인증메일 클릭해서 들어오면 아래 링크 작동됨
@@ -14,7 +15,7 @@ export const GET = async (request: Request) => {
 
   const token = searchParams.get('token');
   const userId = searchParams.get('userId');
-  const next = searchParams.get('next') ?? '/email-confirmed';
+  const next = toSafeRedirect(searchParams.get('next'), '/email-confirmed');
 
   if (!token || !userId) {
     return NextResponse.redirect(`${origin}/auth-code-error?reason=error`);
