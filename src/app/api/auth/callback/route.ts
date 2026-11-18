@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/shared/lib/supabase/server';
 import { RESULT_CODE } from '@/shared/lib/message/resultCode';
 import { createRedirectUrl } from '@/shared/utils/navigation/createRedirectUrl';
+import { toSafeRedirect } from '@/shared/domain/auth/redirect';
 
 export const GET = async (request: Request) => {
   const { searchParams, origin } = new URL(request.url);
@@ -10,7 +11,7 @@ export const GET = async (request: Request) => {
 
   const next = searchParams.get('next') ?? '/';
 
-  const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/';
+  const safeNext = toSafeRedirect(next);
 
   const supabase = await createClient();
   if (code) {

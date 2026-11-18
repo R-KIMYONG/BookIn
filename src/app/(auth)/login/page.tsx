@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import LoginForm from './_components/LoginForm';
 import SocialLoginButtons from './_components/SocialLoginButtons';
+import { toSafeRedirect } from '@/shared/domain/auth/redirect';
 
 const LoginPage = async ({ searchParams }: { searchParams: Promise<{ redirectTo?: string }> }) => {
-  const { redirectTo = '/' } = await searchParams;
+  const redirectTo = toSafeRedirect((await searchParams).redirectTo);
 
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">

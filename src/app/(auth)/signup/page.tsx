@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import SignupForm from './_components/SignupForm';
+import { toSafeRedirect } from '@/shared/domain/auth/redirect';
 
 const SignupPage = async ({ searchParams }: { searchParams: Promise<{ error?: string; redirectTo?: string }> }) => {
-  const { redirectTo = '/' } = await searchParams;
+  const redirectTo = toSafeRedirect((await searchParams).redirectTo);
   return (
     <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] flex items-center justify-center px-4 overflow-hidden">
       <div className="w-full max-w-[420px]">

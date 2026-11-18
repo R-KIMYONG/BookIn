@@ -11,6 +11,7 @@ import { User } from '@supabase/supabase-js';
 import { getBaseUrl } from '@/shared/lib/network/getBaseUrl';
 import { SocialProvider } from '@/components/common/ui/Button/type';
 import { isValidPassword } from '@/shared/utils/validation/isPassword';
+import { toSafeRedirect } from '@/shared/domain/auth/redirect';
 
 export const logout = async (formData: FormData): Promise<ActionResult<{ redirectTo: string }>> => {
   const supabase = await createClient();
@@ -55,7 +56,7 @@ export const login = async (formData: FormData): Promise<ActionResult<{ user: Us
   }
   revalidatePath('/', 'layout');
 
-  const nextPath = redirectTo !== '' && redirectTo !== '/login' ? redirectTo : '/mypage';
+  const nextPath = toSafeRedirect(redirectTo, '/mypage');
 
   return {
     ok: true,
@@ -76,7 +77,7 @@ export const signInWithOAuth = async (formData: FormData) => {
 
   const baseUrl = await getBaseUrl();
 
-  const callbackUrl = `${baseUrl}/api/auth/callback?next=${next}`;
+  const callbackUrl = `${baseUrl}/api/auth/callback?next=${encodeURIComponent(toSafeRedirect(next))}`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -100,8 +101,7 @@ export const signup = async (formData: FormData): Promise<ActionResult<{ user: U
   const confirmPassword = String(formData.get('confirmPassword') ?? '');
   const nickname = String(formData.get('nickname') ?? '').trim();
 
-  const redirectTo = String(formData.get('redirectTo') ?? '/').trim();
-
+  const redirectTo = toSafeRedirect(String(formData.get('redirectTo') ?? '/').trim());
   if (!nickname) {
     return {
       ok: false,
