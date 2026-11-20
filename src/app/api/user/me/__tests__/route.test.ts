@@ -1,64 +1,32 @@
-import { createClient } from '@/shared/lib/supabase/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '../route';
+import { createAdminClient } from '@/shared/lib/supabase/admin';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
-vi.mock('@/shared/lib/supabase/server', () => {
+vi.mock('@/shared/lib/supabase/admin', () => {
   return {
-    createClient: vi.fn(),
+    createAdminClient: vi.fn(),
+  };
+});
+vi.mock('@/shared/lib/auth/getCurrentUser', () => {
+  return {
+    getCurrentUser: vi.fn(),
   };
 });
 describe('user/me route 테스트', () => {
-  afterEach(() => vi.restoreAllMocks());
-  it('인증실패 401 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: async () => {
-          return {
-            data: { user: null },
-            error: { message: '인증실패' },
-          };
-        },
-      },
-    };
-
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
-
-    const response = await GET();
-    expect(response.status).toBe(401);
-
-    expect(await response.json()).toEqual({ message: '인증 정보를 확인할 수 없습니다.' });
-  });
-
+  afterEach(() => vi.resetAllMocks());
   it('!user status 200 반환 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return {
-            data: { user: null },
-            error: null,
-          };
-        },
-      },
-    };
-
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue(null);
 
     const response = await GET();
-
     expect(response.status).toBe(200);
+
     expect(await response.json()).toBeNull();
+    expect(createAdminClient).not.toHaveBeenCalled();
   });
 
   it('public user table get user info success', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return {
-            data: { user: 'user-1' },
-            error: null,
-          };
-        },
-      },
+    const fakeAdmin = {
       from: () => {
         return {
           select: () => {
@@ -76,27 +44,19 @@ describe('user/me route 테스트', () => {
       },
     };
 
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1', nickname: 'kim' } as any);
+    vi.mocked(createAdminClient).mockReturnValue(fakeAdmin as any);
 
     const response = await GET();
 
     const userData = await response.json();
-
     expect(response.status).toBe(200);
 
     expect(userData).toEqual({ id: 'user-1', nickname: 'kim' });
   });
 
   it('public user table get user info error', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return {
-            data: { user: 'user-1' },
-            error: null,
-          };
-        },
-      },
+    const fakeAdmin = {
       from: () => {
         return {
           select: () => {
@@ -113,8 +73,8 @@ describe('user/me route 테스트', () => {
         };
       },
     };
-
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1', user: 'kim' } as any);
+    vi.mocked(createAdminClient).mockReturnValue(fakeAdmin as any);
 
     const response = await GET();
     const error = await response.json();
@@ -125,11 +85,13 @@ describe('user/me route 테스트', () => {
   it('catch error', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    vi.mocked(createClient).mockRejectedValue(new Error('server error'));
+    vi.mocked(getCurrentUser).mockRejectedValue(new Error('server error'));
 
     const response = await GET();
     const error = await response.json();
+
     expect(response.status).toBe(500);
+
     expect(error).toEqual({ message: '서버 오류가 발생했습니다.' });
     expect(spy).toHaveBeenCalledWith(expect.any(Error));
   });
