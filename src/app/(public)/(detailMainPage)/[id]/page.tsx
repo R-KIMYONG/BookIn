@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import EmptyState from '@/components/common/EmptyState';
 import { upsertBook } from '@/shared/lib/book/upsertBook';
 import { RailsSkeleton } from '@/app/(private)/mypage/_components/recommend/rail/RailsSkeleton';
@@ -12,8 +13,43 @@ import { parseItemId } from '@/shared/domain/book/ids';
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import AdultBlocked from './_components/AdultBlocked';
+import { makeHref } from '@/shared/domain/book/makeHref';
 
 export const maxDuration = 60;
+
+export const generateMetadata = async ({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> => {
+  const itemId = parseItemId((await params).id);
+
+  if (!itemId) return { title: '책을 찾을 수 없어요', robots: { index: false } };
+
+  const book = await getYes24Detail(itemId).catch(() => null);
+
+  if (!book) return { title: '책을 찾을 수 없어요', robots: { index: false } };
+  if (book.adult) return { title: '청소년 이용불가 도서', robots: { index: false } };
+
+  const description = (book.description ?? `${book.author} · ${book.publisher}`)
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 150);
+
+  const url = makeHref(book.itemId);
+
+  return {
+    title: book.title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'book',
+      title: book.title,
+      description,
+      url,
+      siteName: 'BookIn',
+      locale: 'ko_KR',
+      images: [{ url: book.cover, alt: book.title }],
+      ...(book.isbn13 && { isbn: book.isbn13 }),
+    },
+  };
+};
 
 const MainDetail = async ({
   params,
