@@ -4,6 +4,7 @@ import { GET, POST } from '../route';
 import { getRecommendations } from '@/shared/lib/server/entities/getRecommendations';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 
 vi.mock('@/shared/lib/supabase/server', () => {
   return { createClient: vi.fn() };
@@ -11,6 +12,11 @@ vi.mock('@/shared/lib/supabase/server', () => {
 
 vi.mock('@/shared/lib/supabase/admin', () => {
   return { createAdminClient: vi.fn() };
+});
+
+// 로그인 유저는 getCurrentUser로 확인 (내부 구현인 auth.getUser 대신 직접 대체)
+vi.mock('@/shared/lib/auth/getCurrentUser', () => {
+  return { getCurrentUser: vi.fn() };
 });
 
 vi.mock('@/shared/lib/server/entities/getRecommendations', () => {
@@ -39,14 +45,7 @@ describe('taste route GET test', () => {
   //GET success case 정상적으로 값을 반환여부 테스트
 
   it('GET/auth정보 없을때 오류 반환여부 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: null } };
-        },
-      },
-    };
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue(null);
 
     const res = await GET();
     const result = await res.json();
@@ -55,14 +54,7 @@ describe('taste route GET test', () => {
   });
 
   it('error throw할때 try/catch에서 받는지 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
-    };
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     vi.mocked(getRecommendations).mockRejectedValue(new Error('getRecommendation error'));
 
     const res = await GET();
@@ -72,15 +64,7 @@ describe('taste route GET test', () => {
     expect(result).toEqual({ error: '불러오기 실패' });
   });
   it('success case 정상적으로 값을 반환여부 테스트', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
-    };
-
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     vi.mocked(getRecommendations).mockResolvedValue({
       taste_summary: { taste_read: 'a', fun_fortune: 'b', one_line_meme: 'c', reading_style: 'd' },
     } as any);
@@ -111,26 +95,15 @@ describe('taste route POST test', () => {
   // 6. upsert 에러면 500
   // 7. 성공하면 200과 taste_summary를 반환한다
   it('로그인 안 하면 401', async () => {
-    const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: null } };
-        },
-      },
-    };
-    vi.mocked(createClient).mockResolvedValue(fakeSupabase as any);
+    vi.mocked(getCurrentUser).mockResolvedValue(null);
     const res = await POST();
     const result = await res.json();
     expect(res.status).toBe(401);
     expect(result).toEqual({ error: '로그인 필요합니다.' });
   });
   it('쿨다운 중이면 429', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
       from: vi.fn(() => {
         return {
           select: () => {
@@ -164,12 +137,8 @@ describe('taste route POST test', () => {
     expect(result).toEqual({ error: `${leftMin}분 후에 다시 추천받을 수 있어요` });
   });
   it('get_taste_distribution rpc 에러면 500', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
       from: vi.fn(() => {
         return {
           select: () => {
@@ -212,12 +181,8 @@ describe('taste route POST test', () => {
       { genre: '잡지', cnt: 1 },
       { genre: '에세이', cnt: 1 },
     ];
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
       from: vi.fn(() => {
         return {
           select: () => {
@@ -259,12 +224,8 @@ describe('taste route POST test', () => {
       { genre: '잡지', cnt: 1 },
       { genre: '에세이', cnt: 1 },
     ];
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
       from: vi.fn(() => {
         return {
           select: () => {
@@ -312,12 +273,8 @@ describe('taste route POST test', () => {
       { genre: '잡지', cnt: 1 },
       { genre: '에세이', cnt: 1 },
     ];
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'user-1' } as any);
     const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'user-1' } } };
-        },
-      },
       from: vi.fn(() => {
         return {
           select: () => {
@@ -394,12 +351,8 @@ describe('taste route POST test', () => {
       { genre: '잡지', cnt: 4 },
       { genre: '에세이', cnt: 3 },
     ];
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: 'test_user_1' } as any);
     const fakeSupabase = {
-      auth: {
-        getUser: () => {
-          return { data: { user: { id: 'test_user_1' } } };
-        },
-      },
       from: vi.fn(() => {
         return {
           select: () => {
