@@ -277,6 +277,7 @@ export type Database = {
           id: string
           isbn13: string | null
           item_id: number
+          page_modified_at: string
           pub_date: string | null
           publisher: string | null
           thumbnail_url: string | null
@@ -292,6 +293,7 @@ export type Database = {
           id?: string
           isbn13?: string | null
           item_id: number
+          page_modified_at?: string
           pub_date?: string | null
           publisher?: string | null
           thumbnail_url?: string | null
@@ -307,6 +309,7 @@ export type Database = {
           id?: string
           isbn13?: string | null
           item_id?: number
+          page_modified_at?: string
           pub_date?: string | null
           publisher?: string | null
           thumbnail_url?: string | null
