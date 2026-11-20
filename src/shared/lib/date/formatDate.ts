@@ -1,5 +1,5 @@
-import dayjs from './dayjs';
+import dayjs, { KST } from './dayjs';
 
 export const formatDate = (date: string | Date) => {
-  return dayjs(date).format('YYYY.MM.DD');
+  return dayjs(date).tz(KST).format('YYYY.MM.DD');
 };
