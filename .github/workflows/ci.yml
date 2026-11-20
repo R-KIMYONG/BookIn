@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, master]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Lint
+        run: yarn lint
+      - name: Test
+        run: yarn test:run
