@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchComments } from '@/shared/lib/comment/fetchComments';
 import { scheduleRailsRebuild } from '@/shared/lib/recommend/scheduleRailsRebuild';
 import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
+import { touchBookPage } from '@/shared/lib/book/touchBookPage';
 
 export const maxDuration = 30;
 
@@ -55,6 +56,7 @@ export const POST = async (request: NextRequest) => {
     .from('comments')
     .insert({ content: cleanContent, book_id, user_id: user.id, updated_at: now });
   if (commentInsertError) return NextResponse.json({ message: '댓글 작성중 오류가 발생했습니다.' }, { status: 500 });
+  await touchBookPage(book_id, now);
 
   scheduleRailsRebuild(user.id);
   return NextResponse.json({ message: '댓글이 등록되었습니다.' }, { status: 201 });
@@ -71,7 +73,7 @@ export const PATCH = async (request: NextRequest) => {
     const cleanContent = sanitizeHtmlServer(content || '');
     if (!id) return NextResponse.json({ message: '수정할 댓글 정보를 찾을 수 없습니다.' }, { status: 400 });
 
-    const { data: target } = await supabase.from('comments').select('user_id').eq('id', id).single();
+    const { data: target } = await supabase.from('comments').select('user_id,book_id').eq('id', id).single();
 
     if (!target) return NextResponse.json({ message: '수정할 댓글을 찾을 수 없습니다.' }, { status: 404 });
 
@@ -86,6 +88,7 @@ export const PATCH = async (request: NextRequest) => {
       console.error(commentUpdateError);
       return NextResponse.json({ message: '댓글 수정 중 오류가 발생했습니다.' }, { status: 500 });
     }
+    await touchBookPage(target.book_id, now);
 
     return NextResponse.json({ message: '댓글이 수정되었습니다.' }, { status: 200 });
   } catch (error) {
@@ -126,6 +129,7 @@ export const DELETE = async (request: NextRequest) => {
 
       return NextResponse.json({ message: '댓글 삭제 중 오류가 발생했습니다.' }, { status: 500 });
     }
+    await touchBookPage(targetComment.book_id);
     scheduleRailsRebuild(user.id);
     return NextResponse.json({ message: '댓글이 삭제되었습니다.' }, { status: 200 });
   } catch (error) {
