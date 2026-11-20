@@ -1,14 +1,9 @@
 import 'server-only';
 import { createClient } from '../../supabase/server';
 import { RankedBook } from '@/shared/domain/ranking/types';
-import dayjs from '@/shared/lib/date/dayjs';
+import dayjs, { KST } from '@/shared/lib/date/dayjs';
 import { rankingCalcChange } from '@/shared/domain/ranking/rankingCalcChange';
 import { toRankingBook } from '@/shared/domain/ranking/toRankingBook';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 export const getRankedBooks = async (): Promise<RankedBook[]> => {
   const supabase = await createClient();
@@ -21,7 +16,7 @@ export const getRankedBooks = async (): Promise<RankedBook[]> => {
     .limit(50);
 
   if (error) throw error;
-  const yesterday = dayjs().tz('Asia/Seoul').subtract(1, 'day').format('YYYY-MM-DD');
+  const yesterday = dayjs().tz(KST).subtract(1, 'day').format('YYYY-MM-DD');
 
   const { data: snapshot, error: snapshotError } = await supabase
     .from('ranking_snapshots')
