@@ -1,14 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import Button from '../../common/ui/Button';
 import EmptyState from '../../common/EmptyState';
 import CategoryItem from '../CategoryItem';
 import { HomeBookGridSkeleton } from './HomeBookSectionSkeleton';
 import { useBookStats } from '@/hooks/book/useBookStats';
 import { useMyStatus } from '@/hooks/book/useMyStatus';
-import { makeHref } from '@/shared/domain/book/makeHref';
 import { HOME_LIST_SIZE, HOME_SECTIONS } from '@/shared/lib/yes24/constants';
 import ListTypeTabs from '@/components/common/ui/ListTypeTabs';
 import { useBookList } from '@/hooks/book/useBookList';
