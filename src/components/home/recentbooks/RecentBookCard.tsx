@@ -49,8 +49,8 @@ const RecentBookCard = ({ book, created_at, onDelete }: RecentBookCardProps) => 
         {book.title}
       </p>
       {/* 상대 시간은 서버 렌더와 하이드레이션 시점이 달라 텍스트가 어긋날 수 있음 */}
-      <p suppressHydrationWarning className="mt-2 text-xs font-medium line-clamp-2 leading-snug">
-        {formatRelativeTime(created_at)}
+      <p className="mt-2 text-xs font-medium line-clamp-2 leading-snug">
+        <span suppressHydrationWarning>{formatRelativeTime(created_at)}</span>
       </p>
     </Link>
   );
