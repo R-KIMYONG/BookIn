@@ -4,8 +4,9 @@ import { Yes24Error, yes24Fetch } from './client';
 import { Yes24ListData } from './types';
 import { toBookDetail } from './normalize';
 import { BookDetail } from '@/shared/domain/book/types';
+import { cache } from 'react';
 
-export const getYes24Detail = async (itemId: ItemId): Promise<BookDetail | null> => {
+export const getYes24Detail = cache(async (itemId: ItemId): Promise<BookDetail | null> => {
   try {
     const data = await yes24Fetch<Yes24ListData>(
       '/goods/itemDetail',
@@ -19,4 +20,4 @@ export const getYes24Detail = async (itemId: ItemId): Promise<BookDetail | null>
     if (error instanceof Yes24Error && error.code?.startsWith('GOODS_')) return null;
     throw error;
   }
-};
+});

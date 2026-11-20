@@ -9,6 +9,7 @@ import GlobalOverlays from './GlobalOverlays';
 import { Noto_Sans_KR, Noto_Sans_JP, Noto_Sans_SC } from 'next/font/google';
 import { Poppins } from 'next/font/google';
 import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
+import { SITE_URL } from '@/shared/constants/site';
 const poppins = Poppins({ subsets: ['latin'], weight: ['600'], variable: '--font-poppins' });
 
 const notoSansKR = Noto_Sans_KR({
@@ -36,6 +37,7 @@ const notoSansSC = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'BookIn',
     template: '%s | BookIn',
