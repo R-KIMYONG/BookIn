@@ -8,7 +8,6 @@ import { Yes24ListType } from '@/shared/lib/yes24/types';
 import ListTypeTabs from '@/components/common/ui/ListTypeTabs';
 import { CATEGORY_LIST_SIZE } from '@/shared/lib/yes24/constants';
 import { useBookList } from '@/hooks/book/useBookList';
-import { useMemo } from 'react';
 import useUrlParams from '@/hooks/url/useUrlParams';
 import EmptyState from '@/components/common/EmptyState';
 import getTotalPages from '@/shared/utils/pagination';
