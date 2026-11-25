@@ -98,7 +98,7 @@ const SearchBar = () => {
 
             {/* 범위 */}
             <section>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-400">범위</p>
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-600">범위</p>
               <div className="flex flex-wrap gap-2">
                 {RANGE.map(({ v, label }) => (
                   <Button
@@ -114,7 +114,7 @@ const SearchBar = () => {
 
             {/* 정렬 */}
             <section>
-              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-400">정렬</p>
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-gray-600">정렬</p>
               <div className="flex flex-wrap gap-2">
                 {SEARCH_SORT_OPTIONS.map((option) => (
                   <Button

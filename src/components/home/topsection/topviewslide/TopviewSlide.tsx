@@ -114,6 +114,7 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
         <div className="flex items-center gap-2">
           <Button
             size="xs"
+            aria-label="이전 슬라이드"
             variant="ghost"
             leftIcon={<CircleChevronLeft width={20} height={20} strokeWidth={2} />}
             className="!hover:bg-gray-none"
@@ -125,6 +126,8 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
               <Button
                 key={i}
                 size="xs"
+                aria-label={`${i + 1}번째 슬라이드`}
+                aria-current={slideIndex === i + 1 ? 'true' : undefined}
                 variant="ghost"
                 leftIcon={
                   <CircleSmall
@@ -143,6 +146,7 @@ const TopViewSlide = ({ books }: { books: TopViewType[] }) => {
           </div>
           <Button
             size="xs"
+            aria-label='다음 슬라이드'
             variant="ghost"
             leftIcon={<CircleChevronRight width={20} height={20} strokeWidth={2} />}
             onClick={handleSlideRight}

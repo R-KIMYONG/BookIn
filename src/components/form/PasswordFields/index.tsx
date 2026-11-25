@@ -34,7 +34,7 @@ const PasswordFields = ({
     <>
       <div>
         <label htmlFor={passwordName} className="mb-1.5 block text-xs font-semibold text-gray-700">
-          {withConfirm && <span className="ml-1 text-red-500">*</span>}
+          {withConfirm && <span className="ml-1 text-red-600">*</span>}
           {passwordLabel}
         </label>
 
@@ -53,6 +53,7 @@ const PasswordFields = ({
           <Button
             type="button"
             className={iconBtn}
+            aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 보기'}
             variant="ghost"
             onClick={() => setShowPw((password) => !password)}
           >
@@ -60,14 +61,14 @@ const PasswordFields = ({
           </Button>
         </div>
 
-        {showHint ? <p className="my-1 text-[11px] text-gray-400">8자 이상 / 영문+숫자+특수문자 포함</p> : null}
+        {showHint ? <p className="my-1 text-[11px] text-gray-600">8자 이상 / 영문+숫자+특수문자 포함</p> : null}
       </div>
 
       {/* 비밀번호 컨펌필드 */}
       {withConfirm ? (
         <div className="mb-1">
           <label htmlFor={confirmName} className="mb-1.5 block text-xs font-semibold text-gray-700">
-            <span className="ml-1 text-red-500">*</span>
+            <span className="ml-1 text-red-600">*</span>
             {confirmLabel}
           </label>
 
@@ -86,6 +87,7 @@ const PasswordFields = ({
             <Button
               type="button"
               className={iconBtn}
+              aria-label={showConfirm ? '비밀번호 확인 숨기기' : '비밀번호 확인 보기'}
               variant="ghost"
               onClick={() => setShowConfirm((confirmPassword) => !confirmPassword)}
             >

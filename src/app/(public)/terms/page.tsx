@@ -48,7 +48,7 @@ const TermsPage = () => {
     router.push('/signup'); // 회원가입 페이지로 이동
   };
   return (
-    <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] flex items-center justify-center px-4 overflow-hidden">
+    <div className="min-h-page bg-[#f6f5f7] flex items-center justify-center px-4">
       <div className="w-full max-w-[460px] py-4">
         <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
           <form onSubmit={handleSubmit} className="p-6 sm:p-7">
@@ -66,7 +66,11 @@ const TermsPage = () => {
                   <p className="text-sm font-semibold text-gray-900">모두 동의</p>
                   <p className="mt-0.5 text-[11px] text-gray-500">필수 및 선택 항목을 한 번에 설정합니다.</p>
                 </div>
-                <SwitchToggle checked={isAllChecked} onChange={() => handleAllChange(!isAllChecked)} />
+                <SwitchToggle
+                  label="모두 동의"
+                  checked={isAllChecked}
+                  onChange={() => handleAllChange(!isAllChecked)}
+                />
               </div>
             </div>
 
@@ -81,7 +85,7 @@ const TermsPage = () => {
                       <div className="flex items-center gap-2">
                         <span
                           className={`inline-flex whitespace-nowrap items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                            item.required ? 'bg-[#af5858]/10 text-[#af5858]' : 'bg-gray-100 text-gray-600'
+                            item.required ? 'bg-gray-200 text-red-700' : 'bg-gray-100 text-gray-600'
                           }`}
                         >
                           {item.required ? '필수' : '선택'}
@@ -102,14 +106,18 @@ const TermsPage = () => {
                         <p className="mt-1 text-[11px] text-gray-500">가입 연령 요건을 확인합니다.</p>
                       )}
                     </div>
-                    <SwitchToggle checked={checked} onChange={() => handleSingleChange(item.id, !checked)} />
+                    <SwitchToggle
+                      label={item.title}
+                      checked={checked}
+                      onChange={() => handleSingleChange(item.id, !checked)}
+                    />
                   </div>
                 );
               })}
             </div>
 
             {/* 하단 안내 */}
-            <p className="mt-4 text-[11px] text-gray-400">선택 항목에 동의하지 않아도 서비스 이용은 가능합니다.</p>
+            <p className="mt-4 text-[11px] text-gray-600">선택 항목에 동의하지 않아도 서비스 이용은 가능합니다.</p>
 
             {/* 버튼 */}
             <div className="mt-6 flex gap-3">
@@ -134,10 +142,6 @@ const TermsPage = () => {
             </div>
           </form>
         </div>
-
-        <p className="mt-6 text-center text-[11px] text-gray-400">
-          계속 진행하면 서비스 이용약관 및 개인정보 처리방침에 동의한 것으로 간주됩니다.
-        </p>
       </div>
     </div>
   );

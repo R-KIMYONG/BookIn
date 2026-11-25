@@ -41,7 +41,7 @@ const AiTasteCard = ({ persona }: { persona: PersonaType }) => {
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <Microscope size={25} color="#5b21b6" />
-          <h3 className="text-sm font-bold text-gray-400">AI 독서 분석</h3>
+          <h3 className="text-sm font-bold text-gray-600">AI 독서 분석</h3>
         </div>
         <Button onClick={() => generate()} disabled={generating} label={'다시 분석'} variant="secondary" />
       </div>

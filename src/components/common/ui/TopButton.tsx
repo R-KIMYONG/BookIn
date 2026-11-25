@@ -29,12 +29,12 @@ const TopButton = () => {
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
-      <div className="flex flex-col items-center ">
+      <div className="flex flex-col items-center">
         <ArrowUp
-          className="w-5 h-5 transition-transform translate-y-0 group-hover:-translate-y-0.5"
+          className="w-4 h-4 transition-transform translate-y-0.5 group-hover:-translate-y-0.5"
           strokeWidth={2.5}
         />
-        <span>Top</span>
+        <span className="text-white text-xs">Top</span>
       </div>
     </Button>
   );

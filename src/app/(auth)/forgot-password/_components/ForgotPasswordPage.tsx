@@ -133,7 +133,7 @@ const ForgotPasswordPage = () => {
 
         <p className="text-xs text-gray-500">메일의 링크를 클릭하여 비밀번호를 재설정해주세요.</p>
 
-        <p className="text-xs text-gray-400">링크는 약 1시간 동안 유효합니다.</p>
+        <p className="text-xs text-gray-600">링크는 약 1시간 동안 유효합니다.</p>
 
         <CountdownStatus expireAt={data?.expireAt ?? null} label="남은 시간" expiredText="만료됨" />
       </div>
@@ -148,7 +148,7 @@ const ForgotPasswordPage = () => {
 export default ForgotPasswordPage;
 
 const Wrapper = ({ children }: { children: ReactNode }) => (
-  <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] flex items-center justify-center px-4">
+  <div className="min-h-page bg-[#f6f5f7] flex items-center justify-center px-4">
     <div className="w-full max-w-[420px]">
       <div className="rounded-2xl bg-white shadow p-6">{children}</div>
     </div>

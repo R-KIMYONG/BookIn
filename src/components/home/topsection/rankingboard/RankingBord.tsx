@@ -39,7 +39,7 @@ const RankingBoard = ({ books }: { books: RankedBook[] }) => {
             <li key={book.item_id}>
               <Link
                 href={makeHref(book.item_id)}
-                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 transition-colors group"
+                className="flex items-center gap-2 px-2 py-2 hover:bg-gray-50 transition-colors group"
               >
                 <RankChangeBadge change={book.change} />
                 {/* 순위 */}

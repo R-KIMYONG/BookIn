@@ -65,6 +65,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: App
             <Button
               variant="secondary"
               size="sm"
+              aria-label="이전 10페이지"
               onClick={prev10}
               disabled={disabled || !canPrev}
               className="group"
@@ -74,6 +75,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: App
             <Button
               variant="secondary"
               size="sm"
+              aria-label="이전 페이지"
               onClick={prev}
               disabled={disabled || !canPrev}
               className="group"
@@ -86,6 +88,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: App
                 <Button
                   key={pageNum}
                   variant="ghost"
+                  aria-current={pageNum === safePage ? 'page' : undefined}
                   className={cn(
                     'h-8 w-8 shrink-0 !rounded-md !text-sm !px-2',
                     pageNum === safePage
@@ -103,6 +106,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: App
           <div className="flex items-center gap-1 shrink-0">
             <Button
               variant="secondary"
+              aria-label="다음 페이지"
               size="sm"
               onClick={next}
               disabled={disabled || !canNext}
@@ -113,6 +117,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: App
             <Button
               variant="secondary"
               size="sm"
+              aria-label="다음 10페이지"
               onClick={next10}
               disabled={disabled || !canNext}
               className="group"
@@ -157,7 +162,7 @@ const AppPagination = ({ page, totalPages, onChange, disabled, isFetching }: App
               }}
             />
 
-            <span className="text-xs text-gray-400">/ {totalPages}</span>
+            <span className="text-xs text-gray-600">/ {totalPages}</span>
           </div>
 
           <Button type="submit" label="이동" variant="secondary" />

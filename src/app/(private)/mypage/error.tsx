@@ -13,7 +13,7 @@ const MypageError = ({ error, reset }: { error: Error; reset: () => void }) => {
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-3rem)] gap-6 bg-gray-50 text-center px-4">
+    <div className="flex flex-col items-center justify-center min-h-page gap-6 bg-gray-50 text-center px-4">
       <div className="text-6xl">⚠️</div>
       <h2 className="text-2xl font-bold text-gray-800">마이페이지를 불러오지 못했어요.</h2>
 

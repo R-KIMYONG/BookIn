@@ -15,7 +15,7 @@ const Loading = ({ size = 'md', text, fullScreen = false }: LoadingProps) => {
     <div
       className={
         fullScreen
-          ? 'flex items-center justify-center min-h-[calc(100vh-3rem)]'
+          ? 'flex items-center justify-center min-h-page'
           : 'flex flex-col items-center justify-center gap-3 py-12'
       }
     >

@@ -107,7 +107,7 @@ const ResetPasswordPage = ({ token }: { token: string }) => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] flex items-center justify-center px-4">
+    <div className="min-h-page bg-[#f6f5f7] flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
         <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
           <div className="px-6 py-7 sm:px-7 sm:py-8">
