@@ -71,7 +71,7 @@ export default async function RootLayout({
       lang="ko"
       className={`${notoSansKR.variable} ${notoSansJP.variable} ${notoSansSC.variable} ${poppins.variable}`}
     >
-      <body>
+      <body className="bg-white">
         <QueryProvider initialUser={user}>
           <GlobalOverlays />
           <Header />

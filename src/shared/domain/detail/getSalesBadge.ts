@@ -10,7 +10,7 @@ export const getSalesBadge = (salesPoint: number): SalesBadge | null => {
 };
 
 export const toneClass: Record<SalesBadge['tone'], string> = {
-  red: 'bg-red-50 text-red-600',
+  red: 'bg-red-50 text-red-700',
   amber: 'bg-amber-50 text-amber-700',
   blue: 'bg-blue-50 text-blue-600',
 };

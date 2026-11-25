@@ -33,7 +33,7 @@ const LikeBooksList = ({ data }: { data: LikeBook[] }) => {
             <div className="mt-2 h-14 px-2 text-xs">
               <p className="font-bold line-clamp-1">{book.title}</p>
               <BookStats viewCount={book.total_view_count} commentCount={book.total_comment_count} />
-              <span className="text-gray-400">{book.created_at ? date : ''}</span>
+              <span className="text-gray-600">{book.created_at ? date : ''}</span>
             </div>
           </li>
         );

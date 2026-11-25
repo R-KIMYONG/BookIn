@@ -1,6 +1,7 @@
 import { CategoryNode } from '@/shared/domain/category/types';
 import CategoryDropdown from './CategoryDropdown';
 import CategoryChips from './CategoryChips';
+import { ChevronRight } from 'lucide-react';
 
 type CategoryHeaderProps = {
   tree: CategoryNode[];
@@ -21,7 +22,7 @@ const CategoryHeader = ({ tree, path }: CategoryHeaderProps) => {
         {mid && (
           <>
             <span aria-hidden="true" className="text-sm text-gray-300">
-              ›
+              <ChevronRight className="w-3.5 h-3.5" />
             </span>
             <CategoryDropdown current={mid} options={toOptions(mall.children)} />
           </>

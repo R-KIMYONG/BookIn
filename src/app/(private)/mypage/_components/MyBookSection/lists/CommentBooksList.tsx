@@ -34,7 +34,7 @@ const CommentBooksList = ({ data }: { data: CommentBook[] }) => {
                 likeCount={book.total_like_count}
                 commentCount={book.total_comment_count}
               />
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-gray-600">
                 <span>{book.last_commented_at ? date : ''}</span>
                 <span>내 댓글 {formatCount(book.comment_count)}개</span>
               </div>

@@ -93,7 +93,7 @@ const BookmarkBooksList = ({ data }: { data: BookmarkBook[] }) => {
                 <TagArea tagNames={tagNames} onMore={() => open(book.itemId, 'mypage')} scope="mypage" />
               ) : (
                 <span
-                  className="text-gray-400 cursor-pointer hover:text-gray-500"
+                  className="text-gray-500 cursor-pointer hover:text-black transition-colors"
                   onClick={() => open(book.itemId, 'mypage')}
                 >
                   태그를 추가해보세요

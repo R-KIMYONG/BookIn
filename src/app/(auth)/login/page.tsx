@@ -7,14 +7,14 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ redirectTo?
   const redirectTo = toSafeRedirect((await searchParams).redirectTo);
 
   return (
-    <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">
+    <div className="min-h-page bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
         <div className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5 p-6 sm:p-7">
           <LoginForm redirectTo={redirectTo} />
           {/* 구분선 */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-[11px] font-semibold text-gray-400">OR</span>
+            <span className="text-[11px] font-semibold text-gray-600">OR</span>
             <div className="h-px flex-1 bg-gray-200" />
           </div>
 
@@ -30,7 +30,7 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ redirectTo?
           </p>
         </div>
         {/* 하단 안내 */}
-        <p className="mt-6 text-center text-[11px] text-gray-400">
+        <p className="mt-6 text-center text-[11px] text-gray-600">
           로그인 시 서비스 이용약관 및 개인정보 처리방침에 동의한 것으로 간주됩니다.
         </p>
       </div>

@@ -49,11 +49,11 @@ const DetailActionBar = ({ itemId }: { itemId: ItemId }) => {
           aria-pressed={liked}
           className={segment}
           leftIcon={
-            <Heart className={cn('h-4 w-4 transition-colors', liked ? 'fill-red-500 text-red-500' : 'text-gray-400')} />
+            <Heart className={cn('h-4 w-4 transition-colors', liked ? 'fill-red-500 text-red-500' : 'text-gray-600')} />
           }
         >
           <span className={liked ? 'font-medium text-red-500' : 'text-gray-600'}>좋아요</span>
-          <span className="tabular-nums text-gray-400 ml-1">{formatCount(likeCount)}</span>
+          <span className="tabular-nums text-gray-600 ml-1">{formatCount(likeCount)}</span>
         </Button>
         <Button
           type="button"
@@ -67,7 +67,7 @@ const DetailActionBar = ({ itemId }: { itemId: ItemId }) => {
             bookmarked ? (
               <BookmarkCheck className="h-4 w-4 text-main" />
             ) : (
-              <Bookmark className="h-4 w-4 text-gray-400" />
+              <Bookmark className="h-4 w-4 text-gray-600" />
             )
           }
         >
