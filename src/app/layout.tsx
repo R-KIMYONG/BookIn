@@ -6,34 +6,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import TopButton from '@/components/common/ui/TopButton';
 import QueryProvider from '@/shared/providers/QueryProvider';
 import GlobalOverlays from './GlobalOverlays';
-import { Noto_Sans_KR, Noto_Sans_JP, Noto_Sans_SC } from 'next/font/google';
+import { Noto_Sans_KR } from 'next/font/google';
 import { Poppins } from 'next/font/google';
 import { getCurrentUser } from '@/shared/lib/auth/getCurrentUser';
 import { SITE_URL } from '@/shared/constants/site';
 const poppins = Poppins({ subsets: ['latin'], weight: ['600'], variable: '--font-poppins' });
 
 const notoSansKR = Noto_Sans_KR({
-  weight: ['400', '500', '700'],
   subsets: ['latin'],
   variable: '--font-noto-kr',
   display: 'swap',
   preload: true,
-});
-
-const notoSansJP = Noto_Sans_JP({
-  weight: ['400', '500', '700'],
-  subsets: ['latin'],
-  variable: '--font-noto-jp',
-  display: 'swap',
-  preload: false,
-});
-
-const notoSansSC = Noto_Sans_SC({
-  weight: ['400', '500', '700'],
-  subsets: ['latin'],
-  variable: '--font-noto-sc',
-  display: 'swap',
-  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -69,7 +52,7 @@ export default async function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${notoSansKR.variable} ${notoSansJP.variable} ${notoSansSC.variable} ${poppins.variable}`}
+      className={`${notoSansKR.variable} ${poppins.variable}`}
     >
       <body className="bg-white">
         <QueryProvider initialUser={user}>
