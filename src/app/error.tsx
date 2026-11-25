@@ -44,7 +44,7 @@ const GlobalError = ({ error, reset }: GlobalProps) => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-3rem)] w-full bg-gradient-to-b from-white to-zinc-50">
+    <div className="min-h-page w-full bg-gradient-to-b from-white to-zinc-50">
       <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-4 py-16">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[11px] text-zinc-600 shadow-sm">
           <span className="inline-block h-2 w-2 rounded-full bg-red-500" />

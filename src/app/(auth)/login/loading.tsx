@@ -1,7 +1,7 @@
 const Bar = ({ className }: { className: string }) => <div className={`rounded-xl bg-gray-100 ${className}`} />;
 
 const Loading = () => (
-  <div className="min-h-[calc(100vh-3rem)] bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">
+  <div className="min-h-page bg-[#f6f5f7] overflow-hidden flex items-center justify-center px-4">
     <div className="w-full max-w-[420px]">
       <div
         className="rounded-2xl bg-white shadow-[0_20px_60px_-25px_rgba(0,0,0,0.25)] ring-1 ring-black/5 p-6 sm:p-7 animate-pulse"
