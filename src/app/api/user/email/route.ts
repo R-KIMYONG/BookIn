@@ -1,4 +1,3 @@
-import { createClient } from '@/shared/lib/supabase/server';
 import { createAdminClient } from '@/shared/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
@@ -40,10 +39,12 @@ export const PATCH = async (request: NextRequest) => {
       .eq('email', newEmail)
       .maybeSingle();
 
-    if (existingUser) return NextResponse.json({ message: '이미 사용중인 이메일입니다.' }, { status: 409 });
+    if (existingUserError) {
+      console.error('이메일 중복체크 실패:', existingUserError);
+      return NextResponse.json({ message: '이메일 확인 중 오류가 발생했습니다.' }, { status: 500 });
+    }
 
-    if (existingUserError)
-      return NextResponse.json({ message: `이메일 중복체크 실패 => ${existingUserError.message}` }, { status: 500 });
+    if (existingUser) return NextResponse.json({ message: '이미 사용중인 이메일입니다.' }, { status: 409 });
 
     const rawToken = randomUUID(); // UUID 랜덤 생성하고
     const tokenHash = hashToken(rawToken); //랜덤으로 생성한 UUID를 암호화
@@ -63,7 +64,10 @@ export const PATCH = async (request: NextRequest) => {
       })
       .eq('id', user.id);
 
-    if (publicError) return NextResponse.json({ message: publicError.message }, { status: 500 });
+    if (publicError) {
+      console.error('pending_email 저장 실패:', publicError);
+      return NextResponse.json({ message: '이메일 변경 요청 중 오류가 발생했습니다.' }, { status: 500 });
+    }
 
     try {
       //이메일 발송
@@ -77,7 +81,10 @@ export const PATCH = async (request: NextRequest) => {
       //오류나면 update한 데이터를 reset
       const { error: clearPendingError } = await clearEmailChangeState(supabaseAdmin, user.id);
 
-      if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
+      if (clearPendingError) {
+        console.error('pending 초기화 실패:', clearPendingError);
+        return NextResponse.json({ message: '인증 메일 발송에 실패했습니다.' }, { status: 500 });
+      }
 
       return NextResponse.json(
         { message: error instanceof Error ? error.message : '인증 메일 발송에 실패했습니다.' },
@@ -98,7 +105,6 @@ export const PATCH = async (request: NextRequest) => {
 export const DELETE = async () => {
   //1. 현재로그인세션을 확인
   //2. public.users테입르의 pending정보를 reset
-  const supabase = await createClient();
 
   const user = await getCurrentUser();
 
@@ -106,7 +112,10 @@ export const DELETE = async () => {
 
   const { error: clearPendingError } = await clearEmailChangeState(createAdminClient(), user.id);
 
-  if (clearPendingError) return NextResponse.json({ message: clearPendingError.message }, { status: 500 });
+  if (clearPendingError) {
+    console.error('pending 초기화 실패:', clearPendingError);
+    return NextResponse.json({ message: '인증 대기 취소 중 오류가 발생했습니다.' }, { status: 500 });
+  }
 
   return NextResponse.json({ message: '이메일 변경 요청이 취소되었습니다.' }, { status: 200 });
 };

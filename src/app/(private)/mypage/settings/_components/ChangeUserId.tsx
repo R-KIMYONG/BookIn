@@ -98,8 +98,8 @@ const ChangeUserId = ({ email }: { email: string }): ReactElement => {
 
     try {
       await toastMutationPromise(changeUserEmailMutation.mutateAsync(newEmail), { pending: '이메일변경 요청중...' });
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // 토스트에서 이미 안내함
     }
   };
 
@@ -128,8 +128,8 @@ const ChangeUserId = ({ email }: { email: string }): ReactElement => {
   const handleCancelPending = async () => {
     try {
       await toastMutationPromise(clearPendingEmailMutation.mutateAsync(), { pending: '인증 대기 취소중...' });
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // 토스트에서 이미 안내함
     }
   };
 
@@ -140,8 +140,8 @@ const ChangeUserId = ({ email }: { email: string }): ReactElement => {
       await toastMutationPromise(changeUserEmailMutation.mutateAsync(pendingData.pendingEmail), {
         pending: '재요청중...',
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // 토스트에서 이미 안내함
     }
   };
 
@@ -217,7 +217,7 @@ const ChangeUserId = ({ email }: { email: string }): ReactElement => {
           maxLength={40}
           autoComplete="off"
         />
-        <p className="mt-2 text-xs text-gray-400">변경 요청 후 인증 메일을 통해 새 이메일을 확인해야 합니다.</p>
+        <p className="mt-2 text-xs text-gray-600">변경 요청 후 인증 메일을 통해 새 이메일을 확인해야 합니다.</p>
       </div>
 
       <div className="mt-4 flex justify-end">
