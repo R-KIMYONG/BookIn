@@ -13,7 +13,7 @@ const LoginLink = () => {
 
   const redirectTo = isAuthPath(pathname) ? toSafeRedirect(searchParams.get('redirectTo')) : currentUrl;
   return (
-    <Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>
+    <Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`} aria-label='로그인'>
       <CircleUser className="h-6 w-6 text-white" />
     </Link>
   );

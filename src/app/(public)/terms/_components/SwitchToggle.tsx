@@ -1,12 +1,14 @@
 type SwitchToggleProps = {
   checked: boolean;
   onChange: () => void;
+  label: string;
 };
-const SwitchToggle = ({ checked, onChange }: SwitchToggleProps) => {
+const SwitchToggle = ({ checked, onChange, label }: SwitchToggleProps) => {
   return (
     <button
       type="button"
       role="switch"
+      aria-label={label}
       aria-checked={checked}
       onClick={onChange}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${

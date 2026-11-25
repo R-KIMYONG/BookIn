@@ -63,6 +63,7 @@ const SearchResultContainer = ({ keyword, target, category, sort, page }: Search
 
   return (
     <div className="px-1 sm:px-6 md:px-10 flex-1">
+      <h2 className="sr-only">검색 결과</h2>
       <BookListView
         list={searchData?.items ?? []}
         page={page}
