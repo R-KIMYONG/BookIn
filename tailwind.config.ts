@@ -17,7 +17,7 @@ const config: Config = {
         page: 'calc(100dvh - 6rem)',
       },
       fontFamily: {
-        sans: ['var(--font-noto-kr)', 'var(--font-noto-jp)', 'var(--font-noto-sc)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-noto-kr)', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         'trophy-ring': {
