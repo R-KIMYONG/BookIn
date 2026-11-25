@@ -20,7 +20,8 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
           alt=""
           fill
           aria-hidden
-          sizes="(max-width:640px) 40vw, 450px"
+          priority={rank === 1}
+          sizes="64px"
           className="object-cover blur-2xl scale-110"
         />
         <div className="absolute inset-0 bg-black/45" />
