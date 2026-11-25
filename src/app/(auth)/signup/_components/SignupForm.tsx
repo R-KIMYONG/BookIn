@@ -34,7 +34,7 @@ const SignupForm = ({ redirectTo }: { redirectTo: string }) => {
       {/* Email */}
       <div className="mb-3">
         <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-gray-700">
-          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-1 text-red-600">*</span>
           Email
         </label>
         <input
@@ -53,7 +53,7 @@ const SignupForm = ({ redirectTo }: { redirectTo: string }) => {
       {/* Nickname */}
       <div className="mt-3 mb-6">
         <label htmlFor="nickname" className="mb-1.5 block text-xs font-semibold text-gray-700">
-          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-1 text-red-600">*</span>
           Nickname
         </label>
         <input
@@ -66,7 +66,7 @@ const SignupForm = ({ redirectTo }: { redirectTo: string }) => {
           maxLength={8}
           required
         />
-        <p className="mt-1 text-[11px] text-gray-400">최대 8자 / 한글·영문·숫자 가능</p>
+        <p className="mt-1 text-[11px] text-gray-600">최대 8자 / 한글·영문·숫자 가능</p>
       </div>
 
       <FormSubmitButton label="회원가입" loadingText="가입중..." fullWidth />

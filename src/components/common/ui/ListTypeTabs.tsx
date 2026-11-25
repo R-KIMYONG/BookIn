@@ -20,7 +20,6 @@ const ListTypeTabs = ({ tabs, active, onChange }: ListTypeTabsProps) => {
           onClick={() => {
             if (tab !== active) onChange(tab);
           }}
-          disabled={tab === active}
           className="!px-2 !py-1 !text-xs"
         />
       ))}

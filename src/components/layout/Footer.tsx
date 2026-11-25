@@ -81,7 +81,7 @@ const Footer = () => {
           </div>
         </details>
 
-        <p className="pt-6 text-[11px] text-gray-400">© {year} BookIn. Built with Next.js</p>
+        <p className="pt-6 text-[11px] text-gray-600">© {year} BookIn. Built with Next.js</p>
       </div>
     </footer>
   );

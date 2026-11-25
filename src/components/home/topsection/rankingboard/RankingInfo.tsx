@@ -27,7 +27,7 @@ const RankingInfo = () => {
         variant="secondary"
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-0.5 text-[11px] text-gray-400 hover:text-gray-600 transition-colors group"
-        aria-label="랭킹 기준 안내"
+        aria-label="화제성 순, 랭킹 기준 안내"
         aria-expanded={open}
         label="화제성 순"
         rightIcon={<Info className="w-3 h-3 transition-transform duration-300 group-hover:scale-110" />}

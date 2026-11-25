@@ -22,7 +22,7 @@ const ProfileCard = async () => {
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative h-11 w-11 overflow-hidden rounded-full border bg-gray-50 shrink-0">
             <Link href={'/mypage/settings'}>
-              <Image src={avatar} alt="avatarImg" className="object-cover cursor-pointer" sizes="44px" fill />
+              <Image src={avatar} alt="프로필 설정" className="object-cover cursor-pointer" sizes="44px" fill />
             </Link>
           </div>
 
@@ -36,7 +36,7 @@ const ProfileCard = async () => {
             <p className="text-xs text-gray-500 truncate">{user.email}</p>
           </div>
         </div>
-        <Link href={'/mypage/settings'}>
+        <Link href={'/mypage/settings'} aria-label='설정'>
           <Settings className="text-gray-700 w-5 h-5 transform hover:rotate-180 duration-300" />
         </Link>
       </div>

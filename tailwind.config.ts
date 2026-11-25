@@ -13,6 +13,9 @@ const config: Config = {
         main: '#AF5858',
         appBg: '#ffffff',
       },
+      minHeight: {
+        page: 'calc(100dvh - 6rem)',
+      },
       fontFamily: {
         sans: ['var(--font-noto-kr)', 'var(--font-noto-jp)', 'var(--font-noto-sc)', 'system-ui', 'sans-serif'],
       },

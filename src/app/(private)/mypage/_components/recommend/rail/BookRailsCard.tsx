@@ -35,8 +35,8 @@ const BookRailsCard = ({ book }: BookRailsCardProps) => {
         </div>
 
         <div className="mt-2 px-0.5">
-          <h5 className="line-clamp-1 text-sm font-semibold leading-5">{book.title}</h5>
-          <p className="mt-0.5 truncate text-xs text-gray-500">{formatAuthor(book.author)}</p>
+          <h4 className="line-clamp-1 text-sm font-semibold leading-5">{book.title}</h4>
+          <p className="mt-0.5 truncate text-xs text-gray-600">{formatAuthor(book.author)}</p>
         </div>
         <div>
           <BookStats viewCount={book.stats?.view_count ?? 0} commentCount={book.stats?.comment_count ?? 0} />

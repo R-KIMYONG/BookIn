@@ -40,7 +40,7 @@ const CategoryItem = ({ item, disabled, viewCount, commentCount }: CategoryItemP
       </div>
 
       <div className="p-4 flex flex-col gap-2">
-        <h5 className="text-sm leading-5 font-semibold line-clamp-1 min-h-[20px]">{item.title}</h5>
+        <h3 className="text-sm leading-5 font-semibold line-clamp-1 min-h-[20px]">{item.title}</h3>
         <div className="h-[16px] flex items-center justify-between">
           {/* YES24 목록 응답에는 평점이 없어 출판사로 대체 */}
           <span className="text-[11px] text-gray-500 truncate">{item.publisher}</span>

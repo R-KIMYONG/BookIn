@@ -62,7 +62,7 @@ const SessionModal = ({ isOpen, isExpired, onClose, onExtend, onGoLogin, showGoL
               <>
                 <p>로그인 세션이 곧 만료됩니다.</p>
                 <p>계속 이용하시려면 지금 연장해주세요.</p>
-                <p className="text-xs text-gray-400">연장 시 로그인 시간이 2시간으로 초기화됩니다.</p>
+                <p className="text-xs text-gray-600">연장 시 로그인 시간이 2시간으로 초기화됩니다.</p>
 
                 {countDownText && (
                   <p className="text-xs text-gray-500">

@@ -70,6 +70,7 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
             >
               <span className="inline-flex items-center gap-1 rounded-full bg-white text-[#af5858] px-3 py-1 text-[11px] font-bold shadow-sm hover:bg-white/90 transition group">
                 자세히 보기
+                <span className="sr-only">: {book.title}</span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
               </span>
             </Link>
@@ -110,6 +111,7 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
           >
             <span className="inline-flex items-center gap-1 rounded-full bg-white text-[#af5858] px-3 py-2 text-xs font-bold shadow-sm hover:bg-white/90 transition group">
               자세히 보기
+              <span className="sr-only">: {book.title}</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </span>
           </Link>

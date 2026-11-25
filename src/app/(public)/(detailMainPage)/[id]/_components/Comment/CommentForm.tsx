@@ -133,7 +133,7 @@ const CommentForm = ({
             />
 
             {/* 룰 */}
-            <div className="flex items-center justify-between mt-1 text-[11px] text-gray-400 select-none">
+            <div className="flex items-center justify-between mt-1 text-[11px] text-gray-600 select-none">
               <span>Enter 줄바꿈 · ⌘/Ctrl + Enter 등록</span>
 
               <div className="flex items-center gap-3">
@@ -160,7 +160,7 @@ const CommentForm = ({
               disabled={update.isPending}
             />
           </div>
-          <details className="mt-2 text-xs text-gray-400 w-fit">
+          <details className="mt-2 text-xs text-gray-600 w-fit">
             <summary className="cursor-pointer">댓글 작성 가이드</summary>
             <ul className="mt-2 space-y-1.5 pl-3">
               <li>• 타인을 비방하거나 불쾌감을 주는 표현은 제한됩니다</li>

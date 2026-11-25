@@ -9,11 +9,6 @@ import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query
 import { prefetchBookInteractions } from '@/shared/lib/server/entities/prefetchBookInteractions';
 import DetailSidePanel from './DetailSidePanel';
 
-// TODO(D2: 상호작용 itemId 전환) 아래 기능을 itemId 기준으로 복구
-//   - 좋아요·북마크·통계·태그 미리 채우기 (getLikesByIsbnList 등 → HydrationBoundary)
-//   - 조회수 칩
-//   - DetailActionsContainer (좋아요·북마크·메모 버튼), DetailBookmarkTags
-
 type BookInfoServerProps = {
   userId: string | null;
   book: BookDetail;
@@ -63,7 +58,7 @@ const BookInfoServer = async ({ book, userId }: BookInfoServerProps) => {
               <h1 className="text-xl font-bold sm:text-2xl">{book.title}</h1>
               {book.subTitle && <p className="mt-1 text-sm text-gray-500 line-clamp-2">{book.subTitle}</p>}
               <p className="mt-1 text-sm text-gray-700">{book.author}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 {[book.publisher, book.pubDate, book.categoryName, book.pages ? `${book.pages}쪽` : null]
                   .filter(Boolean)
                   .join(' · ')}
@@ -84,7 +79,7 @@ const BookInfoServer = async ({ book, userId }: BookInfoServerProps) => {
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-amber-700">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                   <span className="tabular-nums font-medium">{book.starScore}</span>
-                  <span className="text-amber-500">/ 10</span>
+                  <span className="text-amber-700 font-medium">/ 10</span>
                 </span>
               )}
 
@@ -102,15 +97,15 @@ const BookInfoServer = async ({ book, userId }: BookInfoServerProps) => {
 
             {/* 가격 (YES24 상세 응답 기준, 저장하지 않고 5분 캐시로 표시) */}
             <div className="rounded-xl border px-4 py-4 space-y-3">
-              {hasSale && <div className="text-sm text-gray-400 line-through">정가 {shopPrice.toLocaleString()}원</div>}
+              {hasSale && <div className="text-sm text-gray-600 line-through">정가 {shopPrice.toLocaleString()}원</div>}
 
               <div className="flex items-end gap-2">
                 <span className="text-2xl font-bold text-gray-900">{salePrice.toLocaleString()}원</span>
-                {hasSale && <span className="text-sm font-semibold text-red-500">↓{discount}%</span>}
+                {hasSale && <span className="text-sm font-semibold text-red-700">↓{discount}%</span>}
               </div>
 
               {book.yesPoint > 0 && (
-                <p className="text-xs text-gray-400">구매 시 {book.yesPoint.toLocaleString()}원 적립</p>
+                <p className="text-xs text-gray-600">구매 시 {book.yesPoint.toLocaleString()}원 적립</p>
               )}
 
               <div className="flex items-center gap-3 pt-2">
@@ -136,7 +131,7 @@ const BookInfoServer = async ({ book, userId }: BookInfoServerProps) => {
               </div>
 
               {/* 출처 표기 (YES24 Open API 약관 필수) */}
-              <p className="text-[10px] text-gray-400">도서 정보·가격 제공: YES24 (실제 판매가와 다를 수 있어요)</p>
+              <p className="text-[10px] text-gray-600">도서 정보·가격 제공: YES24 (실제 판매가와 다를 수 있어요)</p>
             </div>
 
             {/* 목차 */}

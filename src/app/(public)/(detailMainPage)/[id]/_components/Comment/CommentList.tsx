@@ -92,7 +92,7 @@ const CommentList = ({
     <div className="flex flex-col gap-4">
       <div className="mt-6 flex items-end justify-between">
         <div>
-          <h3 className="text-lg font-extrabold text-gray-900">코멘트</h3>
+          <h2 className="text-lg font-extrabold text-gray-900">코멘트</h2>
           <p className="mt-1 text-xs text-gray-500">
             총 <span className="font-bold text-[#AF5858]">{formatCount(comments.total)}</span>개
           </p>

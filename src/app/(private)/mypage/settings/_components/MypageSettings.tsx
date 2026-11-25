@@ -79,11 +79,11 @@ const MypageSettings = () => {
 
                 <dl className="mt-3 space-y-3">
                   <div>
-                    <dt className="text-xs text-gray-400">닉네임</dt>
+                    <dt className="text-xs text-gray-600">닉네임</dt>
                     <dd className="mt-1 text-sm font-medium text-gray-900">{userInfo.nickname}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-gray-400">이메일</dt>
+                    <dt className="text-xs text-gray-600">이메일</dt>
                     <dd className="mt-1 break-all text-sm font-medium text-gray-900">{userInfo.email}</dd>
                   </div>
                 </dl>
