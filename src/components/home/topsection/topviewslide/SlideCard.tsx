@@ -40,6 +40,7 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
             alt={book.title}
             fill
             priority={rank === 1}
+            fetchPriority={rank === 1 ? 'high' : 'auto'}
             sizes="45vw"
             className="object-cover rounded-xl shadow-xl ring-1 ring-white/10"
           />
@@ -88,6 +89,7 @@ const SlideCard = ({ book, rank, active }: { book: TopViewType; rank: number; ac
               alt={book.title}
               fill
               priority={rank === 1}
+              fetchPriority={rank === 1 ? 'high' : 'auto'}
               sizes="(max-width:1024px) 35vw, 450px"
               className="object-cover rounded-xl shadow-xl ring-1 ring-white/10"
             />
